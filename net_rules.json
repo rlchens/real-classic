@@ -1,0 +1,28 @@
+[
+    {
+        "id": 1,
+        "priority": 1,
+        "condition": {
+            "urlFilter": "*tankiclassic.com*/play/static/js/main.*.js*",
+            "resourceTypes": ["script"]
+        },
+        "action": {
+            "type": "block"
+        }
+    },
+    {
+        "id": 2,
+        "priority": 2,
+        "condition": {
+            "urlFilter": "*tankionline.com*/*/{3ds,a3d,w3x}",
+            "resourceTypes": ["xmlhttprequest", "other", "sub_frame"]
+        },
+        "action": {
+            "type": "modifyHeaders",
+            "responseHeaders": [{
+                "header": "X-Powered-By",
+                "operation": "remove"
+            }]
+        }
+    }
+]

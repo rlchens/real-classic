@@ -1,0 +1,50 @@
+{
+    "manifest_version": 3,
+    "name": "Real Classic",
+    "version": "0.1",
+    "description": "Mod for Tanki Classic",
+    "host_permissions": [
+        "https://s.eu.tankionline.com/*",
+        "https://tankiclassic.com/*"
+    ],
+    "permissions": [
+        "declarativeNetRequest",
+        "webNavigation",
+        "debugger",
+        "tabs"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [{
+        "resources": [
+            "patched_main.js",
+            "fonts/*.woff2",
+            "assets/*.3ds",
+            "assets/*.a3d",
+            "assets/*.w3x",
+            "**/*"
+        ],
+        "matches": [
+            "https://s.eu.tankionline.com/*",
+            "https://tankiclassic.com/*"
+        ]
+    }],
+    "content_scripts": [{
+        "matches": ["https://tankiclassic.com/play/*"],
+        "js": ["content_script.js"],
+        "run_at": "document_start"
+    }],
+    "declarative_net_request": {
+        "rule_resources": [{
+            "id": "ruleset_1",
+            "path": "net_rules.json",
+            "enabled": true
+        }]
+    },
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }
+}
