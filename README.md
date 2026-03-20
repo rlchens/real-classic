@@ -11,7 +11,7 @@
 
 ![Chat](./images/chat.png)
 ![Flag](./images/flag.png)  
-![Cp2](./images/cp2.png)
+![Cp2](./images/cp2.jpg)
 
 ---
 
