@@ -27,10 +27,7 @@
                 font-weight: normal;
                 font-style: normal;
             }
-            
-            html {
-                font-size: max(min(1.48148vh, 1vw), 3px) !important;
-            }
+
             * {
                 font-family: 'Myriad', sans-serif !important;
             }
