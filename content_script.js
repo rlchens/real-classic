@@ -22,6 +22,12 @@
                 font-style: normal;
             }
             @font-face {
+                font-family: 'Myriad';
+                src: url(chrome-extension://${extId}/fonts/myriad-bold.woff2) format('woff2');
+                font-weight: bold;
+                font-style: normal;
+            }
+            @font-face {
                 font-family: 'Military';
                 src: url(chrome-extension://${extId}/fonts/military.woff2) format('woff2');
                 font-weight: normal;
