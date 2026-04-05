@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Real Classic",
-    "version": "0.6",
+    "version": "0.6.1",
     "description": "Mod for Tanki Classic",
     "host_permissions": [
         "https://s.eu.tankionline.com/*",
