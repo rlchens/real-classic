@@ -83,7 +83,7 @@
                         patchedMain = true;
                         console.log('[INTERCEPT] Blocking original, loading patch...');
                         
-                        const extensionUrl = chrome.runtime.getURL('patched_main.js');
+                        const extensionUrl = chrome.runtime.getURL('patched_main2.js');
                         descriptor.set.call(this, extensionUrl);
                         return;
                     }
@@ -105,7 +105,7 @@
                     if (TARGET_REGEX.test(src) && !patchedMain) {
                         patchedMain = true;
                         console.log('[OBSERVER] Intercepting:', src);
-                        node.src = chrome.runtime.getURL('patched_main.js');
+                        node.src = chrome.runtime.getURL('patched_main2.js');
                     }
                 }
             });

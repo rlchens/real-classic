@@ -18,7 +18,7 @@
     },
     "web_accessible_resources": [{
         "resources": [
-            "patched_main.js",
+            "patched_main2.js",
             "fonts/*.woff2",
             "assets/*.3ds",
             "assets/*.a3d",
