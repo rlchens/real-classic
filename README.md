@@ -20,9 +20,9 @@
 
 ## 📷 Скриншоты
 
-<img width="3838" height="1492" alt="image 92" src="https://github.com/user-attachments/assets/896f0d46-f5fe-409e-9a3e-5dacf9a388d7" />
-<img width="3839" height="1890" alt="image 82" src="https://github.com/user-attachments/assets/dc62ceb4-def6-4db6-887a-d59375ee0e5c" />
-<img width="3840" height="1648" alt="image 95" src="https://github.com/user-attachments/assets/670d9c14-6bc2-47bb-ac29-33d2aa0e16f8" />
+<img width="1919" height="746" alt="image 92" src="https://github.com/user-attachments/assets/896f0d46-f5fe-409e-9a3e-5dacf9a388d7" />
+<img width="1919" height="945" alt="image 82" src="https://github.com/user-attachments/assets/dc62ceb4-def6-4db6-887a-d59375ee0e5c" />
+<img width="1920" height="824" alt="image 95" src="https://github.com/user-attachments/assets/670d9c14-6bc2-47bb-ac29-33d2aa0e16f8" />
 ---
 
 ## 📋 Changelog
