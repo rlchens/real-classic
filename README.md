@@ -1,6 +1,6 @@
 # 🛠️ Real Classic — Мод для Tanki Classic
 
-> **Версия:** 0.7 
+> **Версия:** 0.7.1 
 > **Платформа:** Браузер Chrome
 
 ## Уведомления о новых версиях в Telegram: https://t.me/tanki_classic_real
@@ -20,15 +20,17 @@
 
 ## 📷 Скриншоты
 
-<img width="3839" height="1890" alt="image 82" src="https://github.com/user-attachments/assets/dc62ceb4-def6-4db6-887a-d59375ee0e5c" />
-<img width="3839" height="1883" alt="image 83" src="https://github.com/user-attachments/assets/9c21e065-f1d7-4a76-8f5a-9e61f711e238" />
-<img width="3840" height="1891" alt="image 84" src="https://github.com/user-attachments/assets/ec57ba8f-0d03-4039-bccd-9e24b5f55306" />
-<img width="3840" height="1877" alt="image 85" src="https://github.com/user-attachments/assets/e86b9e23-d1a7-4f25-99a5-e76f4fd44c10" />
-<img width="1496" height="1092" alt="image 86" src="https://github.com/user-attachments/assets/b737d8d7-4f01-477e-9e33-d2008160ba9e" />
-
+<img width="1919" height="746" alt="image 92" src="https://github.com/user-attachments/assets/896f0d46-f5fe-409e-9a3e-5dacf9a388d7" />
+<img width="1919" height="945" alt="image 82" src="https://github.com/user-attachments/assets/dc62ceb4-def6-4db6-887a-d59375ee0e5c" />
+<img width="1920" height="824" alt="image 95" src="https://github.com/user-attachments/assets/670d9c14-6bc2-47bb-ac29-33d2aa0e16f8" />
 ---
 
 ## 📋 Changelog
+
+### v0.7.1
+
+- Добавлена старая графика (пока только на карте Пинг-Понг Лето)
+- Добавил стандартную ночь, а предыдущую переместил в Ночь 2012
 
 ### v0.7
 
