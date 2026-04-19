@@ -1,6 +1,6 @@
 # 🛠️ Real Classic — Мод для Tanki Classic
 
-> **Версия:** 0.7.1 
+> **Версия:** 0.7.2 
 > **Платформа:** Браузер Chrome
 
 ## Уведомления о новых версиях в Telegram: https://t.me/tanki_classic_real
@@ -20,12 +20,24 @@
 
 ## 📷 Скриншоты
 
+
+<img width="1920" height="890" alt="image 107" src="https://github.com/user-attachments/assets/678787ad-85c6-46b3-9134-f85e110e86d8" />
 <img width="1919" height="746" alt="image 92" src="https://github.com/user-attachments/assets/896f0d46-f5fe-409e-9a3e-5dacf9a388d7" />
-<img width="1919" height="945" alt="image 82" src="https://github.com/user-attachments/assets/dc62ceb4-def6-4db6-887a-d59375ee0e5c" />
-<img width="1920" height="824" alt="image 95" src="https://github.com/user-attachments/assets/670d9c14-6bc2-47bb-ac29-33d2aa0e16f8" />
+
 ---
 
 ## 📋 Changelog
+
+### v0.7.2
+
+- Возвращены старый дроп и нара
+- Элементы на танке теперь светятся в ночное время
+- Поправлено распределение освещения для выстрелов пушек
+- Изменено освещение ящиков под старые текстуры + сделаны кастомные иконки и текстура ящика овердрайва (чтобы отличалось от ДД)
+- Метки дропа убраны, кроме голда (в настройках следующей версией добавлю переключение, чтоб можно было вернуть, если надо)
+
+<img width="701" height="472" alt="image 108" src="https://github.com/user-attachments/assets/b36c5f6a-8418-476f-8682-e88d2f7c20f0" />
+
 
 ### v0.7.1
 
