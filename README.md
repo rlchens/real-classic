@@ -1,6 +1,6 @@
 # 🛠️ Real Classic — Мод для Tanki Classic
 
-> **Версия:** 0.7.2 
+> **Версия:** 0.7.3
 > **Платформа:** Браузер Chrome
 
 ## Уведомления о новых версиях в Telegram: https://t.me/tanki_classic_real
@@ -27,6 +27,13 @@
 ---
 
 ## 📋 Changelog
+
+### v0.7.3
+
+- Возвращен туман
+- Туман теперь можно включить и выключить в настройках
+
+<img width="1920" height="945" alt="Group 6" src="https://github.com/user-attachments/assets/e3b6d15a-f1c0-4c98-bd35-f7fcc9ffce41" />
 
 ### v0.7.2
 
