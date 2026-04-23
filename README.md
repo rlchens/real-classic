@@ -1,6 +1,6 @@
 # 🛠️ Real Classic — Мод для Tanki Classic
 
-> **Версия:** 0.7.3
+> **Версия:** 0.7.4
 > **Платформа:** Браузер Chrome
 
 ## Уведомления о новых версиях в Telegram: https://t.me/tanki_classic_real
@@ -27,6 +27,14 @@
 ---
 
 ## 📋 Changelog
+
+### v0.7.4
+
+- Сделана старая графика на карте Тишина Лето
+- В настройки добавлено переключение на старую графику (с ящиками, флагами, скайбоксом), вне битвы без перезахода, в битве с переоткрытием игры
+
+<img width="670" height="190" alt="image 21" src="https://github.com/user-attachments/assets/96c2aacd-7997-43a7-8645-eb71f18dd237" />
+<img width="1920" height="943" alt="image 22" src="https://github.com/user-attachments/assets/23e09581-8606-4977-b319-d2738d523051" />
 
 ### v0.7.3
 
