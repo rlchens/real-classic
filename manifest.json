@@ -8,14 +8,8 @@
         "https://tankiclassic.com/*"
     ],
     "permissions": [
-        "declarativeNetRequest",
-        "webNavigation",
-        "debugger",
-        "tabs"
+        "declarativeNetRequest"
     ],
-    "background": {
-        "service_worker": "background.js"
-    },
     "web_accessible_resources": [{
         "resources": [
             "patched_main.js",
