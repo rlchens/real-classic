@@ -48,6 +48,7 @@
 - Пофикшен вид иконок нары (вместе с автонарой)
 - Возвращены старые краски Электра, Чужой, С любовью
 - Добавлен счетчик онлайна в лобби возле кнопки "В бой"
+- Возвращены старые мины
 
 <img width="438" height="316" alt="image 118" src="https://github.com/user-attachments/assets/48a45a3e-c7e0-46e1-99e2-6380b1002df6" />
 <img width="703" height="437" alt="image 123" src="https://github.com/user-attachments/assets/c388a319-3f3c-45fb-b43c-0b519a2d00b9" />
