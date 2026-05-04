@@ -632,6 +632,109 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					will-change: background;
 				}
 				
+				@keyframes flag-pulse {
+					0% {
+						opacity: 0;
+					}
+					25% {
+						opacity: 1;
+					}
+					50% {
+						opacity: 0.5;
+					}
+					75% {
+						opacity: 0.25;
+					}
+					100% {
+						opacity: 0;
+					}
+				}
+				
+				@keyframes point-pulse {
+					0% {
+						opacity: 0;
+					}
+					25% {
+						opacity: 1;
+					}
+					50% {
+						opacity: 0.5;
+					}
+					75% {
+						opacity: 0.25;
+					}
+					100% {
+						opacity: 0;
+					}
+				}
+				
+				@keyframes flag-dropped-pulse {
+					0% {
+						opacity: 0;
+					}
+					45% {
+						opacity: 1;
+					}
+					55% {
+						opacity: 1;
+					}
+					100% {
+						opacity: 0;
+					}
+				}
+				
+				@keyframes flag-cont-dropped-pulse {
+					0% {
+						opacity: 1;
+					}
+					45% {
+						opacity: 0;
+					}
+					55% {
+						opacity: 0;
+					}
+					100% {
+						opacity: 1;
+					}
+				}
+				
+
+				.flag-delivered::before {
+					content: ' ';
+					background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/flagDelivered.png);
+					animation: flag-pulse 1.5s ease-out forwards !important;
+					will-change: opacity;
+					position: absolute;
+					width: 2rem;
+					height: 2rem;
+					transform: translate(0rem, -0.15rem);
+				}
+				
+				.css-7623cl.flag-delivered::before {
+					transform: translate(-0.2rem, -0.15rem) !important;
+				}
+				
+				.flag-dropped::before {
+					content: ' ';
+					background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redFlagTaken.png);
+					animation: flag-dropped-pulse 2s ease-out forwards infinite !important;
+					will-change: opacity;
+					position: absolute;
+					width: 2rem;
+					height: 2rem;
+					transform: translate(0rem, -0.15rem);
+				}
+				
+				.css-7623cl.flag-dropped::before {
+					background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueFlagTaken.png);
+					transform: translate(-0.2rem, -0.15rem) !important;
+				}
+				
+				.flag-dropped .css-19277fl {
+					animation: flag-cont-dropped-pulse 2s ease-out forwards infinite !important;
+					will-change: opacity;
+				}
+				
 				/* === RANK UP POPUP === */
 			.rank-up-popup-overlay {
 				position: fixed !important;
@@ -701,6 +804,16 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			@keyframes popup-fade-out {
 				from { opacity: 1; transform: scale(1); }
 				to { opacity: 0; transform: scale(1); }
+			}
+			
+			@keyframes blink-opacity {
+				0%, 100% { opacity: 1; }
+				50% { opacity: 0; }
+			}
+			
+			.blink-warning {
+				animation: blink-opacity 1s step-end infinite !important;
+				will-change: opacity;
 			}
 			  
 			  /* loader */
@@ -1088,7 +1201,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  }
 				  
 				  .css-1668k2l > div {
-					text-wrap-mode: nowrap;
+					width: 4rem;
+					text-align: right;
 				  }
 				  
 				  .css-1yuo37v, .css-1il55k3 {
@@ -1102,8 +1216,25 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  
 				  .css-yp9e3w {
 					margin-top: -0.1rem;
-					max-width: 0.825rem !important;
+					max-width: 0.625rem !important;
 					max-height: 0.825rem !important;
+					min-width: 0.625rem !important;
+					min-height: 0.825rem !important;
+				  }
+				  
+				  .css-1qfp3l {
+					  max-width: 0.8rem !important;
+					max-height: 0.9rem !important;
+					min-width: 0.8rem !important;
+					min-height: 0.9rem !important;
+				  }
+				  
+				  .css-10c7xxd {
+					  height: 1.8rem !important;
+				  }
+				  
+				  .css-10c7xxd .css-l5h236 {
+					  height: 1.1rem !important;
 				  }
 
 				  .css-1l2dhqi {
@@ -1163,17 +1294,18 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  }
 				  
 				  .css-1iz973p {
-					  border-image-width: 1.0rem !important;
-					  border-image-slice: 12.4 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/closeButton.svg) !important;
-					  background: transparent !important;
-					  height: 1.5rem !important;
-					  min-width: 1.5rem !important;
-					  padding: 0rem !important;
-					  filter: none !important;
+					  border-image-width: unset !important;
+						border-image-slice: unset !important;
+						border-image-source: unset !important;
+						background: url(chrome-extension://nplapeipenkhbpgmpljmcjonnonkmgfd/assets/closeButton.svg) !important;
+						background-size: cover !important;
+						height: 1.5rem !important;
+						min-width: 1.5rem !important;
+						padding: 0rem !important;
+						filter: none !important;
 				  }
 				  
-				  .css-1yj9w4g {
+				  .css-1yj9w4g, .css-43pyvi {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
 					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redInnerButton.svg) !important;
@@ -1229,6 +1361,36 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  max-width: 1.6rem !important;
 					  min-width: 1.6rem !important;
 					  position: absolute !important;
+				  }
+				  
+				  .css-581flt img[src$="ctf_count.svg"] {
+					    max-width: 1.6rem !important;
+						max-height: 1.6rem !important;
+						min-width: 1.6rem !important;
+						min-height: 1.6rem !important;
+						margin-bottom: -0.3rem;
+				  }
+				  
+				  .css-581flt:has(.css-466b8a) .css-466b8a {
+					  max-width: 1.5rem !important;
+						max-height: 1.5rem !important;
+						min-width: 1.5rem !important;
+						min-height: 1.5rem !important;
+				  }
+				  
+				  .css-581flt:has(.css-466b8a) {
+					  font-size: 1.25rem !important;
+					  font-weight: 600 !important;
+				  }
+				  
+				  .css-581flt:has(.css-466b8a) > div {
+					  padding: 0 0.2rem;
+				  }
+				  
+				  .css-iwcpp3:has(.css-466b8a) {
+					  padding-top: 0.425rem !important;
+					  padding-bottom: 0.425rem !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallArea.svg) !important;
 				  }
 				  
 				  .css-12exf76 {
@@ -1410,6 +1572,95 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  
 				  .css-vqpzl5 .css-qouasq, .css-11t9z04 {
 					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blackSmallArea.svg) !important;
+				  }
+				  
+				  .css-iwcpp3, .css-11q19bv {
+					  border-image-width: 1.6rem !important;
+					  border-image-slice: 21 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleArea.svg) !important;
+					  background: transparent !important;
+				  }
+				  
+				  .point-block {
+					display: flex;
+				  }
+				  
+				  .point-block > div {
+					width: 2.75rem;
+					height: 2.75rem;
+					font-size: 1.3rem;
+					font-weight: bold;
+					color: white;
+					text-align: center;
+					line-height: 3rem;
+					position: relative;
+					border-image-width: 1.7rem;
+					border-image-slice: 19;
+					border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleMiniArea.svg);
+					padding-left: 0.1rem;
+					margin-right: -0.05rem;
+					border-radius: 0.4rem;
+				  }
+				  
+				  .point-block > div::before {
+					content: ' ';
+					width: 2.8rem;
+					height: 2.8rem;
+					font-size: 1.3rem;
+					color: white;
+					text-align: center;
+					line-height: 3rem;
+					left: 0;
+					position: absolute;
+					z-index: 1;
+					border-radius: 0.4rem;
+				  }
+				  
+				  .point-block > div::after {
+					content: ' ';
+					width: 2.8rem;
+					height: 2.8rem;
+					border-right: 0.15rem white solid;
+					left: 0;
+					position: absolute;
+					z-index: 1;
+				  }
+				  
+				  .point-captured::before {
+					  background: white;
+					  animation: point-pulse 1s ease-out forwards !important;
+						will-change: opacity;
+				  }
+    
+				  .point-block > div:last-child::after {
+					  border-right: none;
+				  }
+				  
+				  .css-iwcpp3 {
+					  padding: 0.61rem 0.85rem !important;
+					  font-weight: 400 !important;
+				  }
+				  
+				  .css-11q19bv {
+					  border: none !important;
+					  border-image-width: none !important;
+					  border-image-slice: none !important;
+					  border-image-source: none !important;
+					  background: transparent !important;
+				  }
+				  
+				  .css-1xbh12v {
+					  border-image-width: 1.6rem !important;
+					  border-image-slice: 19 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaLeft.svg) !important;
+					  background: linear-gradient(to left, rgb(0, 67, 137) -10%, rgb(145, 33, 0) 15%) !important;
+				  }
+				  
+				  .css-7623cl {
+					  border-image-width: 1.6rem !important;
+					  border-image-slice: 19 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaRight.svg) !important;
+					  background: linear-gradient(to right, rgb(145, 33, 0) -10%, rgb(0, 67, 137) 15%) !important;
 				  }
 				  
 				  .css-yj108x {
@@ -2007,6 +2258,257 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					display: flex !important;
 					justify-content: space-between !important;
 				}
+				
+				.css-1etbyg9 {
+					bottom: 0.6425rem !important;
+					left: 0.75rem !important;
+					transform: none !important;
+				}
+				
+				.css-1ts3alt {
+					width: 2.86rem !important;
+					height: 2.85rem !important;
+				}
+				
+				.css-w30yle {
+					position: relative !important;
+				}
+				
+				.css-7ppis6 {
+					font-size: 0.75rem !important;
+					font-weight: 400 !important;
+					height: 1rem !important;
+					position: absolute !important;
+					bottom: 0.1rem !important;
+					z-index: 1 !important;
+					right: 0.3rem !important;
+				}
+				
+				.css-1co1t4 {
+					bottom: 4.5rem !important;
+					left: 0.75rem !important;
+				}
+				
+				.css-1oftwpg {
+					bottom: 0.6425rem !important;
+					right: 0.75rem !important;
+					gap: 0.9rem !important;
+				}
+				
+				.css-1xbh12v, .css-7623cl {
+					position: relative !important;
+					width: auto !important;
+					background-color: transparent !important;
+				}
+				
+				.css-1xbh12v {
+					justify-content: flex-start !important;
+					color: rgb(255, 119, 76) !important;
+					padding: 0.545rem 1.2rem 0.545rem 0.8rem !important;
+				}
+				
+				.css-1xbh12v:has(.css-19277fl) {
+					padding: 0.19rem 0.6rem 0.19rem 0.4rem !important;
+				}
+				
+				.css-7623cl {
+					justify-content: flex-end !important;
+					color: rgb(71, 162, 255) !important;
+					padding: 0.545rem 0.8rem 0.545rem 1.2rem !important;
+				}
+				
+				.css-7623cl:has(.css-19277fl) {
+					padding: 0.19rem 0.4rem 0.19rem 0.6rem !important;
+				}
+				
+				.css-19277fl {
+					max-width: 2.25rem !important;
+					max-height: 2.25rem !important;
+					min-width: 2.25rem !important;
+					min-height: 2.25rem !important;
+					padding: 0.141rem 0;
+				}
+				
+				.css-11q19bv {
+					font-size: 1.3rem;
+					border-radius: 0.4rem !important;
+				}
+				
+				.css-1jdwlj, .css-581flt {
+					font-size: 0.87rem !important;
+				}
+				
+				.css-1jdwlj {
+					gap: 0.4rem !important;
+				}
+				
+				.css-1xfzc85 {
+					max-width: 1.3rem !important;
+					max-height: 1.3rem !important;
+					min-width: 1.3rem !important;
+					min-height: 1.3rem !important;
+				}
+				
+				.css-5148o1 {
+					margin-left: -0.15rem;
+				}
+				
+				.css-duplv3 {
+					padding: 0.286rem !important;
+				}
+				
+				.css-1uzjx7n {
+					font-size: 1.25rem !important;
+					font-weight: 400 !important;
+				}
+				
+				.css-n7j3ec, .css-19th4vq, .css-b4tmc9 {
+					gap: 0.357143rem !important;
+				}
+				
+				.css-1793var tr th {
+					padding-top: 0.1075rem !important;
+					padding-bottom: 0.1075rem !important;
+					font-size: 0.8rem !important;
+					font-weight: 400 !important;
+					background-color: rgba(207, 74, 28, 1) !important;
+				}
+				
+				.css-1793var tr th:first-child {
+					border-radius: 0.25rem 0px 0px 0.25rem !important;
+				}
+				
+				.css-1793var tr th:last-child {
+					border-radius: 0px 0.25rem 0.25rem 0px !important;
+				}
+				
+				.css-jk6wcv tr th {
+					padding-top: 0.1075rem !important;
+					padding-bottom: 0.1075rem !important;
+					font-size: 0.8rem !important;
+					font-weight: 400 !important;
+				}
+				
+				.css-jk6wcv tr th:first-child {
+					border-radius: 0.25rem 0px 0px 0.25rem !important;
+				}
+				
+				.css-jk6wcv tr th:last-child {
+					border-radius: 0px 0.25rem 0.25rem 0px !important;
+				}
+				
+				.css-1xoe9z5, .css-2jkz6, .css-f26bpq {
+					height: auto !important;
+				}
+				
+				.css-1793var tr td:first-child {
+					text-align: left !important;
+					padding-left: 0.2rem !important;
+					border-radius: 0.25rem 0px 0px 0.25rem !important;
+				}
+				
+				.css-1793var tr td:last-child {
+					padding-right: 1.285rem !important;
+					border-radius: 0px 0.25rem 0.25rem 0px !important;
+				}
+				
+				.css-1793var tr td {
+					text-align: right !important;
+				}
+				
+				.css-1793var tr td {
+					padding-top: 0rem !important;
+					padding-bottom: 0rem !important;
+					font-size: 0.87rem !important;
+					font-weight: 400 !important;
+				}
+				
+				.css-709jao tr td:first-child {
+					text-align: left !important;
+					padding-left: 0.2rem !important;
+					border-radius: 0.25rem 0px 0px 0.25rem !important;
+				}
+				
+				.css-709jao tr td:last-child {
+					padding-right: 1.285rem !important;
+					border-radius: 0px 0.25rem 0.25rem 0px !important;
+				}
+				
+				.css-709jao tr td {
+					text-align: right !important;
+				}
+				
+				.css-709jao tr td {
+					padding-top: 0rem !important;
+					padding-bottom: 0rem !important;
+					font-size: 0.87rem !important;
+					font-weight: 400 !important;
+					background-color: rgba(52, 77, 104, 0.8) !important;
+				}
+				
+				.css-709jao tr th {
+					background-color: rgba(110, 197, 238, 1) !important;
+				}
+				
+				.css-lfnfpz tr td:first-child {
+					text-align: left !important;
+					padding-left: 0.2rem !important;
+					border-radius: 0.25rem 0px 0px 0.25rem !important;
+				}
+				
+				.css-lfnfpz tr td:last-child {
+					padding-right: 1.285rem !important;
+					border-radius: 0px 0.25rem 0.25rem 0px !important;
+				}
+				
+				.css-lfnfpz tr td {
+					text-align: right !important;
+				}
+				
+				.css-lfnfpz tr td {
+					padding-top: 0rem !important;
+					padding-bottom: 0rem !important;
+					font-size: 0.87rem !important;
+					font-weight: 400 !important;
+				}
+				
+				.css-1xoe9z5, .css-2jkz6, .css-f26bpq {
+					padding: 0.5rem 0.5rem !important;
+				}
+				
+				#modal-root:has(.css-n7j3ec) {
+					background: transparent !important;
+				}
+				
+				#app-root:has(.css-1ayv084) + #modal-root {
+					display: none !important;
+				}				
+				
+				.css-2jkz6 {
+					background-color: rgba(40, 51, 84, 0.9) !important;
+				}
+				
+				.css-1793var, .css-709jao {
+					border-spacing: 0px 0.14285rem !important;
+				}
+				
+				.css-ocvtbc {
+					justify-content: flex-end !important;
+				}
+				
+				.css-a2v00f {
+					max-width: 1.5rem !important;
+					max-height: 1.5rem !important;
+					height: 100% !important;
+					width: 100% !important;
+					position: relative !important;
+					top: -0.05rem !important;
+					margin-left: -0.8rem !important;
+					margin-right: -0.8rem !important;
+					left: unset !important;
+					transform: none !important;
+					z-index: 1;
+				}
     `;
 
     const styleElement = document.createElement('style');
@@ -2051,7 +2553,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				const savedTime = localStorage.getItem('mapTime') || 'day';
 				const savedGraphics = localStorage.getItem('oldGraphics') === 'true';
 				const savedLightmaps = localStorage.getItem('oldLightmaps') === 'true';
-				const timeLabels = { day: 'День', evening: 'Вечер', night: 'Ночь', night2012: 'Ночь 2012', dark: 'Тьма' };
+				const timeLabels = { day: 'День', day2012: 'День 2012', evening: 'Вечер', night: 'Ночь', night2012: 'Ночь 2012', dark: 'Тьма' };
 				const initialLabel = timeLabels[savedTime] || 'День';
 
 				// Создаём ОДИН общий враппер для всех настроек
@@ -2072,6 +2574,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								<div class="css-wiug9j" style="display: none; position: absolute; top: 100%; left: 0; z-index: 999;">
 									<div class="css-16lcb1c" style="background: rgba(20,20,20,0.95); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 4px 0; min-width: 100px; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
 										<div class="css-ce958s" data-value="day" style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; transition: background 0.15s;">День</div>
+										<div class="css-ce958s" data-value="day2012" style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; transition: background 0.15s;">День 2012</div>
 										<div class="css-ce958s" data-value="evening" style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; transition: background 0.15s;">Вечер</div>
 										<div class="css-ce958s" data-value="night" style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; transition: background 0.15s;">Ночь</div>
 										<div class="css-ce958s" data-value="night2012" style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; transition: background 0.15s;">Ночь 2012</div>
@@ -2571,7 +3074,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		);
 		
 		updateCSSZoomVariable(zoomFactor);
-		console.log(baseValue, zoomFactor, vhUnit, vwUnit)
 		
 		document.documentElement.style.fontSize = `${calculatedSize}px`;
 		
@@ -3353,20 +3855,27 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 	}
 	
 	realWindow.rankNames = [
-		'Новобранец', 'Рядовой', 'Ефрейтор', 'Капрал', 'Мастер-капрал', 'Сержант', 'Штаб-сержант', 'Мастер-сержант', 'Первый сержант',
-		'Сержант-майор', 'Уорент-офицер 1', 'Уорент-офицер 2', 'Уорент-офицер 3', 'Уорент-офицер 4', 'Уорент-офицер 5', 'Младший лейтенант', 
-		'Лейтенант', 'Старший лейтенант', 'Капитан', 'Майор', 'Подполковник', 'Полковник', 'Бригадир', 'Генерал-майор',
-		'Генерал-лейтенант', 'Генерал', 'Маршал', 'Фельдмаршал', 'Командор', 'Генералиссимус', 'Легенда'
+		'Новобранец', 'Рядовой', 'Ефрейтор', 'Капрал', 'Мастер-капрал', 
+		'Сержант', 'Штаб-сержант', 'Мастер-сержант', 'Первый сержант', 'Сержант-майор', 
+		'Уорент-офицер 1', 'Уорент-офицер 2', 'Уорент-офицер 3', 'Уорент-офицер 4', 'Уорент-офицер 5', 
+		'Младший лейтенант', 'Лейтенант', 'Старший лейтенант', 'Капитан', 'Майор', 
+		'Подполковник', 'Полковник', 'Бригадир', 'Генерал-майор', 'Генерал-лейтенант', 
+		'Генерал', 'Маршал', 'Фельдмаршал', 'Командор', 'Генералиссимус', 
+		'Легенда'
 	];
 	
 	realWindow.rankScores = [
-		0, 100, 500, 1500, 3700, 7100, 12300, 20000, 29000, 41000, 57000, 76000, 98000, 125000, 156000, 192000, 
-		233000, 280000, 332000, 390000, 455000, 527000, 606000, 692000,
-		787000, 889000, 1000000, 1122000, 1255000, 1400000, 100000000
+		0, 100, 500, 1500, 3700, 
+		7100, 12300, 20000, 29000, 41000, 
+		57000, 76000, 98000, 125000, 156000, 
+		192000, 233000, 280000, 332000, 390000, 
+		455000, 527000, 606000, 692000,	787000, 
+		889000, 1000000, 1122000, 1255000, 1400000, 
+		100000000
 	];
 	
 	// 🔥 ОТДЕЛЬНАЯ ФУНКЦИЯ ДЛЯ АНИМАЦИИ (переиспользуемая)
-	function triggerRankUpAnimation(rankIndex, duration = 1000) {
+	realWindow.triggerRankUpAnimation = (rankIndex, duration = 1000) => {
 		const element = document.querySelector('.css-1irhnvq');
 		if (!element) return;
 		
@@ -3394,7 +3903,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				}
 			}, duration + 100);
 		}
-	}
+	};
 	
 	// 🔥 НОВАЯ ФУНКЦИЯ: ПОКАЗ ПОПАПА
 	function showRankUpPopup(rankIndex) {
@@ -4270,6 +4779,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		const battlesInfo = window.__BATTLES_INFO__;
 		
 		if (!battlesInfo?.battles?.n5_1) return;
+		if (!battlesInfo?.usersTeam?.n5_1) return;
+		if (!battlesInfo?.userScore?.n5_1) return;
 
 		const battleIndex = battlesInfo.battles.n5_1.p6_1.indexOf(window.__SELECTED_BATTLE__);
 		const usersbattleIndex = battlesInfo.users.n5_1.p6_1.indexOf(window.__SELECTED_BATTLE__);
@@ -4436,7 +4947,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				}
 				scoreDiv.textContent = battleScoreCount;
 
-				// 🔥 БЕЗОПАСНОЕ УДАЛЕНИЕ: только если элемент ещё в дереве
 				const placeholder = scoreContainer.querySelector('.css-16k3smd');
 				if (placeholder?.parentNode === scoreContainer) {
 					placeholder.remove();
@@ -4453,7 +4963,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		const timeIndex = roundEndTimesArr?.indexOf(battleId) ?? -1;
 		const timerContainer = selectedBattle.querySelector('.css-ompuv2 .css-ompuv2');
 
-		// 🔥 1. ОЧИСТКА СТАРОГО ИНТЕРВАЛА
 		if (battleTimers.has(battleId)) {
 			const oldTimer = battleTimers.get(battleId);
 			clearInterval(oldTimer.intervalId);
@@ -4469,15 +4978,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			}
 			
 		}
-		// Если нет данных → выходим (НЕ удаляем контейнер!)
 		if (timeIndex === -1 || !timerContainer) {
 			return;
 		}
 
-		// 🔥 2. ПОЛУЧЕНИЕ/СОЗДАНИЕ timerDiv (1 раз)
 		let timerDiv = timerContainer.querySelector('.remaining-time');
 		if (!timerDiv) {
-			// Пытаемся найти плейсхолдер
 			const placeholder = timerContainer.querySelector('.css-16k3smd');
 			if (placeholder?.parentNode === timerContainer) {
 				placeholder.remove();
@@ -4487,7 +4993,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			timerContainer.appendChild(timerDiv);
 		}
 
-		// 🔥 3. ФУНКЦИЯ ОБНОВЛЕНИЯ
 		const tick = () => {
 			if (selectedBattle && selectedBattle.querySelector('.css-ompuv2 .css-ompuv2 .css-1c6n0dp') && selectedBattle.querySelector('.remaining-time')) {
 				selectedBattle.querySelector('.css-ompuv2 .css-ompuv2 .css-1c6n0dp').style.display = '';
@@ -4502,7 +5007,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			}
 			const endTime = battlesInfo.roundEndTimes?.n5_1?.q6_1[timeIndex];
 			
-			// Если данные пропали → останавливаем, но НЕ трогаем DOM
 			if (!endTime) {
 				const timer = battleTimers.get(battleId);
 				if (timer) {
@@ -4514,21 +5018,18 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 
 			const diffMs = endTime.getTime() - Date.now();
 			
-			// 🔥 ВРЕМЯ ВЫШЛО: просто ставим 00:00, НИЧЕГО НЕ УДАЛЯЕМ
 			if (diffMs <= 0) {
 				const timer = battleTimers.get(battleId);
 				if (timer) {
 					clearInterval(timer.intervalId);
 					battleTimers.delete(battleId);
 				}
-				// 🔥 БЕЗОПАСНО: только текст, без remove()
 				if (timerDiv?.parentNode) {
 					timerDiv.textContent = "00:00";
 				}
 				return;
 			}
 
-			// Форматируем и обновляем
 			const totalSec = Math.floor(diffMs / 1000);
 			const m = Math.floor(totalSec / 60);
 			const s = totalSec % 60;
@@ -4538,17 +5039,407 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			}
 		};
 
-		// 🔥 4. ЗАПУСК
 		tick();
 		const intervalId = setInterval(tick, 1000);
 		battleTimers.set(battleId, { intervalId, timerDiv });
 	};
+	
+	realWindow.updateBattleHud = (pointName, progress, team, status) => {
+		const iconMode = document.querySelector('.css-a2v00f');
+		const iconCount = document.querySelector('.css-581flt img[src$="cp_count.88d28925.png"]');
+		const rightHudContainer = document.querySelector('.css-1oftwpg');
+		const rightHudContainerFirstChildren = document.querySelector('.css-iwcpp3');
+		if (window.__OPTIONS_BATTLE__?.h_1) {
+			const battleOptions = window.__OPTIONS_BATTLE__.h_1.map((el) => el.w2_1);
+			if (battleOptions) {
+				if (!battleOptions?.includes('Bonuses') && !battleOptions?.includes('Supplies')) {
+					const supplies = document.querySelector('.css-1etbyg9')
+					if (supplies) supplies.style.display = 'none'
+				}
+			
+				if (!battleOptions?.includes('Ultimates')) {
+					const ultimates = document.querySelector('.css-1co1t4')
+					if (ultimates) ultimates.style.display = 'none'
+				}
+			}
+		}
+		
+		if (iconMode) {
+			if (iconMode.src !== `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.svg`) {
+				iconMode.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.svg`;
+			}
+		}
+		
+		if (iconCount) {
+			if (iconCount.src !== `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.png`) {
+				iconCount.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.png`;
+			}
+		}
+		
+		if (window.__REMAINING_TIME__ === -1) {
+			document.querySelector('.css-1oftwpg .css-iwcpp3 .css-581flt:has(img[src*="clock"])').style.display = 'none'
+		}
+		
+		function sortChildrenAlphabetically(selector, sortBy = 'text') {
+			const container = document.querySelector(selector);
+			if (!container || container.children.length < 2) return;
 
-	// 🔥 ГЛОБАЛЬНАЯ ОЧИСТКА ПРИ УХОДЕ СО СТРАНИЦЫ
+			const sorted = Array.from(container.children).sort((a, b) => {
+				if (sortBy === 'class') {
+					return a.className.localeCompare(b.className);
+				}
+				return a.textContent.trim().localeCompare(b.textContent.trim());
+			});
+
+			sorted.forEach(el => container.appendChild(el));
+		}
+		
+		function pointCaptured(el) {
+			el.classList.add('point-captured');
+			el.dataset.pointCaptured = 'true';
+			
+			const onEnd = () => {
+				el.classList.remove('point-captured');
+				el.dataset.pointCaptured = 'false';
+				el.removeEventListener('animationend', onEnd);
+			};
+			el.addEventListener('animationend', onEnd);
+			
+			setTimeout(() => {
+				if (el.dataset.pointCaptured === 'true') {
+					el.classList.remove('point-captured');
+					el.dataset.pointCaptured = 'false';
+				}
+			}, 1100);
+		}
+		
+		if ((pointName !== undefined) && (progress !== undefined)) {
+			const pointBlock = document.querySelector('.css-1oftwpg .point-block');
+			if (pointBlock) {
+				const hasPointBlock = document.querySelector(`.css-1oftwpg .point-block .point-${pointName}`);
+				if (!hasPointBlock) {
+					window.__SORTED_POINTS__ = false;
+					const point = document.createElement('div');
+					point.className = `point-${pointName}`
+					point.textContent = pointName;
+					pointBlock.appendChild(point);
+				} else {
+					if (team === 'TEAM_A') {
+						hasPointBlock.style.background = `conic-gradient(rgb(145, 33, 0) ${Math.abs(progress) * 3.6}deg, transparent 0deg)`;
+						if (Math.abs(progress) === 100) {
+							hasPointBlock.style.color = 'rgb(255, 119, 76)';
+						} else {
+							hasPointBlock.style.color = 'white';
+						}
+						
+						if (status) {
+							pointCaptured(hasPointBlock)
+						}
+					}
+					if (team === 'TEAM_B') {
+						hasPointBlock.style.background = `conic-gradient(rgb(0, 67, 137) ${Math.abs(progress) * 3.6}deg, transparent 0deg)`;
+						if (Math.abs(progress) === 100) {
+							hasPointBlock.style.color = 'rgb(71, 162, 255)';
+						} else {
+							hasPointBlock.style.color = 'white';
+						}
+						
+						if (status) {
+							pointCaptured(hasPointBlock)
+						}
+					}
+					if (!window.__SORTED_POINTS__) sortChildrenAlphabetically('.point-block', 'text');
+					window.__SORTED_POINTS__ = true;
+					
+					const container = document.querySelector('.point-block');
+					
+					if (container.children.length >= 2) {
+						Array.from(container.children).forEach((el, index) => {
+							if (index === 0) {
+								el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaLeft.svg)`;
+							} else if (index === (container.children.length - 1)) {
+								el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaRight.svg)`;
+							} else {
+								el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaCenter.svg)`;
+							}
+						})
+					}
+				}
+			} else {
+				const newBlock = createScoreBlock();
+				rightHudContainer.insertBefore(newBlock, rightHudContainerFirstChildren);
+				
+				const point = document.createElement('div');
+				point.className = `point-${pointName}`
+				point.textContent = pointName;
+				document.querySelector('.css-1oftwpg .point-block').appendChild(point);
+			}
+		}
+		
+		if (window.__BATTLE_MODE__ === 'JGR') {
+			const secondCounter = document.querySelector('.css-11q19bv');
+			const newCounter = document.querySelector('.css-iwcpp3 .css-466b8a');
+			if (secondCounter) {
+				secondCounter.className = 'css-iwcpp3'
+				secondCounter.innerHTML = `
+					<div class="css-581flt">
+						<img class="css-466b8a" src="${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/scull.c7d3d323.svg">
+						<div>0</div>
+					</div>
+				`;
+			}
+			if (newCounter) {
+				document.querySelector('.css-iwcpp3:has(.css-466b8a) .css-581flt > div').innerHTML = window.__KILLS__
+			}
+		}
+		
+        function createScoreLimitBlock(score) {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'css-581flt';
+			
+			const img = document.createElement('img');
+			img.className = 'css-1xfzc85';
+			img.src = 'chrome-extension://nplapeipenkhbpgmpljmcjonnonkmgfd/tankiclassic.com/play/static/images/scull.c7d3d323.svg';
+			
+			const value = document.createElement('div');
+			value.textContent = score;
+			
+			wrapper.appendChild(img);
+			wrapper.appendChild(value);
+			
+			return wrapper;
+		}
+		
+		function createScoreBlock() {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'point-block';
+			
+			return wrapper;
+		}
+
+		// Использование:
+		if (window.__SCORE_LIMIT__ && (window.__BATTLE_MODE__ === 'DM' || window.__BATTLE_MODE__ === 'JGR')) {
+			if (!document.querySelector('.css-1oftwpg .css-iwcpp3:first-child .css-581flt img[src*="scull"]')) {
+				const clockBlock = document.querySelector('.css-1oftwpg .css-iwcpp3:first-child .css-581flt img[src$="clock.1e1fe192.svg"]')?.closest('.css-581flt');
+				if (clockBlock) {
+					const newBlock = createScoreLimitBlock(window.__SCORE_LIMIT__);
+					clockBlock.parentNode.insertBefore(newBlock, clockBlock);
+				} else {
+					const scoreStats = document.querySelector('.css-1oftwpg .css-iwcpp3:first-child');
+					const newBlock = createScoreLimitBlock(window.__SCORE_LIMIT__);
+					scoreStats.appendChild(newBlock);
+				}
+				
+			} else {
+				const scoreStats = document.querySelector('.css-1oftwpg .css-iwcpp3:first-child .css-581flt > div');
+				scoreStats.innerHTML = window.__SCORE_LIMIT__;
+			}
+		}
+		
+		if ((window.__SCORE_LIMIT__ !== undefined) && (window.__MAX_CURRENT_SCORE__ !== undefined)) {
+			const diff = window.__SCORE_LIMIT__ - window.__MAX_CURRENT_SCORE__;
+			const target = document.querySelector('.css-1oftwpg .css-iwcpp3 .css-581flt:has(img[src$="ctf_count.svg"]) > div')
+			|| document.querySelector('.css-1oftwpg .css-iwcpp3 .css-581flt:has(img[src*="scull"]) > div')
+			|| document.querySelector('.css-1oftwpg .css-iwcpp3 .css-581flt:has(img[src$="dom.png"]) > div');
+			
+			if (target) {
+				if (window.__BATTLE_MODE__ === 'DM' || window.__BATTLE_MODE__ === 'JGR' || window.__BATTLE_MODE__ === 'CP' || window.__BATTLE_MODE__ === 'TDM') {
+					if ((diff < 4) || (window.__SCORE_LIMIT__ < 4)) {
+						target.className = 'blink-warning';
+					} else {
+						target.className = '';
+					}
+				} else if (window.__BATTLE_MODE__ === 'CTF') {
+					if ((diff < 2) || (window.__SCORE_LIMIT__ < 2)) {
+						target.className = 'blink-warning';
+					} else {
+						target.className = '';
+					}
+				}
+				
+			}
+		}
+		
+		
+	}
+	
+	const flagBlinkIntervals = new Map();
+	
+	const FLAG_SRC = {
+		red: {
+			normal: `${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/red_flag.902470b8.png`,
+			taken: `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redFlagTaken.png`
+		},
+		blue: {
+			normal: `${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/blue_flag.3abc6059.png`,
+			taken: `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueFlagTaken.png`
+		}
+	};
+	
+	realWindow.updateFlagsHud = (team, status) => {
+		const redFlag = document.querySelector('.css-1xbh12v .css-19277fl');
+		const redFlagCont = document.querySelector('.css-1xbh12v');
+		const blueFlag = document.querySelector('.css-7623cl .css-19277fl');
+		const blueFlagCont = document.querySelector('.css-7623cl');
+		
+		// 🔥 ФУНКЦИЯ: запуск мигания для команды
+		function startFlagBlink(teamName, flagEl) {
+			if (!flagEl) return;
+			
+			if (flagBlinkIntervals.has(teamName)) return;
+			
+			const originalSrc = flagEl.src;
+			flagEl.dataset.originalSrc = originalSrc;
+			
+			const sources = FLAG_SRC[teamName];
+			let isTaken = true;
+			
+			const intervalId = setInterval(() => {
+				flagEl.src = isTaken ? sources.taken : sources.normal;
+				isTaken = !isTaken;
+			}, 500);
+			
+			flagBlinkIntervals.set(teamName, intervalId);
+		}
+		
+		function stopFlagBlink(teamName, flagEl) {
+			const intervalId = flagBlinkIntervals.get(teamName);
+			if (intervalId) {
+				clearInterval(intervalId);
+				flagBlinkIntervals.delete(teamName);
+				
+				if (flagEl && flagEl.dataset.originalSrc) {
+					flagEl.src = flagEl.dataset.originalSrc;
+					delete flagEl.dataset.originalSrc;
+				}
+			}
+		}
+		
+		if (team === 'red' && status === 'delivered') {
+			flagDelivered(blueFlagCont);
+			stopFlagBlink('red', redFlag);
+			redFlag.src = FLAG_SRC.red.normal;
+		}
+		if (team === 'blue' && status === 'delivered') {
+			flagDelivered(redFlagCont);
+			stopFlagBlink('blue', redFlag);
+			blueFlag.src = FLAG_SRC.blue.normal;
+		}
+		
+		if (team === 'red' && status === 'dropped') {
+			redFlagCont.classList.add('flag-dropped');
+			stopFlagBlink('red', redFlag);
+			redFlag.src = FLAG_SRC.red.normal;
+		}
+		if (team === 'blue' && status === 'dropped') {
+			blueFlagCont.classList.add('flag-dropped');
+			stopFlagBlink('blue', redFlag);
+			blueFlag.src = FLAG_SRC.blue.normal;
+		}
+		if (team === 'red' && status === 'taken') {
+			if (redFlagCont.className.includes('flag-dropped')) {
+				redFlagCont.classList.remove('flag-dropped');
+			}
+			startFlagBlink('red', redFlag);
+		}
+		if (team === 'blue' && status === 'taken') {
+			if (blueFlagCont.className.includes('flag-dropped')) {
+				blueFlagCont.classList.remove('flag-dropped');
+			}
+			startFlagBlink('blue', blueFlag);
+		}
+		if (team === 'red' && status === 'base') {
+			if (redFlagCont.className.includes('flag-dropped')) {
+				redFlagCont.classList.remove('flag-dropped');
+			}
+			stopFlagBlink('red', redFlag);
+			redFlag.src = FLAG_SRC.red.normal;
+		}
+		if (team === 'blue' && status === 'base') {
+			if (blueFlagCont.className.includes('flag-dropped')) {
+				blueFlagCont.classList.remove('flag-dropped');
+			}
+			stopFlagBlink('blue', redFlag);
+			blueFlag.src = FLAG_SRC.blue.normal;
+		}
+		
+		function flagDelivered(el) {
+			el.classList.add('flag-delivered');
+			el.dataset.flagDelivered = 'true';
+			
+			const onEnd = () => {
+				el.classList.remove('flag-delivered');
+				el.dataset.flagDelivered = 'false';
+				el.removeEventListener('animationend', onEnd);
+			};
+			el.addEventListener('animationend', onEnd);
+			
+			setTimeout(() => {
+				if (el.dataset.flagDelivered === 'true') {
+					el.classList.remove('flag-delivered');
+					el.dataset.flagDelivered = 'false';
+				}
+			}, 1600);
+		}
+	}
+	
+	let __remainingTimeIntervalId = null;
+
+	realWindow.startRemainingTimeCountdown = () => {
+		if (__remainingTimeIntervalId !== null) {
+			return;
+		}
+		
+		if (!window.__REMAINING_TIME__ || window.__REMAINING_TIME__ <= 0) {
+			return;
+		}
+		
+		__remainingTimeIntervalId = setInterval(() => {
+			if (window.__REMAINING_TIME__ > 0) {
+				window.__REMAINING_TIME__--;
+				
+				const timerEl = document.querySelector('.css-1oftwpg .css-iwcpp3 .css-581flt:has(img[src*="clock"]) > div')
+				if (timerEl) {
+					const m = Math.floor(window.__REMAINING_TIME__ / 60);
+					const s = window.__REMAINING_TIME__ % 60;
+					if (m === 0 && s < 31) {
+						timerEl.className = 'blink-warning';
+					} else {
+						timerEl.className = '';
+					}
+				}
+			}
+			
+			if (window.__REMAINING_TIME__ <= 0) {
+				stopRemainingTimeCountdown();
+				
+				if (typeof window.__ON_TIME_UP__ === 'function') {
+					window.__ON_TIME_UP__();
+				}
+			}
+		}, 1000);
+	}
+
+	function stopRemainingTimeCountdown() {
+		if (__remainingTimeIntervalId !== null) {
+			clearInterval(__remainingTimeIntervalId);
+			__remainingTimeIntervalId = null;
+		}
+	}
+	
+	realWindow.__FLAG_KILLFEED_STARTED__ = false
+
 	window.addEventListener('beforeunload', () => {
+		stopRemainingTimeCountdown();
 		battleTimers.forEach(timer => clearInterval(timer.intervalId));
 		battleTimers.clear();
 	});
+	
+	if (!window.__NICK_RENDER_TRACKER__) {
+		realWindow.__NICK_RENDER_TRACKER__ = new Map(); 
+		realWindow.__NICK_RENDER_PRETRACKER__ = new Map(); 
+		realWindow.__RENDER_TICK__ = '0';                 
+	}
 
 	
 	// === MONITORING DOM ===
@@ -4657,6 +5548,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					const containerRight = document.getElementById('toasts-container-right')
 					if (containerCenter) containerCenter.remove()
 					if (containerRight) containerRight.remove()
+					document.querySelectorAll('.css-1mi2jwo').forEach((el) => el.remove())
 				}
 			});
 			
@@ -4826,7 +5718,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         1153: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/overheat.89c0e772.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/overheat.89c0e772.svg"
         }
         ,
         1196: (t, n, i) => {
@@ -7286,7 +8178,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         5680: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/overheat.c5da6580.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/overheat.c5da6580.svg"
         }
         ,
         5741: (t, n, i) => {
@@ -13043,6 +13935,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					if (t.bpc_1.w2_1 === 'JOIN_THE_BATTLE') {
 						if (!window.__BATTLE_USERS__.get(t.apc_1.zru_1.toString())) {
 							let userObject = {}
+							userObject.userId = t.apc_1.zru_1.toString()
 							userObject.userName = t.apc_1.arv_1
 							userObject.userRank = t.apc_1.brv_1
 							userObject.hasPremium = t.apc_1.crv_1
@@ -13728,6 +14621,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 }
                 function DC() {}
                 function UC(t, n, i, r, e, s, u, _, a, o, h, c, f, l) {
+                    window.__SCORE_LIMIT__ = _;
+                    window.__OPTIONS_BATTLE__ = o;
+                    setTimeout(() => window.updateBattleHud(), 100)
                     o = o === al ? _v() : o,
                     h = h === al ? null : h,
                     c = c === al ? null : c,
@@ -27845,7 +28741,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						  window.__BATTLES_INFO__.score = window._.cloneDeep(h);
 						  window.__BATTLES_INFO__.roundEndTimes = roundEndTimes;
                         i = n.mpg(al, al, h, al, al, al, al, al, al, o)
-						//console.log('t instanceof MS', t, MS);
                     } else if (t instanceof LS) {
 						const usersTeamCont = (t, n, i) => {
                             for (var r = Dv(n.zpf_1, i), e = n.bpg_1, s = Ml(Ol(e.s())), u = e.h1().m(); u.o(); ) {
@@ -27882,7 +28777,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  window.__BATTLES_INFO__.usersTeam = usersTeam;
 					  window.__BATTLES_INFO__.userScore = userScore;
                         i = n.mpg(al, al, al, al, al, usersTeamCont(0, n, t.tph_1), userScoreCont(0, n, t.tph_1));
-						//console.log('t instanceof LS', t, LS);
                     } else if (t instanceof DS) {
 						let roundEndTimes = window._.cloneDeep(Yv(n.fpg_1, t.uph_1));
 						  roundEndTimes.n5_1.p6_1 = roundEndTimes.n5_1.p6_1.map((el) => el ? el.toString() : el);
@@ -27897,11 +28791,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						 window.__BATTLES_INFO__.roundEndTimes = roundEndTimes;
 						window.__BATTLES_INFO__.fund = fund;
                         i = n.mpg(al, al, al, al, al, al, al, al, al, Yv(n.fpg_1, t.uph_1), al, Yv(n.hpg_1, t.uph_1));
-						//console.log('t instanceof DS', t, DS);
                     } else if (t instanceof jS) {
 						window.__BATTLES_INFO__.loaded = !0;
                         i = n.mpg(!0);
-						//console.log('t instanceof jS', t, jS);
                     } else if (t instanceof kS) {
                         var c = uv(n.xpf_1, Ll(t.npg_1, (r = t.ppg_1,
                         e = t.qpg_1,
@@ -27943,7 +28835,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  window.__BATTLES_INFO__.users = users;
 					  window.__BATTLES_INFO__.creators = window._.cloneDeep(v);
                         i = n.mpg(al, c, l, f, v)
-						//console.log('t instanceof kS', t, kS);
                     } else if (t instanceof zS) {
 						let battles = window._.cloneDeep(Yv(n.xpf_1, t.rpg_1));
 							  battles.n5_1.p6_1 = battles.n5_1.p6_1.map((el) => el ? el.toString() : el);
@@ -27977,7 +28868,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  window.__BATTLES_INFO__.creators = window._.cloneDeep(Yv(n.apg_1, t.rpg_1));
 					  window.__BATTLES_INFO__.alreadySeeBattleInfo = window._.cloneDeep(Ov(n.gpg_1, t.rpg_1));
                         i = n.mpg(al, Yv(n.xpf_1, t.rpg_1), al, Yv(n.zpf_1, t.rpg_1), Yv(n.apg_1, t.rpg_1), al, al, al, al, al, Ov(n.gpg_1, t.rpg_1));
-						//console.log('t instanceof zS', t, zS);
                     } else if (t instanceof SS) {
 						let battles = window._.cloneDeep(uv(n.xpf_1, Ll(t.spg_1, Dv(n.xpf_1, t.spg_1).opi(al, al, al, al, al, al, t.tpg_1))));
 							  battles.n5_1.p6_1 = battles.n5_1.p6_1.map((el) => el ? el.toString() : el);
@@ -28000,7 +28890,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							  });
 						window.__BATTLES_INFO__.battles = battles;
                         i = n.mpg(al, uv(n.xpf_1, Ll(t.spg_1, Dv(n.xpf_1, t.spg_1).opi(al, al, al, al, al, al, t.tpg_1))));
-						//console.log('t instanceof SS', t, SS);
                     } else if (t instanceof CS) {
 						let battles = window._.cloneDeep(uv(n.xpf_1, Ll(t.upg_1, Dv(n.xpf_1, t.upg_1).opi(al, al, al, al, al, al, al, al, al, al, al, al, al, t.vpg_1))));
 							  battles.n5_1.p6_1 = battles.n5_1.p6_1.map((el) => el ? el.toString() : el);
@@ -28023,7 +28912,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							  });
 						window.__BATTLES_INFO__.battles = battles;
                         i = n.mpg(al, uv(n.xpf_1, Ll(t.upg_1, Dv(n.xpf_1, t.upg_1).opi(al, al, al, al, al, al, al, al, al, al, al, al, al, t.vpg_1))));
-						//console.log('t instanceof CS', t, CS);
                     } else if (t instanceof TS) {
                         i = function(t, n, i) {
                             for (var r = n.aph_1, e = Zl(Pl(r, 10)), s = r.m(); s.o(); ) {
@@ -28094,10 +28982,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							
                             return i.mpg(al, al, al, b, al, k, I, M, Hv(i.epg_1, D))
                         }(0, t, n);
-						//console.log('t instanceof TS', t, TS);
                     } else if (t instanceof IS) {
                         i = this.xph(new TS(t.cph_1,tv(t.dph_1),t.eph_1), n);
-						//console.log('t instanceof IS', t, IS);
                     } else if (t instanceof AS) {
                         var w = Dv(n.zpf_1, t.fph_1)
                           , d = uv(n.zpf_1, Ll(t.fph_1, Ov(w, t.gph_1)))
@@ -28131,49 +29017,39 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							window.__BATTLES_INFO__.userSuspicion = window._.cloneDeep(m);
 							window.__BATTLES_INFO__.userSuspicionByIp = window._.cloneDeep(b);
                         i = n.mpg(al, al, al, d, al, g, p, m, b)
-						//console.log('t instanceof AS', t, AS);
                     } else if (t instanceof NS) {
 						let userScore = window._.cloneDeep(uv(n.cpg_1, Ll(t.iph_1, t.jph_1)));
 						  userScore.n5_1.p6_1 = userScore.n5_1.p6_1.map((el) => el ? el.toString() : el);
 						window.__BATTLES_INFO__.userScore = userScore;
                         i = n.mpg(al, al, al, al, al, al, uv(n.cpg_1, Ll(t.iph_1, t.jph_1)));
-						//console.log('t instanceof NS', t, NS);
                     } else if (t instanceof OS) {
 						window.__BATTLES_INFO__.userSuspicion = window._.cloneDeep(uv(n.dpg_1, Ll(t.nph_1, t.oph_1)));
 						window.__BATTLES_INFO__.userSuspicionByIp = window._.cloneDeep(uv(n.epg_1, Ll(t.nph_1, t.pph_1)));
                         i = n.mpg(al, al, al, al, al, al, al, uv(n.dpg_1, Ll(t.nph_1, t.oph_1)), uv(n.epg_1, Ll(t.nph_1, t.pph_1)));
-						//console.log('t instanceof OS', t, OS);
                     } else if (t instanceof ES) {
                         var q = uv(Dv(n.ypf_1, t.wpg_1), Ll(t.xpg_1, t.ypg_1));
 						window.__BATTLES_INFO__.score = window._.cloneDeep(uv(n.ypf_1, Ll(t.wpg_1, q)));
                         i = n.mpg(al, al, uv(n.ypf_1, Ll(t.wpg_1, q)))
-						//console.log('t instanceof ES', t, ES);
                     } else {
 						if (t instanceof yS) {
 							i = new qS;
-							//console.log('t instanceof yS', t, yS);
 						} else if (t instanceof US) {
 							window.__BATTLES_INFO__.alreadySeeBattleInfo = window._.cloneDeep(Pv(n.gpg_1, t.yph_1));
 							i = n.mpg(al, al, al, al, al, al, al, al, al, al, Pv(n.gpg_1, t.yph_1));
-							//console.log('t instanceof US', t, US);
 						} else if (t instanceof PS) {
 							let fund = window._.cloneDeep(uv(n.hpg_1, Ll(t.kph_1, t.lph_1)));
 							  fund.n5_1.p6_1 = fund.n5_1.p6_1.map((el) => el ? el.toString() : el);
 							window.__BATTLES_INFO__.fund = fund;
 							i = n.mpg(al, al, al, al, al, al, al, al, al, al, al, uv(n.hpg_1, Ll(t.kph_1, t.lph_1)));
-							//console.log('t instanceof PS', t, PS);
 						} else if (t instanceof RS) {
 							window.__BATTLES_INFO__.proLimit = window._.cloneDeep(t.qph_1);
 							i = n.mpg(al, al, al, al, al, al, al, al, al, al, al, al, t.qph_1);
-							//console.log('t instanceof RS', t, RS);
 						} else if (t instanceof BS) {
 							window.__BATTLES_INFO__.isLimitReached = window._.cloneDeep(t.vph_1);
 							i = n.mpg(al, al, al, al, al, al, al, al, al, al, al, al, al, t.vph_1);
-							//console.log('t instanceof BS', t, BS);
 						} else if (t instanceof FS) {
 							window.__BATTLES_INFO__.reEnterProtectBattleId = window._.cloneDeep(t.wph_1);
 							i = n.mpg(al, al, al, al, al, al, al, al, al, al, al, al, al, al, t.wph_1);
-							//console.log('t instanceof FS', t, FS);
 						} else {
 							i = n;
 						}
@@ -28539,6 +29415,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 ,
                 ol(jC).zpm = function(t, n, i, r, e, s, u, _, a, o, h, c, f, l, v, w, d, p, m, g, b, q, $, x, y, j, k, z) {
 					if (this?.coy_1?.w2_1) window.__BATTLE_MODE__ = this.coy_1.w2_1
+					if (g) {
+						window.__REMAINING_TIME__ = g
+						window.startRemainingTimeCountdown()
+					}
                     return t = t === al ? this.aoy_1 : t,
                     n = n === al ? this.boy_1 : n,
                     i = i === al ? this.coy_1 : i,
@@ -28796,32 +29676,54 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                           , d = t.ypn_1
                           , p = t.zpn_1;
                         i = n.zpm(e, s, al, u, _, a, o, al, al, !1, al, f, r, al, al, al, al, c, !1, h, al, l, v, w, d, p)
-                    } else if (t instanceof BC)
+                    } else if (t instanceof BC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, t.apo_1);
-                    else if (t instanceof EC)
+                    } else if (t instanceof EC) {
                         i = n.zpm(al, al, t.dpn_1);
-                    else if (t instanceof TC)
+                    } else if (t instanceof TC) {
                         i = n.zpm(al, al, al, al, al, al, al, t.epn_1);
-                    else if (t instanceof IC)
+                    } else if (t instanceof IC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, t.fpn_1);
-                    else if (t instanceof SC)
+                    } else if (t instanceof SC) {
+						window.__MAX_CURRENT_SCORE__ = t.bpn_1;
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, uv(n.loy_1, Ll(t.apn_1, t.bpn_1)));
-                    else if (t instanceof CC)
+                    } else if (t instanceof CC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, t.cpn_1);
-                    else if (t instanceof AC)
+                    } else if (t instanceof AC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !1, al, !1);
-                    else if (t instanceof NC)
+                    } else if (t instanceof NC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, t.gpn_1);
-                    else if (t instanceof VC)
+                    } else if (t instanceof VC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !0, al, al, !(n.soy_1 && !n.poy_1) && n.soy_1);
-                    else if (t instanceof WC)
+                    } else if (t instanceof WC) {
                         i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !1);
-                    else if (t instanceof YC) {
+                    } else if (t instanceof YC) {
                         var m = tE();
                         i = n.zpm(al, al, al, al, al, al, al, al, al, !1, al, m, al, al, null, !1, !0, al, !1)
-                    } else
-                        i = t instanceof DC ? n.zpm(al, al, al, al, al, al, al, al, al, !0) : t instanceof ZC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !1) : t instanceof XC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !n.soy_1) : t instanceof PC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, _w(t.hpn_1)) : t instanceof OC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, t.ipn_1) : t instanceof RC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, null) : t instanceof JC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !0) : t instanceof QC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !1) : t instanceof FC ? new jC : t instanceof KC ? n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, t.bpo_1) : n;
-                    return i
+                    } else if (t instanceof DC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, !0) 
+                    } else if (t instanceof ZC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !1) 
+                    } else if (t instanceof XC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !n.soy_1)
+                    } else if (t instanceof PC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, _w(t.hpn_1))
+                    } else if (t instanceof OC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, t.ipn_1)
+                    } else if (t instanceof RC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, null) 
+                    } else if (t instanceof JC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !0) 
+                    } else if (t instanceof QC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, al, !1) 
+                    } else if (t instanceof FC) {
+						i = new jC
+                    } else if (t instanceof KC) {
+						i = n.zpm(al, al, al, al, al, al, al, al, al, al, al, al, al, t.bpo_1)
+                    } else {
+						i = n;
+                    } 
+					return i
                 }
                 ,
                 ol(rE).dpo = function(t, n, i, r, e, s, u, _, a, o, h, c, f) {
@@ -29023,9 +29925,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 ,
                 ol($E).epp = function(t, n) {
                     var i;
-                    if (t instanceof sE)
+                    if (t instanceof sE) {
                         i = new rE;
-                    else if (t instanceof uE) {
+                    } else if (t instanceof uE) {
                         var r = t.fpo_1.m35_1
                           , e = Pv(n.zp7_1, r)
                           , s = uv(n.ap8_1, Ll(r, t.fpo_1.f33()))
@@ -29072,21 +29974,35 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         }
                         var Z = Hv(n.cp8_1, W);
                         i = n.epo(w, q, z, Z, G, A, L)
-                    } else if (t instanceof aE)
+                    } else if (t instanceof aE) {
                         i = n.epo(al, al, uv(n.bp8_1, Ll(t.jpo_1, t.kpo_1)));
-                    else if (t instanceof oE)
+                    } else if (t instanceof oE) {
                         i = n.epo(al, al, al, ow(n.cp8_1, t.lpo_1));
-                    else if (t instanceof wE)
+                    } else if (t instanceof wE) {
+						if (t.upo_1.m35_1.toString() === window.__SELF_ID__) window.__KILLS__ = t.upo_1.k35_1
+						setTimeout(() => window.updateBattleHud(), 100)
                         i = n.epo(al, al, al, al, al, al, uv(n.fp8_1, Ll(t.upo_1.m35_1, t.upo_1)));
-                    else if (t instanceof dE) {
+                    } else if (t instanceof dE) {
                         for (var J = t.vpo_1, Q = Zl(Pl(J, 10)), tt = J.m(); tt.o(); ) {
                             var nt = tt.p()
                               , it = Ll(nt.m35_1, nt);
                             Q.j(it)
                         }
                         i = n.epo(al, al, al, al, al, al, Hv(n.fp8_1, Q))
-                    } else
-                        i = t instanceof pE ? n.epo(al, al, al, al, al, al, al, uv(n.gp8_1, Ll(t.wpo_1, t.xpo_1))) : t instanceof bE ? n.epo(al, al, al, al, al, al, al, al, al, uv(n.ip8_1, Ll(t.bpp_1, t.cpp_1))) : t instanceof qE ? n.epo(Ov(n.zp7_1, t.dpp_1)) : t instanceof hE ? n.epo(al, al, al, al, uv(n.dp8_1, Ll(t.fpp_1, t.gpp_1))) : t instanceof cE ? n.epo(al, al, al, al, al, al, al, al, al, al, al, t.npo_1 ? Pv(n.kp8_1, t.mpo_1) : Ov(n.kp8_1, t.mpo_1), t.opo_1 ? Pv(n.lp8_1, t.mpo_1) : Ov(n.lp8_1, t.mpo_1)) : t instanceof fE ? n.epo(al, al, al, al, al, al, al, al, al, al, al, hw(t.ppo_1), hw(t.qpo_1)) : t instanceof eE ? n.epo(al, al, al, al, al, function(t, n) {
+					} else if (t instanceof pE) {
+						i = n.epo(al, al, al, al, al, al, al, uv(n.gp8_1, Ll(t.wpo_1, t.xpo_1)));
+					} else if (t instanceof bE) {
+						i = n.epo(al, al, al, al, al, al, al, al, al, uv(n.ip8_1, Ll(t.bpp_1, t.cpp_1)));
+					} else if (t instanceof qE) {
+						i = n.epo(Ov(n.zp7_1, t.dpp_1));
+					} else if (t instanceof hE) {
+						i = n.epo(al, al, al, al, uv(n.dp8_1, Ll(t.fpp_1, t.gpp_1)));
+					} else if (t instanceof cE) {
+						i = n.epo(al, al, al, al, al, al, al, al, al, al, al, t.npo_1 ? Pv(n.kp8_1, t.mpo_1) : Ov(n.kp8_1, t.mpo_1), t.opo_1 ? Pv(n.lp8_1, t.mpo_1) : Ov(n.lp8_1, t.mpo_1));
+					} else if (t instanceof fE) {
+						i = n.epo(al, al, al, al, al, al, al, al, al, al, al, hw(t.ppo_1), hw(t.qpo_1));
+					} else if (t instanceof eE) {
+						i = n.epo(al, al, al, al, al, function(t, n) {
                             for (var i = Ml(Ol(n.s())), r = n.h1().m(); r.o(); ) {
                                 var e, s = r.p(), u = s.i2();
                                 switch (s.j2().x2_1) {
@@ -29116,7 +30032,19 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 i.p2(s, _)
                             }
                             return i
-                        }(0, n.fp8_1)) : t instanceof lE ? n.epo(al, al, al, al, al, al, al, al, al, al, ow(n.jp8_1, t.rpo_1)) : t instanceof vE ? n.epo(al, al, al, al, al, al, al, al, al, al, uv(n.jp8_1, Ll(t.spo_1, t.tpo_1))) : t instanceof mE ? n.epo(al, al, al, al, al, al, al, al, uv(n.hp8_1, Ll(t.ypo_1, t.zpo_1))) : t instanceof gE ? n.epo(al, al, al, al, al, al, al, al, Yv(n.hp8_1, t.app_1)) : n;
+                        }(0, n.fp8_1));
+					} else if (t instanceof lE) {
+						i = n.epo(al, al, al, al, al, al, al, al, al, al, ow(n.jp8_1, t.rpo_1));
+					} else if (t instanceof vE) {
+						debugger
+						i = n.epo(al, al, al, al, al, al, al, al, al, al, uv(n.jp8_1, Ll(t.spo_1, t.tpo_1)));
+					} else if (t instanceof mE) {
+						i = n.epo(al, al, al, al, al, al, al, al, uv(n.hp8_1, Ll(t.ypo_1, t.zpo_1)));
+					} else if (t instanceof gE) {
+						i = n.epo(al, al, al, al, al, al, al, al, Yv(n.hp8_1, t.app_1));
+                    } else {
+						i = n;
+					}
                     return i
                 }
                 ,
@@ -52059,7 +52987,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         n.display = "flex",
                         n.flexDirection = "column",
                         n.gap = ed(16) / 16 + "rem",
-                        n.width = Ww(45) + "vw",
+                        n.width = P?.isBattleResults ? "41.4285rem" : "36.5725rem",
                         t.className = sw(n);
                         var i = function(t, n) {
                             return function(i) {
@@ -52148,7 +53076,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                     var e = t.children;
                                     od(i, e)
                                 } else {
-                                    Vw(i, "div", Kj);
                                     var s = function(t) {
                                         return function(n) {
                                             var i = {};
@@ -52420,6 +53347,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 var e = [t].slice()
                                   , s = [sw({})]
                                   , u = e.concat(s);
+                                window.isFinishResult = n.isFinishResult;
                                 r.className = uw.apply(null, [].slice.call(u.slice())),
                                 Vw(r, "colgroup", sk),
                                 Vw(r, "thead", fk);
@@ -52454,7 +53382,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     Vw(t, "col", ak),
                     Vw(t, "col", ok),
                     Vw(t, "col", hk),
-                    Vw(t, "col", ck),
+                    window.isFinishResult && (Vw(t, "col", ck)),
                     $w
                 }
                 function uk(t) {
@@ -52517,20 +53445,23 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     Vw(t, "th", dk),
                     Vw(t, "th", pk),
                     Vw(t, "th", mk),
-                    Vw(t, "th", gk),
+                    window.isFinishResult && (Vw(t, "th", gk)),
                     $w
                 }
                 function vk(t) {
                     qk();
                     return t.className = sw({
+						paddingLeft: '1.285rem !important',
+						textAlign: 'left',
                         backgroundColor: "#06110680"
                     }),
-                    od(t, "Имя"),
+                    od(t, "Позывной"),
                     $w
                 }
                 function wk(t) {
                     qk();
                     return t.className = sw({
+						textAlign: 'right',
                         backgroundColor: "#06110680"
                     }),
                     od(t, "Счёт"),
@@ -52539,6 +53470,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 function dk(t) {
                     qk();
                     return t.className = sw({
+						textAlign: 'right',
                         backgroundColor: "#06110680"
                     }),
                     od(t, "Уничтожено"),
@@ -52547,6 +53479,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 function pk(t) {
                     qk();
                     return t.className = sw({
+						textAlign: 'right',
                         backgroundColor: "#06110680"
                     }),
                     od(t, "Подбит"),
@@ -52555,14 +53488,18 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 function mk(t) {
                     qk();
                     return t.className = sw({
+						paddingRight: window.isFinishResult ? '' : '1.285rem !important',
+						textAlign: 'right',
                         backgroundColor: "#06110680"
                     }),
-                    od(t, "У/УП"),
+                    od(t, "У/П"),
                     $w
                 }
                 function gk(t) {
                     qk();
                     return t.className = sw({
+						paddingRight: '1.285rem !important',
+						textAlign: 'right',
                         backgroundColor: "#06110680"
                     }),
                     od(t, "Приз"),
@@ -52583,7 +53520,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                         n.className = sw(i);
                                         var r = function(t) {
                                             return function(n) {
-                                                return n.src = me.b1eu(t.g1ew_1, !1, zp()),
+												const isPremium = window.__ONLINE_USERS_PREMIUM__[window.__ONLINE_USERS_NAMES__.indexOf(t.f1ew_1)];
+                                                return n.src = me.b1eu(t.g1ew_1, isPremium, zp()),
                                                 $w
                                             }
                                         }(t);
@@ -52643,7 +53581,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                             $w
                         }
                         );
-                        return Vw(r, "td", c),
+                        return n.isFinishResult && (Vw(r, "td", c)),
                         $w
                     }
                 }
@@ -52767,7 +53705,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                                 i.width = Ww(100) + "%",
                                                 n.className = sw(i);
                                                 var r = t.x2_1;
-                                                return n.src = 4 === r ? di : 2 === r ? wi : 3 === r ? vi : "",
+                                                let src = 4 === r ? di : 2 === r ? wi : 3 === r ? vi : "";
+												if ((4 === r ? di : 2 === r ? wi : 3 === r ? vi : "").includes('ctf_mode.fba37902.svg')) {
+													src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/ctf_count.svg`
+												}
+                                                return n.src = src,
                                                 $w
                                             }
                                         }(t);
@@ -52994,7 +53936,35 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         lK(n, "background", "linear-gradient(180deg, #999999 0%, #808080 25%, #4D4D4D 50%, #333333 75%, #666666 100%)");
                         var s = ed(3) / 16 + "rem"
                           , u = hK().j1eu_1;
-                        if (n.border = Ww(s) + " " + Ww("solid") + " " + Ww(u),
+                        
+                        var a = function(t, n) {
+							return function(i) {
+								var r = {};
+								r.width = Ww(2) + "rem",
+								r.display = "flex",
+								r.justifyContent = "center",
+								r.alignItems = "center",
+								r.backgroundColor = "#661A007A",
+								r.color = "#fff",
+								r.gap = Ww(.5) + "rem";
+								var e = Ww(.5) + "rem"
+								  , s = Ww(1) + "rem";
+								r.padding = Ww(e) + " " + Ww(s),
+								i.className = sw(r),
+
+								t.battleType.equals(Ap()) && Vw(i, "img", Mk);
+								var u = function(t) {
+                                    return function(n) {
+                                        return od(n, t),
+                                        $w
+                                    }
+                                }(n);
+                                return Vw(i, "div", u),
+                                $w
+							}
+						}(i, r);
+                        Vw(t, "div", a);
+						if (n.border = Ww(s) + " " + Ww("solid") + " " + Ww(u),
                         n.borderRadius = ed(8) / 16 + "rem",
                         t.className = sw(n),
                         i.battleType.equals(Tp()) || i.battleType.equals(Ip())) {
@@ -53016,46 +53986,20 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                             }(i);
                             Vw(t, "img", _)
                         }
-                        var a = function(t, n) {
-                            return function(i) {
-                                var r = {};
-                                r.width = Ww(2) + "rem",
-                                r.display = "flex",
-                                r.justifyContent = "center",
-                                r.alignItems = "center",
-                                r.backgroundColor = "#661A007A",
-                                r.color = "#fff",
-                                r.gap = Ww(.5) + "rem";
-                                var e = Ww(.5) + "rem"
-                                  , s = Ww(1) + "rem";
-                                r.padding = Ww(e) + " " + Ww(s),
-                                i.className = sw(r),
-                                t.battleType.equals(Ap()) && Vw(i, "img", Mk);
-                                var u = function(t) {
-                                    return function(n) {
-                                        return od(n, t),
-                                        $w
-                                    }
-                                }(n);
-                                return Vw(i, "div", u),
-                                $w
-                            }
-                        }(i, r);
-                        Vw(t, "div", a);
                         var o = function(t, n) {
-                            return function(i) {
-                                var r = {};
-                                r.width = Ww(2) + "rem",
-                                r.display = "flex",
-                                r.justifyContent = "center",
-                                r.alignItems = "center",
-                                r.backgroundColor = "#002C586E",
-                                r.color = "#fff",
-                                r.gap = Ww(.5) + "rem";
-                                var e = Ww(.5) + "rem"
-                                  , s = Ww(1) + "rem";
-                                r.padding = Ww(e) + " " + Ww(s),
-                                i.className = sw(r);
+							return function(i) {
+								var r = {};
+								r.width = Ww(2) + "rem",
+								r.display = "flex",
+								r.justifyContent = "center",
+								r.alignItems = "center",
+								r.backgroundColor = "#002C586E",
+								r.color = "#fff",
+								r.gap = Ww(.5) + "rem";
+								var e = Ww(.5) + "rem"
+								  , s = Ww(1) + "rem";
+								r.padding = Ww(e) + " " + Ww(s),
+								i.className = sw(r);
                                 var u = function(t) {
                                     return function(n) {
                                         return od(n, t),
@@ -53065,8 +54009,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 return Vw(i, "div", u),
                                 t.battleType.equals(Ap()) && Vw(i, "img", Lk),
                                 $w
-                            }
-                        }(i, e);
+							}
+						}(i, e);
                         return Vw(t, "div", o),
                         $w
                     }
@@ -55821,7 +56765,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     return function(n) {
                         var i = wC()
                           , r = function(t) {
-							  //debugger
                             return function(n) {
                                 var i = {};
                                 return i.backgroundColor = $C().a1f4(xp()),
@@ -72856,9 +73799,14 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 e.className = AW().d1fr_1;
                                 var s = function(t, n, i) {
 									// RANK SCORE STRIPE
-									const baseScore = window.rankScores[window.rankNames.indexOf(i)]
-									t = t - baseScore
-									n = n - baseScore
+									let baseScore = 0;
+									if (i) {
+										baseScore = window.rankScores[window.rankNames.indexOf(i)]
+									}
+									if (baseScore) {
+										t = t - baseScore
+										n = n - baseScore
+									}
 									
                                     return function(i) {
                                         var r = [AW().b1fr_1].slice()
@@ -77348,7 +78296,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         12e3: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/suicide.aaf32a67.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/suicide.aaf32a67.svg"
         }
         ,
         12017: (t, n, i) => {
@@ -79902,7 +80850,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         16147: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/red_flag.902470b8.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/red_flag.902470b8.png"
         }
         ,
         16173: (t, n, i) => {
@@ -80792,7 +81740,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         17908: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/blue_flag.3abc6059.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/blue_flag.3abc6059.png"
         }
         ,
         17952: (t, n, i) => {
@@ -93596,7 +94544,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         28361: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/freezing.7f014edf.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/freezing.7f014edf.svg"
         }
         ,
         28380: (t, n, i) => {
@@ -93664,7 +94612,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         29512: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/freezing.bff72869.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/freezing.bff72869.svg"
         }
         ,
         29518: (t, n, i) => {
@@ -103054,10 +104002,15 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					}
 					t.h_1.forEach((user) => {
 						let userObject = {}
+						userObject.userId = user.m35_1.toString()
 						userObject.userName = user.h35_1
 						userObject.userRank = user.g35_1
 						userObject.hasPremium = user.f35_1
 						userObject.team = 'NONE'
+						if (user.m35_1.toString() === window.__SELF_ID__) {
+							window.__KILLS__ = user.k35_1
+							setTimeout(() => window.updateBattleHud(), 100)
+						}
 						
 						window.__BATTLE_USERS__.set(user.m35_1.toString(), userObject)
 					})
@@ -103126,6 +104079,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					}
 					t.h_1.forEach((user) => {
 						let userObject = {}
+						userObject.userId = user.m35_1.toString()
 						userObject.userName = user.h35_1
 						userObject.userRank = user.g35_1
 						userObject.hasPremium = user.f35_1
@@ -103145,6 +104099,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					}
 					t.h_1.forEach((user) => {
 						let userObject = {}
+						userObject.userId = user.m35_1.toString()
 						userObject.userName = user.h35_1
 						userObject.userRank = user.g35_1
 						userObject.hasPremium = user.f35_1
@@ -103231,8 +104186,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                           , h = null != o && Kt(o, Yt) ? o : Wt()
                           , c = function(t) {
                             var n = t.b3d_1;
+							window.__RENDER_TICK__ = String(parseInt(window.__RENDER_TICK__ || '0') + 1);
+							window.__NICK_RENDER_PRETRACKER__ = new Map();
 							window.__BATTLE_USERS__.forEach((user) => {
-								user.team = user.team === 'TEAM_A' ? 'TEAM_B' : 'TEAM_A'
+								user.team = user?.team === 'TEAM_A' ? 'TEAM_B' : 'TEAM_A'
 								window.__BATTLE_USERS__.set(user.userId, user)
 							})
 							window.__BLUE_FLAG_CHANGED__ = false
@@ -106588,6 +107545,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 function Ij(t, n, name) {
                     return function() {
                         var i = t ? new bx(n) : gx(n);
+                        if (name.includes('suicide.aaf32a67.svg')) {
+                            i.name = 'suicide'
+                        }
 						// Supplies
 						if (name.includes('repairWithoutBackground.b9e452b0.svg')) {
                             i.name = 'repairWithoutBackground'
@@ -128881,8 +129841,15 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         i[r] = arguments[r];
                     var u = (0,
                     e.J)(i, t.registered, void 0);
-					//console.log(t.key + "-" + u.name);
-					//if ((t.key + "-" + u.name)?.includes('css-3qnlp')) debugger
+					//debugger
+					
+					if ((t.key + "-" + u.name)?.includes('css-12gl1uk')) debugger
+					if ((t.key + "-" + u.name)?.includes('css-7623cl')) {
+						//debugger
+						setTimeout(() => {
+							window.updateBattleHud()
+						}, 100)
+					}
                     return (0,
                     s.sk)(t, u, !1),
                     t.key + "-" + u.name
@@ -134620,12 +135587,22 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 case 6:
                     var r = ha
                       , e = ca;
+					  let isBattleHud = false;
+					  if (i.memoizedProps.className === "css-1mi2jwo") {
+						  isBattleHud = true;
+					  }
                     ha = null,
                     fa(t, n, i),
                     ca = e,
-                    null !== (ha = r) && (ca ? (t = ha,
-                    i = i.stateNode,
-                    8 === t.nodeType ? t.parentNode.removeChild(i) : t.removeChild(i)) : ha.removeChild(i.stateNode));
+                    null !== (ha = r) && (
+						ca ? (
+							t = ha,
+							i = i.stateNode,
+							8 === t.nodeType ? 
+								!isBattleHud ? t.parentNode.removeChild(i) : setTimeout(() => t.parentNode.removeChild(i), 27000)
+								: !isBattleHud ? t.removeChild(i) : setTimeout(() => t.removeChild(i), 27000)
+						) : !isBattleHud ? ha.removeChild(i.stateNode) : setTimeout(() => ha.removeChild(i.stateNode), 27000)
+					);
                     break;
                 case 18:
                     null !== ha && (ca ? (t = ha,
@@ -191452,6 +192429,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 }
                 function Ac(t, n) {
 				// === ЗАМЕНА 3DS
+				if (t.includes('44/31167700274234') && JSON.parse(localStorage.getItem('oldGraphics'))) {
+					t = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/mine/object.3ds`;
+				}
                     if (
                         t.includes('31167700275754') // флаги
                         || t.includes('31167700273743')
@@ -203182,7 +204162,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         77396: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/suicide.fa6ce4b0.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/suicide.fa6ce4b0.svg"
         }
         ,
         77603: (t, n, i) => {
@@ -204156,7 +205136,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         79777: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/tank-found-ic.b8ba4b47.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/tank-found-ic.b8ba4b47.png"
         }
         ,
         79836: (t, n, i) => {
@@ -262688,6 +263668,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							window.__BATTLE_FEED_RIGHT__.push({ type: 'neutralizedOurPoint', point })
 						}
 						if (pointStatus?.includes('captured') && point) {
+							window.updateBattleHud(point, 100, window.__BATTLE_USERS__.get(window.__SELF_ID__).team === 'TEAM_A' ? 'TEAM_A' : 'TEAM_B', true)
 							window.__BATTLE_FEED_CENTER__.push({ type: 'capturedOurPoint', point })
 							window.__BATTLE_FEED_RIGHT__.push({ type: 'capturedOurPoint', point })
 						}
@@ -262699,6 +263680,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							window.__BATTLE_FEED_RIGHT__.push({ type: 'neutralizedEnemyPoint', point })
 						}
 						if (pointStatus?.includes('captured') && point) {
+							window.updateBattleHud(point, 100, window.__BATTLE_USERS__.get(window.__SELF_ID__).team === 'TEAM_A' ? 'TEAM_B' : 'TEAM_A', true)
 							window.__BATTLE_FEED_CENTER__.push({ type: 'capturedEnemyPoint', point })
 							window.__BATTLE_FEED_RIGHT__.push({ type: 'capturedEnemyPoint', point })
 						}
@@ -272382,22 +273364,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                             window.__WEAPON_SKIN_NAMES__.push(n.v6t_1.h_1[0].name)
                             
                             if (n.v6t_1.h_1[0].name.includes('fire')) {
-								if (!window.__FIRE_ID2__) {
-									window.__FIRE_ID2__ = 1
-								} else {
-									window.__FIRE_ID2__++
-								}
 								if (window.__FIRE_COLOR__[0]) {
 									window.__FIRE_COLOR__[0].h_1[0].sel_1.name = n.v6t_1.h_1[0].name
-									window.__FIRE_COLOR__[0].h_1[0].sel_1.id = window.__FIRE_BUFFER__[window.__FIRE_ID2__ - 1].id
 									window.__FIRE_COLOR__[0].h_1[1].sel_1.name = n.v6t_1.h_1[0].name
-									window.__FIRE_COLOR__[0].h_1[1].sel_1.id = window.__FIRE_BUFFER__[window.__FIRE_ID2__ - 1].id
 									window.__FIRE_COLOR__[0].h_1[2].sel_1.name = n.v6t_1.h_1[0].name
-									window.__FIRE_COLOR__[0].h_1[2].sel_1.id = window.__FIRE_BUFFER__[window.__FIRE_ID2__ - 1].id
 									window.__FIRE_COLOR__[0].h_1[3].sel_1.name = n.v6t_1.h_1[0].name
-									window.__FIRE_COLOR__[0].h_1[3].sel_1.id = window.__FIRE_BUFFER__[window.__FIRE_ID2__ - 1].id
 									window.__FIRE_COLOR__[0].h_1[4].sel_1.name = n.v6t_1.h_1[0].name
-									window.__FIRE_COLOR__[0].h_1[4].sel_1.id = window.__FIRE_BUFFER__[window.__FIRE_ID2__ - 1].id
 								}
 								
 								if (window.__FIRE_COLOR__[0]) window.__FIRE_COLOR__.shift()
@@ -307473,7 +308445,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 var f = i.l84().w87().r(c)
                                   , l = new CS(f.e83(),f.w86_1,f.l1t())
                                   , v = r.x9e_1.m2(l);
-                                  //debugger // Mesh
                                 if (null != v) {
                                     var w = null
                                       , d = n.w9e();
@@ -316790,6 +317761,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         var n = function(n) {
                             return function(t, n) {
                                 var i = t.cwp(n.ax5_1);
+								window.__FLAG_KILLFEED_STARTED__ = true;
+								if (i.nwo_1.w2_1 === 'TEAM_A') {
+									window.updateFlagsHud('red', 'taken')
+								}
+								if (i.nwo_1.w2_1 === 'TEAM_B') {
+									window.updateFlagsHud('blue', 'taken')
+								}
 								window.__BATTLE_FEED_CENTER__.push({ type: 'flagTaken', team: i.nwo_1.w2_1, id: n.bx5_1.toString() })
 								window.__BATTLE_FEED_RIGHT__.push({ type: 'flagTaken', id: n.bx5_1.toString() })
                                 i.xwu();
@@ -316818,6 +317796,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         var n = function(n) {
                             return function(t, n) {
                                 var i, r, e = t.cwp(n.px4_1);
+								window.__FLAG_KILLFEED_STARTED__ = true;
+								if (e.nwo_1.w2_1 === 'TEAM_A') {
+									window.updateFlagsHud('red', 'dropped')
+								}
+								if (e.nwo_1.w2_1 === 'TEAM_B') {
+									window.updateFlagsHud('blue', 'dropped')
+								}
 								window.__BATTLE_FEED_CENTER__.push({ type: 'dropFlag', team: e.nwo_1.w2_1, id: e.rwo_1.toString() })
 								window.__BATTLE_FEED_RIGHT__.push({ type: 'dropFlag', id: e.rwo_1.toString() })
                                 e.swo_1.equals(jft()) && Qlt(t).twp(e, n.qx4_1),
@@ -316866,6 +317851,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         var n = function(n) {
                             return function(t, n) {
                                 var i = t.cwp(n.dwp_1);
+								window.__FLAG_KILLFEED_STARTED__ = true;
+								if (i.nwo_1.w2_1 === 'TEAM_A') {
+									window.updateFlagsHud('red', 'base')
+								}
+								if (i.nwo_1.w2_1 === 'TEAM_B') {
+									window.updateFlagsHud('blue', 'base')
+								}
 								if (n.ewp_1) {
 									window.__BATTLE_FEED_CENTER__.push({ type: 'returnedFlagUser', team: i.nwo_1.w2_1, id: n.ewp_1.toString() })
 									window.__BATTLE_FEED_RIGHT__.push({ type: 'returnedFlagUser', team: i.nwo_1.w2_1, id: n.ewp_1.toString() })
@@ -316890,6 +317882,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         var n = function(n) {
                             return function(t, n) {
                                 var i = t.cwp(n.xx4_1);
+								window.__FLAG_KILLFEED_STARTED__ = true;
+								if (i.nwo_1.w2_1 === 'TEAM_A') {
+									window.updateFlagsHud('red', 'delivered')
+								}
+								if (i.nwo_1.w2_1 === 'TEAM_B') {
+									window.updateFlagsHud('blue', 'delivered')
+								}
 								window.__BATTLE_FEED_CENTER__.push({ type: 'flagDelivered', team: i.nwo_1.w2_1, id: i.rwo_1.toString() })
 								window.__BATTLE_FEED_RIGHT__.push({ type: 'flagDelivered', team: i.nwo_1.w2_1, id: i.rwo_1.toString() })
                                 ovt(t, i),
@@ -318122,6 +319121,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                       , r = hht(this.buy_1, i);
                     null != r && this.auy_1.qxe(r);
                     var e, s, u = this.euy_1, _ = Math.abs(u);
+					//console.log(this?.auy_1?.xx5_1, this.euy_1); // points progress
+					window.updateBattleHud(this?.auy_1?.xx5_1, this.euy_1, i?.w2_1)
                     this.auy_1.za4(_),
                     (s = (e = this).euy_1 * e.fuy_1) > 0 || 0 === e.euy_1 && 0 !== e.fuy_1 ? e.zux_1.exe() : s < 0 ? e.zux_1.dxe() : e.zux_1.cxe(),
                     function(t) {
@@ -326390,7 +327391,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         Amt(function(t) {
                             var n = t.wxx_1;
 							if (window.__SELF_ID__ === t?.vxx_1?.ewa_1?.toString()) {
-								triggerRankUpAnimation(t.bxy_1)
+								window.triggerRankUpAnimation(t.bxy_1)
 							}
 							if (window.__BATTLE_USERS__.get(t?.vxx_1?.ewa_1?.toString())) {
 								let userObject = window.__BATTLE_USERS__.get(t.vxx_1.ewa_1.toString())
@@ -393951,12 +394952,42 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         }
                     }
 					
-					// FLAGS
-					if (n?.l4a_1?.v6t_1?.h_1 && n?.l4a_1?.v6t_1?.h_1[0]?.isChanged) {
-						(n.e3x(t.a3p_1), n.c3x(t.p3o_1), t.g3o_1.r1t(n))
-						return
+					const nickObj = n?.l4a_1?.v6t_1?.h_1?.[0];
+					const nickName = nickObj?.name;
+
+					if (nickName) {
+						const tracker = window.__NICK_RENDER_TRACKER__;
+						const pretracker = window.__NICK_RENDER_PRETRACKER__;
+						const currentTick = window.__RENDER_TICK__ || '0';
+						let lastTick = tracker.get(nickName) || '-1';
+						if (nickObj?.isChanged) {
+							if (!pretracker.get(nickName)) {
+								n.e3x(t.a3p_1);
+								n.c3x(t.p3o_1);
+								t.g3o_1.r1t(n);
+								pretracker.set(nickName, '5');
+								
+							} else if (parseInt(pretracker.get(nickName)) > 0) {
+								n.e3x(t.a3p_1);
+								n.c3x(t.p3o_1);
+								t.g3o_1.r1t(n);
+								pretracker.set(nickName, String(parseInt(pretracker.get(nickName)) - 1));
+							} else {
+								
+							}
+						}
+						if (parseInt(lastTick) < parseInt(currentTick)) {
+							n.e3x(t.a3p_1);
+							n.c3x(t.p3o_1);
+							t.g3o_1.r1t(n);
+
+							tracker.set(nickName, currentTick);
+							
+							return; 
+						}
 					}
 					
+					// FLAGS
 					if (n?.l4a_1?.v6t_1?.h_1 && n?.l4a_1?.v6t_1?.h_1[0]?.name?.includes('redFlag')) {
                         if (!window.__RED_FLAG_RENDERED__) {
                             window.__RED_FLAG_RENDERED__ = true;
@@ -404359,12 +405390,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     var zt = this.h3o_1[Sc().x2_1]
                       , St = 0
                       , Ct = zt.s();
-                    if (St < Ct)
+                    if (0)
                         do {
                             var Et = St;
                             St = St + 1 | 0,
                             zt.r(Et).r41(this, n)
-                        } while (St < Ct);
+                        } while (0);
                     var Tt = this.h3o_1[Cc().x2_1]
                       , It = 0
                       , At = Tt.s();
@@ -405510,6 +406541,24 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						var mult = DARK_MULT;
 						var off  = DARK_OFF;
 						var dir  = DARK_DIR;
+						n.b3p_1.u3q_1.k3e_1 = mult[0];
+						n.b3p_1.u3q_1.l3e_1 = mult[1];
+						n.b3p_1.u3q_1.m3e_1 = mult[2];
+						n.b3p_1.u3q_1.n3e_1 = 1;
+						  
+						n.b3p_1.v3q_1.s3q_1.k3e_1 = off[0];
+					    n.b3p_1.v3q_1.s3q_1.l3e_1 = off[1];
+					    n.b3p_1.v3q_1.s3q_1.m3e_1 = off[2];
+					    n.b3p_1.v3q_1.s3q_1.n3e_1 = 1;
+						
+						n.b3p_1.v3q_1.t3q_1.n1j_1 = dir[0];
+					    n.b3p_1.v3q_1.t3q_1.o1j_1 = dir[1];
+					    n.b3p_1.v3q_1.t3q_1.p1j_1 = dir[2];
+					}
+					if (localStorage.getItem('mapTime') === 'day2012') {
+						var mult = DAY_MULT;
+						var off  = DAY_OFF;
+						var dir  = DAY_DIR;
 						n.b3p_1.u3q_1.k3e_1 = mult[0];
 						n.b3p_1.u3q_1.l3e_1 = mult[1];
 						n.b3p_1.u3q_1.m3e_1 = mult[2];
@@ -408046,9 +409095,24 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							this.m5i_1.b5i_1.l4a_1.v6t_1.h_1[0].w80_1 = changeColorNick.texture
 						}
 					}
+                    let isSuicide = false;
+                    let suicideWidth = 0;
+                    let suicideHeight = 0;
+                    if (this.m5i_1.b5i_1.l4a_1.v6t_1.h_1[0].name === 'suicide') {
+                        isSuicide = true;
+                        if (window.outerHeight > window.outerWidth) {
+                            suicideWidth = window.outerWidth / 5;
+                            suicideHeight = window.outerWidth / 5;
+                        } else {
+                            suicideWidth = window.outerHeight / 5;
+                            suicideHeight = window.outerHeight / 5;
+                        }
+                    }
                     r.k3u(i.a55_1, this.m5i_1.h3z()),
-                    r.n3r(i.y54_1, Zp().n5i_1.o5c_1, Zp().n5i_1.p5c_1, this.m5i_1.r3m_1.p1j_1),
-                    r.o3r(i.x54_1, n.a3m_1.j1s(), n.a3m_1.i1s(), Zp().n5i_1.q5c_1, Zp().n5i_1.r5c_1),
+                    isSuicide ? r.n3r(i.y54_1, (window.outerWidth / 2) - (suicideWidth / 2), (window.outerHeight / 2) - suicideHeight, this.m5i_1.r3m_1.p1j_1)
+                    : r.n3r(i.y54_1, Zp().n5i_1.o5c_1, Zp().n5i_1.p5c_1, this.m5i_1.r3m_1.p1j_1),
+                    isSuicide ? r.o3r(i.x54_1, n.a3m_1.j1s(), n.a3m_1.i1s(), suicideWidth, suicideHeight)
+                    : r.o3r(i.x54_1, n.a3m_1.j1s(), n.a3m_1.i1s(), Zp().n5i_1.q5c_1, Zp().n5i_1.r5c_1),
                     r.o3r(i.w54_1, this.m5i_1.g5i_1 - this.m5i_1.e5i_1, this.m5i_1.e5i_1, this.m5i_1.h5i_1 - this.m5i_1.f5i_1, this.m5i_1.f5i_1),
                     t.q4b(i.z54_1, this.m5i_1.b5i_1),
                     t.o4b(t.w3p_1)
@@ -411722,7 +412786,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						if (e.colorMultiplier) t.a3p_1.o3r(e.colorMultiplier, mult[0], mult[1], mult[2], mult[3]);
 						if (e.colorOffset)     t.a3p_1.o3r(e.colorOffset,     off[0],  off[1],  off[2],  off[3]);
 					}
-					if (localStorage.getItem('mapTime') === 'day') {
+					if (localStorage.getItem('mapTime') === 'day' || localStorage.getItem('mapTime') === 'day2012') {
 						var mult = DAY_MULT;
 						var off  = DAY_OFF;
 						if (e.colorMultiplier) t.a3p_1.o3r(e.colorMultiplier, mult[0], mult[1], mult[2], mult[3]);
@@ -414215,7 +415279,96 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         }
 						
                         if (i?.n3y_1.includes('Flag')) {
-                            if (window.__BATTLE_MODE__ === 'CTF') this.j4h_1 = Yw();
+                            if (window.__BATTLE_MODE__ === 'CTF') {
+								this.j4h_1 = Yw();
+								
+								if (window.__BATTLE_USERS__?.get(window.__SELF_ID__)?.team === 'TEAM_A') {
+									if (this.n7k_1.l4a_1.v6t_1.h_1[0]?.name === 'redFlag') {
+										console.log(window.__FLAG_KILLFEED_STARTED__)
+										if (!window.__FLAG_KILLFEED_STARTED__) {
+											if (!window.__FLAG_POS_BLUE__) {
+												window.__FLAG_POS_BLUE__ = { x: i.a3z_1[12], y: i.a3z_1[13]};
+											}
+											if ((i.a3z_1[12] !== window.__FLAG_POS_BLUE__.x) || (i.a3z_1[13] !== window.__FLAG_POS_BLUE__.y)) {
+												window.__FLAG_KILLFEED_STARTED__ = true;
+												window.updateFlagsHud('blue', 'taken')
+											} else {
+												if ((i.a3z_1[12] % 10 === 0) && (i.a3z_1[13] % 10 === 0)) {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('blue', 'base')
+												} else {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('blue', 'taken')
+												}
+											}
+											window.__FLAG_POS_BLUE__ = { x: i.a3z_1[12], y: i.a3z_1[13] };
+										}
+									}
+									
+									if (this.n7k_1.l4a_1.v6t_1.h_1[0]?.name === 'blueFlag') {
+										if (!window.__FLAG_KILLFEED_STARTED__) {
+											if (!window.__FLAG_POS_RED__) {
+												window.__FLAG_POS_RED__ = { x: i.a3z_1[12], y: i.a3z_1[13]};
+											}
+											if ((i.a3z_1[12] !== window.__FLAG_POS_RED__.x) || (i.a3z_1[13] !== window.__FLAG_POS_RED__.y)) {
+												window.__FLAG_KILLFEED_STARTED__ = true;
+												window.updateFlagsHud('red', 'taken')
+											} else {
+												if ((i.a3z_1[12] % 10 === 0) && (i.a3z_1[13] % 10 === 0)) {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('red', 'base')
+												} else {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('red', 'taken')
+												}
+											}
+											window.__FLAG_POS_RED__ = { x: i.a3z_1[12], y: i.a3z_1[13] };
+										}
+									}
+								} else {
+									if (this.n7k_1.l4a_1.v6t_1.h_1[0]?.name === 'redFlag') {
+										if (!window.__FLAG_KILLFEED_STARTED__) {
+											if (!window.__FLAG_POS_RED__) {
+												window.__FLAG_POS_RED__ = { x: i.a3z_1[12], y: i.a3z_1[13]};
+											}
+											if ((i.a3z_1[12] !== window.__FLAG_POS_RED__.x) || (i.a3z_1[13] !== window.__FLAG_POS_RED__.y)) {
+												window.__FLAG_KILLFEED_STARTED__ = true;
+												window.updateFlagsHud('red', 'taken')
+											} else {
+												if ((i.a3z_1[12] % 10 === 0) && (i.a3z_1[13] % 10 === 0)) {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('red', 'base')
+												} else {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('red', 'taken')
+												}
+											}
+											window.__FLAG_POS_RED__ = { x: i.a3z_1[12], y: i.a3z_1[13] };
+										}
+									}
+									
+									if (this.n7k_1.l4a_1.v6t_1.h_1[0]?.name === 'blueFlag') {
+										if (!window.__FLAG_KILLFEED_STARTED__) {
+											if (!window.__FLAG_POS_BLUE__) {
+												window.__FLAG_POS_BLUE__ = { x: i.a3z_1[12], y: i.a3z_1[13]};
+											}
+											if ((i.a3z_1[12] !== window.__FLAG_POS_BLUE__.x) || (i.a3z_1[13] !== window.__FLAG_POS_BLUE__.y)) {
+												window.__FLAG_KILLFEED_STARTED__ = true;
+												window.updateFlagsHud('blue', 'taken')
+											} else {
+												if ((i.a3z_1[12] % 10 === 0) && (i.a3z_1[13] % 10 === 0)) {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('blue', 'base')
+												} else {
+													window.__FLAG_KILLFEED_STARTED__ = true;
+													window.updateFlagsHud('blue', 'taken')
+												}
+											}
+											window.__FLAG_POS_BLUE__ = { x: i.a3z_1[12], y: i.a3z_1[13] };
+										}
+									}
+								}
+							}
                             //if (JSON.parse(localStorage.getItem('changeMatrix'))) {
                                  // Матрица бильборда для синего флага
                                  const camMatrix = n.h3m_1;
@@ -414360,6 +415513,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         e.n3r(r.p7l_1, 0, 0, 0)) 
 					}
                     if (localStorage.getItem('mapTime') === 'day') {
+                        JSON.parse(localStorage.getItem('settings.graphics.fog')) ? (e.o3r(r.o7l_1, t.g3p_1.k3e_1, t.g3p_1.l3e_1, t.g3p_1.m3e_1, t.g3p_1.n3e_1),
+                        e.n3r(r.p7l_1, t.h3p_1, t.i3p_1, this.p7k_1)) : (e.o3r(r.o7l_1, 0, 0, 0, 0),
+                        e.n3r(r.p7l_1, 0, 0, 0)) 
+					}
+					if (localStorage.getItem('mapTime') === 'day2012') {
                         JSON.parse(localStorage.getItem('settings.graphics.fog')) ? (e.o3r(r.o7l_1, t.g3p_1.k3e_1, t.g3p_1.l3e_1, t.g3p_1.m3e_1, t.g3p_1.n3e_1),
                         e.n3r(r.p7l_1, t.h3p_1, t.i3p_1, this.p7k_1)) : (e.o3r(r.o7l_1, 0, 0, 0, 0),
                         e.n3r(r.p7l_1, 0, 0, 0)) 
