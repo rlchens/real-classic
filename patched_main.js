@@ -1619,7 +1619,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .point-block > div::after {
 					content: ' ';
 					width: 2.8rem;
-					height: 2.8rem;
+					height: 2.65rem;
 					border-right: 0.15rem white solid;
 					left: 0;
 					position: absolute;
@@ -2304,7 +2304,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				.css-1xbh12v {
 					justify-content: flex-start !important;
 					color: rgb(255, 119, 76) !important;
-					padding: 0.545rem 1.2rem 0.545rem 0.8rem !important;
+					padding: 0.599rem 1.2rem 0.599rem 0.8rem !important;
 				}
 				
 				.css-1xbh12v:has(.css-19277fl) {
@@ -2314,7 +2314,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				.css-7623cl {
 					justify-content: flex-end !important;
 					color: rgb(71, 162, 255) !important;
-					padding: 0.545rem 0.8rem 0.545rem 1.2rem !important;
+					padding: 0.599rem 0.8rem 0.599rem 1.2rem !important;
 				}
 				
 				.css-7623cl:has(.css-19277fl) {
