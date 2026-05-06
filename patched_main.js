@@ -3181,38 +3181,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		'.css-1ewhe6d': 'rank-progress',
 		'.css-1g5n39': 'rank-item',
 		'.css-13q915e': 'drag-handle-left',
-		'.css-vheepe': 'drag-handle-right',
-		'.css-jm75h2': 'rank-31',
-		'.css-1ky4vk8': 'rank-30',
-		'.css-kdkdzu': 'rank-29',
-		'.css-1mhfmot': 'rank-28',
-		'.css-jpdgvi': 'rank-27',
-		'.css-1jn0cph': 'rank-26',
-		'.css-1iropyw': 'rank-25',
-		'.css-1y5dwcz': 'rank-24',
-		'.css-2uutwx': 'rank-23',
-		'.css-c5rgrv': 'rank-22',
-		'.css-1xcd4oi': 'rank-21',
-		'.css-8m7z1c': 'rank-20',
-		'.css-16ehet': 'rank-19',
-		'.css-smicsz': 'rank-18',
-		'.css-5r3yku': 'rank-17',
-		'.css-nocow1': 'rank-16',
-		'.css-1u7rfet': 'rank-15',
-		'.css-1669w9': 'rank-14',
-		'.css-dcqipq': 'rank-13',
-		'.css-9tg4to': 'rank-12',
-		'.css-11rsqag': 'rank-11',
-		'.css-q1gvff': 'rank-10',
-		'.css-1ckdekk': 'rank-9',
-		'.css-n5tckb': 'rank-8',
-		'.css-1hru7ms': 'rank-7',
-		'.css-1p2v55g': 'rank-6',
-		'.css-11j20es': 'rank-5',
-		'.css-4qu7iw': 'rank-4',
-		'.css-18clt6p': 'rank-3',
-		'.css-1pp0dy5': 'rank-2',
-		'.css-r67ul': 'rank-1'
+		'.css-vheepe': 'drag-handle-right'
 	};
 
 	// === ФУНКЦИЯ СОЗДАНИЯ И РАЗМЕЩЕНИЯ CLONE ===
@@ -3371,7 +3340,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			if (selectionStart > selectionEnd) {
 				[selectionStart, selectionEnd] = [selectionEnd, selectionStart];
 			}
-			
 			// Обновляем классы рангов
 			if (handleLeftRank) updateRankClass(handleLeftRank, selectionStart);
 			if (handleRightRank) updateRankClass(handleRightRank, selectionEnd);
@@ -30178,7 +30146,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					} else if (t instanceof lE) {
 						i = n.epo(al, al, al, al, al, al, al, al, al, al, ow(n.jp8_1, t.rpo_1));
 					} else if (t instanceof vE) {
-						debugger
 						i = n.epo(al, al, al, al, al, al, al, al, al, al, uv(n.jp8_1, Ll(t.spo_1, t.tpo_1)));
 					} else if (t instanceof mE) {
 						i = n.epo(al, al, al, al, al, al, al, al, uv(n.hp8_1, Ll(t.ypo_1, t.zpo_1)));
@@ -56182,7 +56149,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                                     r.backgroundImage = "url(" + me.b1eu(t, !1, zp()) + ")";
                                                     var e = [sw(r)]
                                                       , s = i.concat(e);
-                                                    return n.className = uw.apply(null, [].slice.call(s.slice())),
+                                                    return n.className = `rank-${t}`,
                                                     $w
                                                 }
                                             }(i);
@@ -56225,7 +56192,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                                     r.backgroundImage = "url(" + me.b1eu(t, !1, zp()) + ")";
                                                     var e = [sw(r)]
                                                       , s = i.concat(e);
-                                                    return n.className = uw.apply(null, [].slice.call(s.slice())),
+                                                    return n.className = `rank-${t}`,
                                                     $w
                                                 }
                                             }(i);
@@ -129993,7 +129960,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     e.J)(i, t.registered, void 0);
 					//debugger
 					
-					if ((t.key + "-" + u.name)?.includes('css-12gl1uk')) debugger
 					if ((t.key + "-" + u.name)?.includes('css-7623cl')) {
 						setTimeout(() => {
 							window.updateBattleHud()
