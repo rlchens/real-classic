@@ -580,6 +580,47 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  background-size: calc(var(--browser-zoom-factor) * 10vw), calc(var(--browser-zoom-factor) * 10vw) !important;
 			  }
 			  
+			  /* === GLOW HIGHLIGHT НА ПРОГРЕСС-БАРЕ === */
+				.rank-progress {
+					position: relative !important; /* Для позиционирования ::after */
+					overflow: visible !important;  /* Чтобы свечение не обрезалось */
+				}
+
+				/* Подсветка добавленной части */
+				.rank-progress::after {
+					content: '';
+					position: absolute;
+					top: 0;
+					/* left и width задаются динамически через JS */
+					height: 100%;
+					background: linear-gradient(90deg, 
+						rgba(0, 255, 0, 0) 0%, 
+						rgba(0, 255, 0, 0.6) 50%, 
+						rgba(0, 255, 0, 0) 100%);
+					box-shadow: 0 0 0.5rem rgba(0, 255, 0, 0.8), 
+								0 0 1rem rgba(0, 255, 0, 0.4);
+					border-radius: inherit;
+					opacity: 1;
+					pointer-events: none;
+					animation: glow-fade-out 1s ease-out forwards;
+					z-index: 10; /* Поверх основной полоски */
+				}
+
+				@keyframes glow-fade-out {
+					0% {
+						opacity: 1;
+						box-shadow: 0 0 0.5rem rgba(0, 255, 0, 0.8);
+					}
+					50% {
+						opacity: 0.6;
+						box-shadow: 0 0 1rem rgba(0, 255, 0, 0.4);
+					}
+					100% {
+						opacity: 0;
+						box-shadow: 0 0 0 rgba(0, 255, 0, 0);
+					}
+				}
+			  
 			  /* === GLOW ANIMATION === */
 				@keyframes glow-pulse {
 					0% {
@@ -1195,6 +1236,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					font-weight: 400 !important;
 				  }
 				  
+				  .css-rxxlm3 p {
+					  display: flex;
+						gap: 0.2rem;
+				  }
+				  
 				  .css-1668k2l {
 					height: 1.25rem !important;
 					gap: 0.2rem !important;
@@ -1297,7 +1343,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  border-image-width: unset !important;
 						border-image-slice: unset !important;
 						border-image-source: unset !important;
-						background: url(chrome-extension://nplapeipenkhbpgmpljmcjonnonkmgfd/assets/closeButton.svg) !important;
+						background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/closeButton.svg) !important;
 						background-size: cover !important;
 						height: 1.5rem !important;
 						min-width: 1.5rem !important;
@@ -1568,6 +1614,44 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  border-image-slice: 14 !important;
 					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blackArea.svg) !important;
 					  background: transparent !important;
+				  }
+				  
+				  .css-l9qovh, .css-19qw7vn {
+					  border-image-width: 1.2rem !important;
+					  border-image-slice: 14 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blackArea.svg) !important;
+					  background: transparent !important;
+					  height: 2rem !important;
+					  bottom: 12rem !important;
+					  left: 0.75rem !important;
+				  }
+				  
+				  .css-l9qovh {
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueArea.svg) !important;
+				  }
+				  
+				  .css-l9qovh.TEAM_A {
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redArea.svg) !important;
+				  }
+				  
+				  .css-1c1wcrm, .css-1vl3ale, .css-gcy3m0, .css-dteaal {
+					  font-size: 0.9rem !important;
+				  }
+				  
+				  .css-1c1wcrm, .css-gcy3m0 {
+					  padding-left: 0.3rem !important;
+				  }
+				  
+				  .css-1vl3ale {
+					  color: white !important;
+				  }
+				  
+				  .css-1c1wcrm {
+					  color: rgb(71, 162, 255) !important;
+				  }
+				  
+				  .TEAM_A .css-1c1wcrm {
+					  color: rgb(255, 119, 76) !important;
 				  }
 				  
 				  .css-vqpzl5 .css-qouasq, .css-11t9z04 {
@@ -3968,317 +4052,160 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 
 	// === КОНФИГУРАЦИЯ ===
 	const TOAST_CONFIG = {
-		MAX_ITEMS: 15,           // Максимум элементов в интерфейсе
-		QUEUE_1_DURATION: 10000, // 10 секунд для центра
-		QUEUE_2_DURATION: 30000  // 30 секунд для правой колонки
+		MAX_ITEMS: 10,           // Максимум элементов в интерфейсе
+		CENTER_DURATION: 10000, // 10 секунд для центра
+		RIGHT_DURATION: 30000  // 30 секунд для правой колонки
 	};
 
-	// === ДОБАВИМ ССЫЛКУ НА BASEARRAY В createReactiveArray ===
-	function createReactiveArray(arrayName) {
-		const baseArray = window[arrayName];
-		let version = 0;
-		let subscribers = new Set();
-		let isDeletionMode = false; 
+	// === ПРОСТОЙ ДОБАВЛЕНИЕ ТОСТА (БЕЗ PROXY) ===
+	function addBattleToast(queue, item) {
+		const targetArray = queue === 'center' 
+			? window.__BATTLE_FEED_CENTER__ 
+			: window.__BATTLE_FEED_RIGHT__;
 		
-		// Возвращаем также baseArray для прямого доступа
-		const proxyArray = new Proxy(baseArray, {
-			set(target, prop, value, receiver) {
-				if (typeof target[prop] === 'function' && typeof prop === 'string') {
-					const result = Reflect.set(target, prop, value, receiver);
-					
-					if (!isDeletionMode) {
-						version++;
-						subscribers.forEach(subscriber => subscriber({ 
-							type: 'mutation',
-							property: prop,
-							version 
-						}));
-				 } 
-					return result;
-			 }
-				
-				if (prop !== 'length') {
-					target[prop] = value;
-					version++;
-					
-					subscribers.forEach(subscriber => subscriber({ 
-						type: 'index-update',
-						property: prop,
-						version 
-					}));
-					
-					return true;
-			 }
-				
-				const result = Reflect.set(target, prop, value, receiver);
-				
-				if (!isDeletionMode) {
-					version++;
-					subscribers.forEach(subscriber => subscriber({ 
-						type: 'length-change',
-						property: prop,
-						value: value,
-						version 
-					}));
-				}
-				
-				return result;
-		 },
-			
-			get(target, prop, receiver) {
-				return Reflect.get(target, prop, receiver);
-			}
-		});
+		const duration = queue === 'center' 
+			? TOAST_CONFIG.CENTER_DURATION 
+			: TOAST_CONFIG.RIGHT_DURATION;
 		
-		function subscribe(callback) {
-			subscribers.add(callback);
-			return () => subscribers.delete(callback);
+		// 🔥 1. Если больше лимита — удаляем самый старый (FIFO)
+		if (targetArray.length >= TOAST_CONFIG.MAX_ITEMS) {
+			const oldest = targetArray.shift(); // Удаляем первый
+			const container = document.getElementById(`toasts-container-${queue}`);
+			const oldestEl = container?.querySelector('[data-toast-id]');
+			if (oldestEl) removeToastElement(oldestEl);
 		}
 		
-		function safeSplice(count) {
-			isDeletionMode = true;
-			
-			try {
-				baseArray.splice(0, count);
-			} finally {
-				isDeletionMode = false;
-			}
-		}
+		// 🔥 2. Добавляем новый элемент с уникальным ID
+		const toastId = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+		item.toastId = toastId;
+		targetArray.push(item);
 		
-		const originalPush = proxyArray.push.bind(proxyArray);
-		proxyArray.push = function(...items) {
-			const result = originalPush.apply(this, items);
-			
-			subscribers.forEach(subscriber => subscriber({ 
-				type: 'push',
-				itemCount: items.length,
-				version: ++version 
-			}));
-			
-			return result;
-		};
+		// 🔥 3. Рендерим сразу (без подписок)
+		renderSingleToast(queue, item, duration, toastId);
 		
-		return {
-			array: proxyArray,        // Возвращаем прокси
-			baseArray: baseArray,     // ВОЗВОРЯЕМ доступ к оригиналу ✅
-			subscribe,
-			safeSplice,       
-			getSubscriberCount: () => subscribers.size,
-			getIsDeletionMode: () => isDeletionMode
-		};
+		// 🔥 4. Самоудаление через таймер
+		setTimeout(() => {
+			removeToastById(queue, toastId);
+		}, duration);
 	}
 
-	// === СОЗДАНИЕ REACTIVE МАССИВОВ ===
-	const centerFeed = createReactiveArray('__BATTLE_FEED_CENTER__');
-	const rightFeed = createReactiveArray('__BATTLE_FEED_RIGHT__');
-
-	// СОХРАНЯЕМ ССЫЛКИ НА БАЗОВЫЕ МАССИВЫ ДЛЯ ПРОСТОГО УДАЛЕНИЯ
-	const BASE_ARRAYS = {
-		center: centerFeed.baseArray,
-		right: rightFeed.baseArray
-	};
-
-	// Обновляем ссылки window чтобы использовать reactive версии
-	Object.defineProperty(window, '__BATTLE_FEED_CENTER__', {
-		get() { return centerFeed.array; },
-		set(val) { 
-			centerFeed.baseArray.length = 0; 
-			val.forEach(item => centerFeed.baseArray.push(item));
-		},
-		enumerable: true,
-		configurable: true
-	});
-
-	Object.defineProperty(window, '__BATTLE_FEED_RIGHT__', {
-		get() { return rightFeed.array; },
-		set(val) {
-			rightFeed.baseArray.length = 0;
-			val.forEach(item => rightFeed.baseArray.push(item));
-		},
-		enumerable: true,
-		configurable: true
-	});
-
-	// === ОБНОВЛЕНИЕ КОНТЕЙНЕРА (БЕЗ MAP И КЛЮЧЕЙ!) ===
-	function updateContainer(queueArray, container, duration, queueType) {
-		const maxItems = 14;
+	
+	// === РЕНДЕР ОДНОГО ТОСТА (МИНИМАЛЬНЫЙ) ===
+	function renderSingleToast(queue, item, duration, toastId) {
+		const containerId = `toasts-container-${queue}`;
+		let container = document.getElementById(containerId);
 		
-		// 1. Если больше 14 — удаляем самый старый элемент (с индексом 0)
-		if (queueArray.length > maxItems) {
-			const oldIndex = 0;
-			
-			const oldElement = container.querySelector(`[data-sync-index="${oldIndex}"]`);
-			if (oldElement) {
-				removeFromDOMAndArray(oldIndex, queueType, oldElement);
-				const targetArray = queueType === 'right' ? BASE_ARRAYS.right : BASE_ARRAYS.center;
-				targetArray.splice(oldIndex, 1);
-			}
+		if (!container) {
+			container = createToastContainer(queue);
 		}
 		
-		// 2. Добавляем элементы по порядку
-		for (let i = 0; i < queueArray.length; i++) {
-			const existingElement = container.querySelector(`[data-sync-index="${i}"]`);
-			
-			if (!existingElement && queueArray[i]) {
-				// Создаём новый элемент
-				const toast = createBattleToastElement(queueArray[i], duration, i, queueType);
-				toast.dataset.syncIndex = String(i);
-				container.appendChild(toast);
-				
-				// Сразу добавляем таймер на удаление
-				setTimeout(() => {
-					const targetElement = container.querySelector(`[data-sync-index="${i}"]`);
-					if (targetElement) {
-						removeFromDOMAndArray(i, queueType, targetElement);
-					}
-				}, duration);
-			}
+		const el = createBattleToastElement(item, queue);
+		el.dataset.toastId = toastId;
+		el.dataset.queue = queue;
+		
+		// Анимация появления
+		el.style.opacity = '1';
+		container.appendChild(el);
+		
+		setTimeout(() => {
+			// Запуск анимации
+			requestAnimationFrame(() => {
+				el.style.transition = 'opacity 0.3s ease';
+				el.style.opacity = '0.5';
+			});
+		}, queue === 'center' ? 3000 : 15000);
+	}
+	
+	// === УДАЛЕНИЕ ПО ID ===
+	function removeToastById(queue, toastId) {
+		const container = document.getElementById(`toasts-container-${queue}`);
+		if (!container) return;
+		
+		const el = container.querySelector(`[data-toast-id="${toastId}"]`);
+		if (el) removeToastElement(el);
+		
+		// Чистим массив
+		const targetArray = queue === 'center' 
+			? window.__BATTLE_FEED_CENTER__ 
+			: window.__BATTLE_FEED_RIGHT__;
+		
+		const index = targetArray.findIndex(t => t.toastId === toastId);
+		if (index !== -1) {
+			targetArray.splice(index, 1);
 		}
 	}
 
-	// === МОМЕНТАЛЬНОЕ УДАЛЕНИЕ ИЗ DOM И МАССИВА ===
-	function removeFromDOMAndArray(index, queueType, element) {		
-		// Скрываем с анимацией и удаляем из DOM
-		if (element.parentNode) {
-			element.style.opacity = '0';
-			
-			setTimeout(() => {
-				if (element.parentNode) {
-					element.parentNode.removeChild(element);
-				}
-			}, 500); // Даем время на скрытие перед полным удалением
-		}
+	// === УДАЛЕНИЕ ЭЛЕМЕНТА С АНИМАЦИЕЙ ===
+	function removeToastElement(el) {
+		if (!el?.parentNode) return;
+		
+		el.style.transition = 'opacity 0.3s ease';
+		el.style.opacity = '0';
+		
+		setTimeout(() => {
+			if (el?.parentNode) {
+				el.parentNode.removeChild(el);
+			}
+		}, 300);
 	}
 
-	// === ОБНОВЛЕНИЕ РЕНДЕРА БЕЗ FULL CLEAR ===
-	function renderToasts(queue) {
-		if (queue === 'center') {
-			const containerCenter = document.getElementById('toasts-container-center');
-			if (!containerCenter) {
-				ensureToastContainers('center');
-				renderToasts('center');
-				return;
-			}
-			updateContainer(window.__BATTLE_FEED_CENTER__, containerCenter, TOAST_CONFIG.QUEUE_1_DURATION, 'center');
-		}
-		
-		if (queue === 'right') {
-			const containerRight = document.getElementById('toasts-container-right');
-		
-			if (!containerRight) {
-				ensureToastContainers('right');
-				renderToasts('right');
-				return;
-			}
-			updateContainer(window.__BATTLE_FEED_RIGHT__, containerRight, TOAST_CONFIG.QUEUE_2_DURATION, 'right');
-			
-			const ranks = containerRight.querySelectorAll('.rank-1, .rank-2, .rank-3, .rank-4, .rank-5, .rank-6, .rank-7, .rank-8, .rank-9, .rank-10, .rank-11, .rank-12, .rank-13, .rank-14, .rank-15, .rank-16, .rank-17, .rank-18, .rank-19, .rank-20, .rank-21, .rank-22, .rank-23, .rank-24, .rank-25, .rank-26, .rank-27, .rank-28, .rank-29, .rank-30, .rank-31');
-		}
-	}
-
-	// === ПОДПИСКИ ===
-	let isCenterRendering = false;
-	let isRightRendering = false;
-
-	centerFeed.subscribe(() => {
-		if (isCenterRendering) return;
-		isCenterRendering = true;
-		
-		const centerArray = window.__BATTLE_FEED_CENTER__;
-		
-		if (centerArray.length > 14) {
-			const excessCount = Math.min(centerArray.length - 14, 1);
-			centerFeed.safeSplice(excessCount);
-		}
-		
-		renderToasts('center');
-		setTimeout(() => { isCenterRendering = false; }, 100);
-	});
-
-	rightFeed.subscribe(() => {
-		if (isRightRendering) return;
-		isRightRendering = true;
-		
-		const rightArray = window.__BATTLE_FEED_RIGHT__;
-		
-		if (rightArray.length > 14) {
-			const excessCount = Math.min(rightArray.length - 14, 1);
-			rightFeed.safeSplice(excessCount);
-		}
-		
-		renderToasts('right');
-		setTimeout(() => { isRightRendering = false; }, 100);
-	});
-
-	// === ЗАПУСК ===
-	function ensureToastContainers(queue) {
-		if (queue === 'center') {
+	// === СОЗДАНИЕ КОНТЕЙНЕРА (ОДИН РАЗ) ===
+	function createToastContainer(queue) {
+		// Стили (если ещё не добавлены)
+		if (!document.getElementById('toast-styles')) {
 			const styles = document.createElement('style');
+			styles.id = 'toast-styles';
 			styles.textContent = `
+				#toasts-container-center, #toasts-container-right {
+					position: fixed;
+					z-index: 1;
+					display: flex;
+					flex-direction: column;
+					gap: 0.3rem;
+					pointer-events: none; /* Не блокирует клики по игре */
+				}
 				#toasts-container-center {
-					position: fixed;
-					z-index: 1;
-					display: flex;
-					flex-direction: column;
-					
-					width: 100%;
 					top: 4vh;
+					left: 50%;
+					transform: translateX(-50%);
 					align-items: center;
+					width: 100%;
 				}
-			`;
-			document.head.appendChild(styles);
-			
-			if (!document.getElementById('toasts-container-center')) {
-				const container1 = document.createElement('div');
-				container1.id = 'toasts-container-center';
-				document.body.appendChild(container1);
-			}
-		}
-		if (queue === 'right') {
-			const styles = document.createElement('style');
-			styles.textContent = `
 				#toasts-container-right {
-					position: fixed;
-					z-index: 1;
-					display: flex;
-					flex-direction: column;
-					
-					right: 0.5rem;
 					top: 4vh;
+					right: 0.5rem;
 					align-items: flex-end;
 				}
+				.battle-item {
+					pointer-events: auto; /* Клик по тосту работает */
+					will-change: opacity, transform; /* Оптимизация анимации */
+				}
 			`;
 			document.head.appendChild(styles);
-			
-			if (!document.getElementById('toasts-container-right')) {
-				const container2 = document.createElement('div');
-				container2.id = 'toasts-container-right';
-				document.body.appendChild(container2);
-			}
 		}
+		
+		const container = document.createElement('div');
+		container.id = `toasts-container-${queue}`;
+		document.body.appendChild(container);
+		return container;
 	}
 	
 	// === СОЗДАНИЕ ЭЛЕМЕНТА ТОСТА ===
-	function createBattleToastElement(item, duration, index, queue) {
+	function createBattleToastElement(item, queue) {
 		const el = document.createElement('div');
 		el.className = 'battle-item';
-		el.id = `battle-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-		el.dataset.syncIndex = String(index);
-		el.dataset.queue = queue;
 		
+		// Базовые стили
 		el.style.cssText = `
-			margin-bottom: 0rem;
+            margin-bottom: 0rem;
 			display: flex;
 			align-items: center;
 			gap: 0.1rem;
-			transition: opacity 1s ease-in-out;
-			opacity: 1;
-			position: relative;
 			color: white;
-			filter: drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.12vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.12vw) black);
-			font-size: 0.82rem;
-			cursor: pointer;
-			min-height: 1.37rem;
+			font-size: ${queue === 'center' ? '1.5rem' : '0.82rem'};
+			font-weight: ${queue === 'center' ? 'bold' : 'normal'};.,
+			min-height: ${queue === 'center' ? '1.45rem' : '1.37rem'};
+			filter: drop-shadow(0 0 calc(var(--browser-zoom-factor) * ${queue === 'center' ? '0.12vw' : '0.05vw'}) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * ${queue === 'center' ? '0.12vw' : '0.05vw'}) rgba(0,0,0,0.75));
 		`;
 		
 		let htmlContent = `
@@ -4286,9 +4213,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			</div>
 		`;
 		
-		let filterRed = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #EF3315) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #EF3315) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #EF3315)`;
-		let filterBlue = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #4088E5) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #4088E5) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #4088E5)`;
-		let filterGreen = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #00FE00) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #00FE00) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.01vw) #00FE00)`;
+		let filterRed = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #EF3315) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #EF3315) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) rgba(239, 51, 21, 0.1))`;
+		let filterBlue = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #4088E5) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #4088E5) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) rgba(64, 136, 229, 0.1))`;
+		let filterGreen = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #00FE00) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #00FE00) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) rgba(0, 254, 0, 0.1))`;
 		
 		
 		if (queue === 'center') {
@@ -4396,7 +4323,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		}
 		
 		if (queue === 'right') {
-			el.style.filter = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black)`;
+			el.style.filter = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) rgba(0, 0, 0, 0.75)`;
 			if (item?.type === 'goldTaken') {
                 const selfUser = window.__BATTLE_USERS__.get(window.__SELF_ID__)
 				const user = window.__BATTLE_USERS__.get(item.id)
@@ -4656,11 +4583,167 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		
 		el.innerHTML = htmlContent;
 		
-		const targetArray = queue === 'right' ? BASE_ARRAYS?.right : BASE_ARRAYS?.center;
-		targetArray?.splice(index, 1);
+		return el;
+	}
+	
+	realWindow.addBattleNotification = (queue, type, data) => {
+		const item = { type, ...data, timestamp: Date.now() };
+		addBattleToast(queue, item);
+	};
+	
+	window.__BATTLE_MESSAGES__ = [];
+
+	const MESSAGE_TOAST_CONFIG = {
+		DURATION: 30000
+	};
+	
+	function addMessage(item) {
+		const targetArray = window.__BATTLE_MESSAGES__;
+		
+		const messageId = `message-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+		item.messageId = messageId;
+		targetArray.push(item);
+		
+		renderSingleMessage(item, messageId);
+	}
+
+	
+	// === РЕНДЕР ОДНОГО ТОСТА (МИНИМАЛЬНЫЙ) ===
+	function renderSingleMessage(item, messageId) {
+		const containerId = `messages-container`;
+		let container = document.getElementById(containerId);
+		
+		if (!container) {
+			container = createMessageContainer();
+		}
+		
+		const el = createBattleMessageElement(item);
+		el.dataset.messageId = messageId;
+		
+		container.appendChild(el);
+
+		setTimeout(() => {
+			requestAnimationFrame(() => {
+				el.classList.add('viewed');
+			});
+		}, 15000);
+		
+		setTimeout(() => {
+			removeMessageElement(el);
+		}, MESSAGE_TOAST_CONFIG.DURATION);
+	}
+
+	function removeMessageElement(el) {
+		if (!el?.parentNode) return;
+		
+		el.classList.add('inactive');
+	}
+
+	// === СОЗДАНИЕ КОНТЕЙНЕРА (ОДИН РАЗ) ===
+	function createMessageContainer() {
+		// Стили (если ещё не добавлены)
+		if (!document.getElementById('message-styles')) {
+			const styles = document.createElement('style');
+			styles.id = 'message-styles';
+			styles.textContent = `
+				#messages-container {
+					position: fixed;
+					z-index: 1;
+					display: flex;
+					flex-direction: column;
+					gap: 0.3rem;
+					pointer-events: none; /* Не блокирует клики по игре */
+					bottom: 15rem;
+					left: 0.75rem;
+					max-height: 71vh;
+					overflow-y: hidden;
+					justify-content: flex-end;
+				}
+				.message-item {
+					margin-bottom: 0rem;
+					display: flex;
+					gap: 0.1rem;
+					color: white;
+					font-size: 0.9rem;
+					font-weight: normal;
+					min-height: 1.37rem;
+					filter: drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black);
+					pointer-events: auto; /* Клик по тосту работает */
+					will-change: opacity, transform; /* Оптимизация анимации */
+					transition: opacity 0.3s ease;
+					opacity: 1;
+				}
+				.message-item.viewed {
+					opacity: 0.75;
+				}
+				.message-item.inactive {
+					transition: unset !important;
+					opacity: 0;
+				}
+				body:has(.css-19qw7vn) .message-item, body:has(.css-l9qovh) .message-item {
+					transition: unset !important;
+					opacity: 1 !important;
+				}
+			`;
+			document.head.appendChild(styles);
+		}
+		
+		const container = document.createElement('div');
+		container.id = `messages-container`;
+		document.body.appendChild(container);
+		return container;
+	}
+	
+	function createBattleMessageElement(item) {
+		const el = document.createElement('div');
+		el.className = 'message-item';
+		
+		let htmlContent = `
+			<div class="battle-item-content">${item.type}
+			</div>
+		`;
+		
+		let filterRed = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #EF3315) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #EF3315) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) rgba(239, 51, 21, 0.1))`;
+		let filterBlue = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #4088E5) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #4088E5) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) rgba(64, 136, 229, 0.1))`;
+		let filterGreen = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #00FE00) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) #00FE00) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.001vw) rgba(0, 254, 0, 0.1))`;
+		
+
+		el.style.filter = `drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) black) drop-shadow(0 0 calc(var(--browser-zoom-factor) * 0.05vw) rgba(0, 0, 0, 0.75)`;
+		const selfUser = window.__BATTLE_USERS__.get(window.__SELF_ID__)
+		let color = '';
+		let teamColor = '';
+		let filter = '';
+		if (selfUser?.team === 'NONE') {
+			color = '#00FE00'
+			filter = filterGreen
+		} else {
+			if (item?.type === 'team') {
+				teamColor = item?.team === 'TEAM_A' ? '#e2978b' : '#96b5dd'
+				color = item?.team === 'TEAM_A' ? '#EF3315' : '#4088E5'
+				filter = item?.team === 'TEAM_A' ? filterRed : filterBlue
+			} else {
+				teamColor = 'white'
+				color = item?.team === 'TEAM_A' ? '#EF3315' : '#4088E5'
+				filter = item?.team === 'TEAM_A' ? filterRed : filterBlue
+			}
+		}
+		htmlContent = `
+			<div class="battle-item-content" style="color: ${item?.type === 'team' ? teamColor : 'white'}">
+				<div class="rank-${item?.rank} ${item?.premium ? 'prem' : ''}"></div>
+				<span style="color: ${color}; filter: ${filter}; margin-right: 0.3rem;">${item?.nick}:</span>
+			 ${item?.message}
+			</div>
+		`;
+		
+		el.innerHTML = htmlContent;
 		
 		return el;
 	}
+	
+	realWindow.addBattleMessage = (type, data) => {
+		const item = { type, ...data, timestamp: Date.now() };
+		addMessage(item);
+	};
 	
 	// === ONLINE COUNTER: создание и обновление ===
 	function createOnlineCounter() {
@@ -4669,13 +4752,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			return;
 		}
 		
-		// Не дублируем, если уже вставлен
 		if (container.querySelector('.injected-online-counter')) {
 			updateOnlineCounterValues();
 			return;
 		}
 		
-		// Создаём обёртку
 		const counterWrapper = document.createElement('div');
 		counterWrapper.className = 'injected-online-counter';
 		counterWrapper.style.cssText = `
@@ -4710,10 +4791,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		
 		container.appendChild(counterWrapper);
 		
-		// Сразу обновляем значения
 		updateOnlineCounterValues();
 		
-		// Подписка на изменения глобальных переменных (если они обновляются динамически)
 		setupOnlineCounterUpdates();
 	}
 
@@ -4733,19 +4812,15 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		}
 	}
 
-	// === ПОДПИСКА НА ОБНОВЛЕНИЯ (если переменные меняются динамически) ===
 	function setupOnlineCounterUpdates() {
-		// Периодическая проверка (если игра не пушит обновления)
 		const updateInterval = setInterval(() => {
 			updateOnlineCounterValues();
 		}, 2000);
 		
-		// Очистка интервала при удалении счетчика (чтобы не утекала память)
 		const originalRemove = Element.prototype.remove;
 		Element.prototype.remove = function() {
 			if (this.classList?.contains('injected-online-counter')) {
 				clearInterval(updateInterval);
-				console.log('[OnlineCounter] Update interval cleared');
 			}
 			return originalRemove.apply(this, arguments);
 		};
@@ -4769,8 +4844,68 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		reEnterProtectBattleId: null
 	}
 
-	// 🔥 Хранилище интервалов: battleId -> { intervalId, timerDiv }
 	const battleTimers = new Map();
+	
+	// 🔥 Хранилище предыдущих значений ширины: элемент → старая ширина (%)
+	realWindow.prevProgressWidths = new WeakMap();
+
+	realWindow.addProgressGlow = (oldPercent, newPercent, width) => {
+		const progress = document.querySelector('.css-1irhnvq > div:first-child');
+		if (oldPercent >= newPercent) return;
+		
+		let diff = newPercent - oldPercent; // Насколько выросла полоска (%)
+		
+		// 🔥 Удаляем старый глоу, если ещё не исчез
+		const oldGlow = document.querySelector('.progress-glow-highlight');
+		if (oldGlow) {
+			console.log(oldGlow)
+			oldGlow.remove();
+		}
+		
+		// 🔥 Создаём подсветку
+		const glow = document.createElement('div');
+		glow.className = 'progress-glow-highlight';
+		if (diff < 0.1) {
+			if (parseInt(width) < 0.1) {
+				diff = 20
+			} else if (parseInt(width) < 1) {
+				diff = 2
+			} else if (parseInt(width) < 10) {
+				diff = 0.2
+			} else {
+				diff = 0.1
+			}
+		}
+		
+		// Позиционируем: начало = старая ширина, ширина = разница
+		glow.style.cssText = `
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: ${diff}%;
+			height: 100%;
+			background: rgba(0, 255, 0, 0.6);
+			box-shadow: 0 0 0.5rem rgba(0, 255, 0, 0.8), 
+						0 0 1rem rgba(0, 255, 0, 0.4);
+			border-radius: inherit;
+			opacity: 1;
+			pointer-events: none;
+			z-index: 10;
+			animation: glow-fade-out 1s ease-out forwards;
+		`;
+		
+		progress.style.position = 'relative'; // Гарантируем позиционирование
+		progress.appendChild(glow);
+		console.log(progress);
+		
+		setTimeout(() => {
+			if (glow.parentNode) {
+				glow.remove();
+			}
+		}, 1000);
+		
+		console.log(`[Glow] +${diff}% on progress bar`);
+	}
 
 	realWindow.updateBattles = () => {
 		const selectedBattle = document.querySelector('.css-3qnlp');
@@ -5217,7 +5352,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			return wrapper;
 		}
 
-		// Использование:
 		if (window.__SCORE_LIMIT__ && (window.__BATTLE_MODE__ === 'DM' || window.__BATTLE_MODE__ === 'JGR')) {
 			if (!document.querySelector('.css-1oftwpg .css-iwcpp3:first-child .css-581flt img[src*="scull"]')) {
 				const clockBlock = document.querySelector('.css-1oftwpg .css-iwcpp3:first-child .css-581flt img[src$="clock.1e1fe192.svg"]')?.closest('.css-581flt');
@@ -5282,7 +5416,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		const blueFlag = document.querySelector('.css-7623cl .css-19277fl');
 		const blueFlagCont = document.querySelector('.css-7623cl');
 		
-		// 🔥 ФУНКЦИЯ: запуск мигания для команды
 		function startFlagBlink(teamName, flagEl) {
 			if (!flagEl) return;
 			
@@ -5433,6 +5566,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		stopRemainingTimeCountdown();
 		battleTimers.forEach(timer => clearInterval(timer.intervalId));
 		battleTimers.clear();
+		
+		window.__BATTLE_FEED_CENTER__ = [];
+		window.__BATTLE_FEED_RIGHT__ = [];
+		
+		['#toasts-container-center', '#toasts-container-right'].forEach(id => {
+			document.getElementById(id)?.remove();
+		});
 	});
 	
 	if (!window.__NICK_RENDER_TRACKER__) {
@@ -5447,12 +5587,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		mutations.forEach(mutation => {
 			mutation.addedNodes.forEach(node => {
 				if (node.nodeType === 1) {					
-					// Проверка на чат-контейнер
 					const chatContainers = node.querySelectorAll('.css-1w0mhl5');
 					chatContainers.forEach(chatContainer => {
-						// Проверяем наличие скроллбара внутри этого контейнера
 						if (!chatContainer.querySelector('.custom-scrollbar-track')) {
-							// Создаём индивидуальный скролл для этого контейнера
 							setTimeout(() => {
 								try {
 									initCustomScrollbar(chatContainer);
@@ -5463,7 +5600,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						}
 					});
 					
-					// Также проверяем сам узел
 					if (node.classList?.contains('css-1w0mhl5') && !node.dataset.customScrollbar) {
 						 setTimeout(() => {
 							 try {
@@ -5486,7 +5622,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								setupDragHandles(clonedContainer);
 								observer.disconnect();
 								
-								// Сразу после создания и внедрения клона
 								setTimeout(() => {
 									const rect = clonedContainer.getBoundingClientRect();
 									removeEmptyDivsInContainer();
@@ -5504,7 +5639,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					if (container) {
 						setTimeout(() => {
 							
-							// Создаём и вставляем новые чекбоксы
 							createCustomCheckboxesFromMap();
 							
 							observer.disconnect();
@@ -5546,8 +5680,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					window.__INITIAL_DIR__ = undefined
 					const containerCenter = document.getElementById('toasts-container-center')
 					const containerRight = document.getElementById('toasts-container-right')
+					const battleMessages = document.getElementById('messages-container')
 					if (containerCenter) containerCenter.remove()
 					if (containerRight) containerRight.remove()
+					if (battleMessages) battleMessages.remove()
 					document.querySelectorAll('.css-1mi2jwo').forEach((el) => el.remove())
 				}
 			});
@@ -13881,7 +14017,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     this.ipb_1 = n,
                     this.jpb_1 = i,
                     this.kpb_1 = r
-					window.__BATTLE_FEED_RIGHT__.push({ type: 'kill', killer: this.hpb_1.toString(), destroyed: this.ipb_1.toString() })
+					window.addBattleNotification('right', 'kill', { killer: this.hpb_1.toString(), destroyed: this.ipb_1.toString() })
                 }
                 function Sz(t) {
                     var n;
@@ -13893,7 +14029,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     }
                     )),
                     this.mpb_1 = t
-					window.__BATTLE_FEED_RIGHT__.push({ type: 'suicide', id: this.mpb_1.toString() })
+					window.addBattleNotification('right', 'suicide', { id: this.mpb_1.toString() })
                 }
                 function Cz(t) {
                     var n;
@@ -13905,7 +14041,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     }
                     )),
                     this.opb_1 = t
-					window.__BATTLE_FEED_RIGHT__.push({ type: 'change', id: this.opb_1.toString() })
+					window.addBattleNotification('right', 'change', { id: this.opb_1.toString() })
                 }
                 function Ez(t) {
                     var n;
@@ -13928,7 +14064,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     }
                     )),
                     this.spb_1 = t
-					window.__BATTLE_FEED_RIGHT__.push({ type: 'leave', id: this.spb_1.toString() })
+					window.addBattleNotification('right', 'leave', { id: this.spb_1.toString() })
                 }
                 function Iz(t) {
                     this.tpb_1 = t
@@ -13951,7 +14087,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							}
 							
 							window.__BATTLE_USERS__.set(t.apc_1.zru_1.toString(), userObject)
-							window.__BATTLE_FEED_RIGHT__.push({ type: 'join', id: t.apc_1.zru_1.toString() })
+							window.addBattleNotification('right', 'join', { id: t.apc_1.zru_1.toString() })
 						}
 					}
                 }
@@ -23504,6 +23640,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         return hQ(e.ms3_1)
                     }
                     ))
+                    // MESSAGE TO ALL
+                    const nick = e?.ms3_1 ? hQ(e.ms3_1) : e;
+					window.addBattleMessage('all', { nick: nick.arv_1, rank: nick.brv_1, premium: nick.crv_1, team: r.w2_1, message: i })
                 }
                 function a2(t, n, i, r) {
                     var e;
@@ -23516,6 +23655,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         return hQ(e.rs3_1)
                     }
                     ))
+                    // MESSAGE TO TEAM
+                    const nick = e?.rs3_1 ? hQ(e.rs3_1) : e;
+					window.addBattleMessage('team', { nick: nick.arv_1, rank: nick.brv_1, premium: nick.crv_1, team: r.w2_1, message: i })
                 }
                 function o2(t, n) {
                     this.vs3_1 = t,
@@ -73813,6 +73955,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                           , e = {}
                                           , s = t / n * 100;
                                         e.width = Ww(s) + "%";
+										
+										// 🔥 ДОБАВЛЯЕМ ГЛОУ-ЭФФЕКТ
+										const oldPercent = window.prevProgressWidths.get(i) || 0;
+										if (s > oldPercent) {
+											// Откладываем на следующий тик, чтобы элемент точно встал в DOM
+											setTimeout(() => {
+												window.addProgressGlow(oldPercent, s, Ww(s));
+											}, 0);
+										}
+										window.prevProgressWidths.set(i, s); // Сохраняем для следующего раза
+										
                                         var u = [sw(e)]
                                           , _ = r.concat(u);
                                         return i.className = uw.apply(null, [].slice.call(_.slice())),
@@ -73830,9 +73983,16 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                                 if (window.__SCORE__ !== t) {
                                                     window.triggerGlowAnimation(document.querySelector('.css-rxxlm3 p'))
                                                 }
+												setTimeout(() => {
+													const text = document.querySelector('.css-rxxlm3 p').textContent.split(' ');
+													text[3] = '<span> </span>';
+													document.querySelector('.css-rxxlm3 p').innerHTML = `${t.toString() + " / " + n.toString()}<span> </span>${hx(i, " ", " ") + " " + r}`
+												}, 0)
                                                 window.__SCORE__ = t
-                                                var s = t.toString() + " / " + n.toString() + " ݂ " + hx(" " + i, " ", " ");
-                                                return od(e, s),
+												var scores = t.toString() + " / " + n.toString() + " ";
+                                                var s = " " + hx(" " + i, " ", " ");
+                                                return od(e, scores),
+                                                od(e, s),
                                                 od(e, " " + r),
                                                 $w
                                             }
@@ -129845,10 +130005,24 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					
 					if ((t.key + "-" + u.name)?.includes('css-12gl1uk')) debugger
 					if ((t.key + "-" + u.name)?.includes('css-7623cl')) {
-						//debugger
 						setTimeout(() => {
 							window.updateBattleHud()
-						}, 100)
+						}, 0)
+					}
+					if ((t.key + "-" + u.name)?.includes('css-l9qovh')) {
+						setTimeout(() => {
+							if (window.__BATTLE_USERS__.get(window.__SELF_ID__) && window.__BATTLE_USERS__.get(window.__SELF_ID__)?.team) {
+								const elem = document.querySelector('.css-l9qovh')
+								elem.classList.add(window.__BATTLE_USERS__.get(window.__SELF_ID__)?.team)
+							}
+						}, 0)
+					}
+					if ((t.key + "-" + u.name)?.includes('css-rxxlm3')) {
+						setTimeout(() => {
+							const text = document.querySelector('.css-rxxlm3 p').textContent.split(' ');
+							text[3] = '<span> </span>';
+							document.querySelector('.css-rxxlm3 p').innerHTML = `${text.join(' ')}`
+						}, 0)
 					}
                     return (0,
                     s.sk)(t, u, !1),
@@ -181437,7 +181611,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                             return et;
                         var r = Xs(i, _i(), 4);
 						// == GOLD DROP
-						window.__BATTLE_FEED_CENTER__.push({ type: 'dropGold' })
+						window.addBattleNotification('center', 'dropGold')
                         r.s89_1 = "gold",
                         Kq(t).m8f(r)
                     }(t, n),
@@ -205668,7 +205842,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         83417: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/open_sans_cyrillic.bb8c7bce.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/open_sans_cyrillic.bb8c7bce.png"
         }
         ,
         83440: (t, n, i) => {
@@ -232005,8 +232179,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 return n;
                             Sn("_goldTaken_userCodec")
                         }(this).q2d(n);
-						window.__BATTLE_FEED_CENTER__.push({ type: 'goldTaken', id: i.m2m_1.toString() })
-						window.__BATTLE_FEED_RIGHT__.push({ type: 'goldTaken', id: i.m2m_1.toString() })
+						window.addBattleNotification('center', 'goldTaken', { id: i.m2m_1.toString() })
+						window.addBattleNotification('right', 'goldTaken', { id: i.m2m_1.toString() })
                         this.mgr(null != i && Ln(i, Dn) ? i : In())
                     }
                 }
@@ -263664,25 +263838,25 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     case 0:
                         e = i;
 						if (pointStatus?.includes('neutralized') && point) {
-							window.__BATTLE_FEED_CENTER__.push({ type: 'neutralizedOurPoint', point })
-							window.__BATTLE_FEED_RIGHT__.push({ type: 'neutralizedOurPoint', point })
+							window.addBattleNotification('center', 'neutralizedOurPoint', { point })
+							window.addBattleNotification('right', 'neutralizedOurPoint', { point })
 						}
 						if (pointStatus?.includes('captured') && point) {
 							window.updateBattleHud(point, 100, window.__BATTLE_USERS__.get(window.__SELF_ID__).team === 'TEAM_A' ? 'TEAM_A' : 'TEAM_B', true)
-							window.__BATTLE_FEED_CENTER__.push({ type: 'capturedOurPoint', point })
-							window.__BATTLE_FEED_RIGHT__.push({ type: 'capturedOurPoint', point })
+							window.addBattleNotification('center', 'capturedOurPoint', { point })
+							window.addBattleNotification('right', 'capturedOurPoint', { point })
 						}
                         break;
                     case 1:
                         e = r;
 						if (pointStatus?.includes('neutralized') && point) {
-							window.__BATTLE_FEED_CENTER__.push({ type: 'neutralizedEnemyPoint', point })
-							window.__BATTLE_FEED_RIGHT__.push({ type: 'neutralizedEnemyPoint', point })
+							window.addBattleNotification('center', 'neutralizedEnemyPoint', { point })
+							window.addBattleNotification('right', 'neutralizedEnemyPoint', { point })
 						}
 						if (pointStatus?.includes('captured') && point) {
 							window.updateBattleHud(point, 100, window.__BATTLE_USERS__.get(window.__SELF_ID__).team === 'TEAM_A' ? 'TEAM_B' : 'TEAM_A', true)
-							window.__BATTLE_FEED_CENTER__.push({ type: 'capturedEnemyPoint', point })
-							window.__BATTLE_FEED_RIGHT__.push({ type: 'capturedEnemyPoint', point })
+							window.addBattleNotification('center', 'capturedEnemyPoint', { point })
+							window.addBattleNotification('right', 'capturedEnemyPoint', { point })
 						}
                         break;
                     default:
@@ -317768,8 +317942,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								if (i.nwo_1.w2_1 === 'TEAM_B') {
 									window.updateFlagsHud('blue', 'taken')
 								}
-								window.__BATTLE_FEED_CENTER__.push({ type: 'flagTaken', team: i.nwo_1.w2_1, id: n.bx5_1.toString() })
-								window.__BATTLE_FEED_RIGHT__.push({ type: 'flagTaken', id: n.bx5_1.toString() })
+								window.addBattleNotification('center', 'flagTaken', { team: i.nwo_1.w2_1, id: n.bx5_1.toString() })
+								window.addBattleNotification('right', 'flagTaken', { id: n.bx5_1.toString() })
                                 i.xwu();
                                 var r = tvt(t).xts_1.cwc(n.bx5_1);
                                 if (null == r)
@@ -317803,8 +317977,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								if (e.nwo_1.w2_1 === 'TEAM_B') {
 									window.updateFlagsHud('blue', 'dropped')
 								}
-								window.__BATTLE_FEED_CENTER__.push({ type: 'dropFlag', team: e.nwo_1.w2_1, id: e.rwo_1.toString() })
-								window.__BATTLE_FEED_RIGHT__.push({ type: 'dropFlag', id: e.rwo_1.toString() })
+								window.addBattleNotification('center', 'dropFlag', { team: e.nwo_1.w2_1, id: e.rwo_1.toString() })
+								window.addBattleNotification('right', 'dropFlag', { id: e.rwo_1.toString() })
                                 e.swo_1.equals(jft()) && Qlt(t).twp(e, n.qx4_1),
                                 hvt(t, e, By, (i = t,
                                 r = e,
@@ -317859,11 +318033,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									window.updateFlagsHud('blue', 'base')
 								}
 								if (n.ewp_1) {
-									window.__BATTLE_FEED_CENTER__.push({ type: 'returnedFlagUser', team: i.nwo_1.w2_1, id: n.ewp_1.toString() })
-									window.__BATTLE_FEED_RIGHT__.push({ type: 'returnedFlagUser', team: i.nwo_1.w2_1, id: n.ewp_1.toString() })
+									window.addBattleNotification('center', 'returnedFlagUser', { team: i.nwo_1.w2_1, id: n.ewp_1.toString() })
+									window.addBattleNotification('right', 'returnedFlagUser', { team: i.nwo_1.w2_1, id: n.ewp_1.toString() })
 								} else {
-									window.__BATTLE_FEED_CENTER__.push({ type: 'returnedFlag', team: i.nwo_1.w2_1 })
-									window.__BATTLE_FEED_RIGHT__.push({ type: 'returnedFlag', team: i.nwo_1.w2_1 })
+									window.addBattleNotification('center', 'returnedFlag', { team: i.nwo_1.w2_1 })
+									window.addBattleNotification('right', 'returnedFlag', { team: i.nwo_1.w2_1 })
 								}
                                 dvt(t, $ft(), i.nwo_1, null),
                                 ovt(t, i);
@@ -317889,8 +318063,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								if (i.nwo_1.w2_1 === 'TEAM_B') {
 									window.updateFlagsHud('blue', 'delivered')
 								}
-								window.__BATTLE_FEED_CENTER__.push({ type: 'flagDelivered', team: i.nwo_1.w2_1, id: i.rwo_1.toString() })
-								window.__BATTLE_FEED_RIGHT__.push({ type: 'flagDelivered', team: i.nwo_1.w2_1, id: i.rwo_1.toString() })
+								window.addBattleNotification('center', 'flagDelivered', { team: i.nwo_1.w2_1, id: i.rwo_1.toString() })
+								window.addBattleNotification('right', 'flagDelivered', { team: i.nwo_1.w2_1, id: i.rwo_1.toString() })
                                 ovt(t, i),
                                 Jlt(t).u2s(lP),
                                 function(t, n, i, r, e) {
@@ -319121,7 +319295,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                       , r = hht(this.buy_1, i);
                     null != r && this.auy_1.qxe(r);
                     var e, s, u = this.euy_1, _ = Math.abs(u);
-					//console.log(this?.auy_1?.xx5_1, this.euy_1); // points progress
 					window.updateBattleHud(this?.auy_1?.xx5_1, this.euy_1, i?.w2_1)
                     this.auy_1.za4(_),
                     (s = (e = this).euy_1 * e.fuy_1) > 0 || 0 === e.euy_1 && 0 !== e.fuy_1 ? e.zux_1.exe() : s < 0 ? e.zux_1.dxe() : e.zux_1.cxe(),
@@ -415284,7 +415457,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								
 								if (window.__BATTLE_USERS__?.get(window.__SELF_ID__)?.team === 'TEAM_A') {
 									if (this.n7k_1.l4a_1.v6t_1.h_1[0]?.name === 'redFlag') {
-										console.log(window.__FLAG_KILLFEED_STARTED__)
 										if (!window.__FLAG_KILLFEED_STARTED__) {
 											if (!window.__FLAG_POS_BLUE__) {
 												window.__FLAG_POS_BLUE__ = { x: i.a3z_1[12], y: i.a3z_1[13]};
@@ -418545,7 +418717,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         96631: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/open_sans_georgian.8ab2c6cf.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/open_sans_georgian.8ab2c6cf.png"
         }
         ,
         96650: (t, n, i) => {
@@ -418555,7 +418727,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         96863: (t, n, i) => {
             "use strict";
-            t.exports = i.p + "static/images/open_sans_latin.1f261a52.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/open_sans_latin.1f261a52.png"
         }
         ,
         97129: (t, n, i) => {
