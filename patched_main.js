@@ -73956,16 +73956,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                           , s = t / n * 100;
                                         e.width = Ww(s) + "%";
 										
-										// 🔥 ДОБАВЛЯЕМ ГЛОУ-ЭФФЕКТ
-										const oldPercent = window.prevProgressWidths.get(i) || 0;
-										if (s > oldPercent) {
-											// Откладываем на следующий тик, чтобы элемент точно встал в DOM
-											setTimeout(() => {
-												window.addProgressGlow(oldPercent, s, Ww(s));
-											}, 0);
-										}
-										window.prevProgressWidths.set(i, s); // Сохраняем для следующего раза
-										
                                         var u = [sw(e)]
                                           , _ = r.concat(u);
                                         return i.className = uw.apply(null, [].slice.call(_.slice())),
