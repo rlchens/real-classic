@@ -200614,6 +200614,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									} else {
 										window.__CHANGE_TO_OLD__ = false
 									}
+									
+									if (i.includes('165/30023360127765')) {
+										window.__CURRENT_MAP__ = 'stadium'
+									}
 								}
 								
                                 if (1 === r) {
@@ -202683,12 +202687,33 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									|| n.includes('267/30545000606632') // over drop point
 									|| n.includes('176/31357575537545') // +1000
 									|| (JSON.parse(localStorage.getItem('oldGraphics')) && (
-											n.includes('157/30545000607206')
+											n.includes('157/30545000607206') // skybox desert
 											|| n.includes('160/30545000606455')
 											|| n.includes('161/30545000607431')
 											|| n.includes('156/30545000606066')
 											|| n.includes('162/30545000606514')
 											|| n.includes('163/30545000606175')
+											
+											|| n.includes('143/30545000607436') // skybox default
+											|| n.includes('145/30545000606242')
+											|| n.includes('147/30545000607015')
+											|| n.includes('146/30545000607201')
+											|| n.includes('144/30545000607425')
+											|| n.includes('142/30545000606135')
+											
+											|| n.includes('201/30545000607502') // skybox city
+											|| n.includes('202/30545000606242')
+											|| n.includes('203/30545000607362')
+											|| n.includes('204/30545000605215')
+											|| n.includes('205/30545000607543')
+											|| n.includes('206/30545000606671')
+											
+											|| n.includes('125/30545000607414') // skybox winter
+											|| n.includes('126/30545000605556')
+											|| n.includes('127/30545000607121')
+											|| n.includes('130/30545000607200')
+											|| n.includes('131/30545000607362')
+											|| n.includes('132/30545000606507')
 										)
 									)
 									
@@ -202698,6 +202723,27 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 ) {
                                     n = n.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'))
                                 }
+								
+								if (window.__CURRENT_MAP__ === 'stadium') {
+									if (n.includes('201/30545000607502')) {
+										n = n.replace('201/30545000607502','157/30545000607206')
+									}
+									if (n.includes('202/30545000606242')) {
+										n = n.replace('202/30545000606242','160/30545000606455')
+									}
+									if (n.includes('203/30545000607362')) {
+										n = n.replace('203/30545000607362','161/30545000607431')
+									}
+									if (n.includes('204/30545000605215')) {
+										n = n.replace('204/30545000605215','156/30545000606066')
+									}
+									if (n.includes('205/30545000607543')) {
+										n = n.replace('205/30545000607543','162/30545000606514')
+									}
+									if (n.includes('206/30545000606671')) {
+										n = n.replace('206/30545000606671','163/30545000606175')
+									}
+								}
 								if (
 									JSON.parse(localStorage.getItem('oldGraphics')) &&
                                     (
@@ -403818,7 +403864,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 }
                 ,
                 Hs(ch).a3n = function() {
-                    var t, n, i = this.s3m_1.n1j_1, r = Math.cos(i), e = this.s3m_1.n1j_1, s = Math.sin(e), u = this.s3m_1.o1j_1, _ = Math.cos(u), a = this.s3m_1.o1j_1, o = Math.sin(a), h = this.s3m_1.p1j_1, c = Math.cos(h), f = this.s3m_1.p1j_1, l = Math.sin(f), v = o * c, w = o * l, d = this.h3m_1;
+					// CAMERA POSITION
+                    var t, n, i = this.s3m_1.n1j_1, lookUpOffset = 0, r = Math.cos(i), e = this.s3m_1.n1j_1 + lookUpOffset, s = Math.sin(e), u = this.s3m_1.o1j_1, _ = Math.cos(u), a = this.s3m_1.o1j_1, o = Math.sin(a), h = this.s3m_1.p1j_1, c = Math.cos(h), f = this.s3m_1.p1j_1, l = Math.sin(f), v = o * c, w = o * l, d = this.h3m_1;
                     d[0] = _ * c,
                     d[1] = s * v - r * l,
                     d[2] = r * v + s * l,
