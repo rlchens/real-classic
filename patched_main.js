@@ -1359,6 +1359,14 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  box-shadow: none !important;
 				  }
 				  
+				  .css-zwi1aq {
+					  border-image-width: 1.1rem !important;
+					  border-image-slice: 15 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redInnerButtonActive.svg) !important;
+					  background: transparent !important;
+					  box-shadow: none !important;
+				  }
+				  
 				  .css-1f6hgrq {
 					  border-image-width: 2rem !important;
 					  border-image-slice: 28 !important;
@@ -1494,7 +1502,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  }
 				  
 				  .css-69i1ev .css-1xji6ji, .css-5harb3 .css-1xji6ji, .css-bs5yg2 .css-1xji6ji, .css-20a40q, .css-9s12yc, .css-1gx1ox7 .css-1xji6ji {
-					  border-image-width: 1.6rem !important;
+					  border-image-width: 1.7rem !important;
 					  border-image-slice: 24 !important;
 					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButton.svg) !important;
 					  background: transparent !important;
@@ -1572,11 +1580,45 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  padding: 0 !important;
 				  }
 				  
-				  .css-h521rs, .css-1ixbp0l, .css-1n70775 {
+				  .css-h521rs, .css-1n70775 {
 					  border-image-width: 1.6rem !important;
 					  border-image-slice: 24 !important;
 					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButtonDisabled.svg) !important;
 					  background: transparent !important;
+				  }
+				  
+				  .css-1ixbp0l .css-7cbgtg {
+					  min-width: 7rem !important;
+					  height: max-content !important;
+					  justify-content: center;
+				  }
+				  
+				  .css-1gx1ox7 > div:last-child .css-1xji6ji {
+					  border-image-width: 1.1rem !important;
+					  border-image-slice: 15 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButton.svg) !important;
+					  background: transparent !important;
+					  box-shadow: none !important;
+				  }
+				  
+				  .css-1gx1ox7 > div:last-child .css-1xji6ji:hover {
+					  border-image-width: 1.1rem !important;
+					  border-image-slice: 15 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonHover.svg) !important;
+					  background: transparent !important;
+					  box-shadow: none !important;
+				  }
+				  
+				  .css-1gx1ox7 > div:last-child .css-1xji6ji:active {
+					  border-image-width: 1.1rem !important;
+					  border-image-slice: 15 !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonActive.svg) !important;
+					  background: transparent !important;
+					  box-shadow: none !important;
+				  }
+				  
+				  .css-1gx1ox7 .css-1xji6ji {
+					  padding: 0.375rem !important;
 				  }
 				  
 				  .css-13vxpdt {
@@ -2593,6 +2635,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					transform: none !important;
 					z-index: 1;
 				}
+				
+				.css-eur6nf {
+					min-width: fit-content;
+				}
     `;
 
     const styleElement = document.createElement('style');
@@ -2675,7 +2721,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						<div class="css-ynddud">
 							<img class="css-yj108x" src="${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/accept.8be2e839.svg" style="display: ${savedGraphics ? 'block' : 'none'};">
 						</div>
-						<div class="css-vo4gqt">Старая графика (Тишина Лето, Пинг-Понг Лето) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
+						<div class="css-vo4gqt">Старая графика (Тишина, Пинг-Понг) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
 					</div>
 					
 					<!-- ЧЕКБОКС СТАРЫХ ЛАЙТМАПОВ -->
@@ -4826,7 +4872,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		// 🔥 Удаляем старый глоу, если ещё не исчез
 		const oldGlow = document.querySelector('.progress-glow-highlight');
 		if (oldGlow) {
-			console.log(oldGlow)
 			oldGlow.remove();
 		}
 		
@@ -4864,15 +4909,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		
 		progress.style.position = 'relative'; // Гарантируем позиционирование
 		progress.appendChild(glow);
-		console.log(progress);
 		
 		setTimeout(() => {
 			if (glow.parentNode) {
 				glow.remove();
 			}
 		}, 1000);
-		
-		console.log(`[Glow] +${diff}% on progress bar`);
 	}
 
 	realWindow.updateBattles = () => {
@@ -5302,7 +5344,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			
 			const img = document.createElement('img');
 			img.className = 'css-1xfzc85';
-			img.src = 'chrome-extension://nplapeipenkhbpgmpljmcjonnonkmgfd/tankiclassic.com/play/static/images/scull.c7d3d323.svg';
+			img.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/scull.c7d3d323.svg`;
 			
 			const value = document.createElement('div');
 			value.textContent = score;
@@ -63891,7 +63933,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     return CO(),
                     t.key = "ContainerOpenButton",
                     t.isBigButton = !0,
-                    t.text = "открыть",
+                    t.text = "Открыть",
                     t.colors = UG(),
                     t.borderType = PG(),
                     t.onClick = SO,
@@ -72157,7 +72199,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                                   , r = function(t) {
                                                     return function(n) {
                                                         return n.colors = UG(),
-                                                        n.text = "Yes",
+                                                        n.text = "Да",
                                                         n.borderType = PG(),
                                                         n.onClick = function(t) {
                                                             return function() {
@@ -72183,7 +72225,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                                   , r = function(t) {
                                                     return function(n) {
                                                         return n.colors = UG(),
-                                                        n.text = "No",
+                                                        n.text = "Нет",
                                                         n.borderType = PG(),
                                                         n.onClick = function(t) {
                                                             return function() {
@@ -79658,10 +79700,42 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     var n = Vn()
                       , i = n
                       , r = _t(this).q2d(t);
+					
+					let towerProp = null;
+					let towerPropIndex = null;
+					let towerPropAtlasIndex = null;
+					r.g83_1.h_1.forEach((atl, atlIndex) => {
+						atl.t82_1.h_1.forEach((prop, index) => {
+							if (prop.a83_1 === 'tower') {
+								towerProp = prop;
+								towerPropIndex = index;
+								towerPropAtlasIndex = atlIndex;
+							}
+						});
+					});
+					if (towerProp && JSON.parse(localStorage.getItem('oldGraphics'))) {
+						towerProp.b83_1 = 128;
+						towerProp.c83_1 = 0;
+						towerProp.d83_1 = 0;
+						
+						r.g83_1.h_1[towerPropAtlasIndex].t82_1.h_1.splice(towerPropIndex, 1);
+						r.g83_1.h_1[towerPropAtlasIndex].t82_1.e4_1 = r.g83_1.h_1[towerPropAtlasIndex].t82_1.e4_1 - 1;
+						
+						const towerAtlasProps = window._.cloneDeep(r.g83_1.h_1[towerPropAtlasIndex]);
+						const towerAtlasPropsBase = window._.cloneDeep(r.g83_1.h_1[towerPropAtlasIndex].t82_1);
+						towerAtlasProps.u82_1 = 128;
+						towerAtlasProps.q82_1 = 512;
+						towerAtlasProps.r82_1 = 'towerAtlas';
+						towerAtlasPropsBase.e4_1 = 1;
+						towerAtlasPropsBase.h_1 = [towerProp];
+						towerAtlasProps.t82_1 = towerAtlasPropsBase;
+						r.g83_1.h_1.push(towerAtlasProps);
+						r.g83_1.e4_1 = r.g83_1.e4_1 + 1;
+					}
+					  
                     i.b84_1 = null == r || r instanceof Un ? r : E();
                     var e = n
                       , s = at(this).q2d(t);
-                    e.c84_1 = null == s || s instanceof Gn ? s : E();
                     var u = n
                       , _ = ot(this).q2d(t);
                     u.d84_1 = _ instanceof Zn ? _ : E();
@@ -79670,12 +79744,42 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     a.e84_1 = o instanceof Zn ? o : E();
                     var h = n
                       , c = ct(this).q2d(t);
-                    h.f84_1 = c instanceof si ? c : E();
                     var f = n
                       , l = ft(this).q2d(t);
                     f.g84_1 = null == l || l instanceof mi ? l : E();
                     var v = n
                       , w = lt(this).q2d(t);
+					  if (towerProp && JSON.parse(localStorage.getItem('oldGraphics'))) {
+						  let indexesTower = [];
+						  let towerShaderIndex = null;
+						  let towerAtlasShaderIndex = s.s83_1.h_1[towerPropAtlasIndex].l83_1;
+						  w.v87_1.h_1.forEach((el, index) => el.a87_1 === 'Steel tower' && indexesTower.push(index));
+						  
+						  const towerBatch = window._.cloneDeep(s.s83_1.h_1[towerPropAtlasIndex]);
+						  towerShaderIndex = s.s83_1.h_1[s.s83_1.h_1.length - 1].l83_1 + 1;
+						  towerBatch.l83_1 = towerShaderIndex;
+						  towerBatch.o83_1 = '';
+						  indexesTower.forEach((el, index) => {
+							  s.s83_1.h_1[towerPropAtlasIndex].o83_1 = s.s83_1.h_1[towerPropAtlasIndex].o83_1.replace(`${el};`, '');
+							  if (index === (indexesTower.length - 1)) {
+								  towerBatch.o83_1 = towerBatch.o83_1 + `${el}`;
+							  } else {
+								  towerBatch.o83_1 = towerBatch.o83_1 + `${el};`;
+							  }
+						  })
+						  s.s83_1.h_1.push(towerBatch);
+						  s.s83_1.e4_1 = s.s83_1.e4_1 + 1;
+						  
+						  const towerAtlasShader = window._.cloneDeep(c.o86_1.h_1[towerAtlasShaderIndex]);
+						  const towerAtlasShaderName = window._.cloneDeep(c.o86_1.h_1[towerAtlasShaderIndex].h86_1.f88_1);
+						  towerAtlasShaderName.h_1[0].c88_1 = 'towerAtlas';
+						  towerAtlasShader.d86_1 = towerShaderIndex;
+						  towerAtlasShader.h86_1.f88_1 = towerAtlasShaderName;
+						  c.o86_1.h_1.push(towerAtlasShader);
+						  c.o86_1.e4_1 = c.o86_1.e4_1 + 1;
+					  }
+                    h.f84_1 = c instanceof si ? c : E();
+                    e.c84_1 = null == s || s instanceof Gn ? s : E();
                     return v.h84_1 = w instanceof bi ? w : E(),
                     n
                 }
@@ -129975,8 +130079,16 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					}
 					if ((t.key + "-" + u.name)?.includes('css-rxxlm3')) {
 						setTimeout(() => {
-							const text = document.querySelector('.css-rxxlm3 p').textContent.split(' ');
+							let text = document.querySelector('.css-rxxlm3 p').textContent.split(' ');
 							text[3] = '<span> </span>';
+							if (!window.__LAST_TEXT_LENGTH__) {
+								window.__LAST_TEXT_LENGTH__ = text.length;
+								window.__LAST_TEXT__ = text.splice(3);
+							}
+							if (text.length !== window.__LAST_TEXT_LENGTH__) {
+								text = [text[0], text[1], text[2], window.__LAST_TEXT__];
+								text = text.flat();
+							}
 							document.querySelector('.css-rxxlm3 p').innerHTML = `${text.join(' ')}`
 						}, 0)
 					}
@@ -196134,11 +196246,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                             case 0:
                                 if (this.w8_1 = 5,
                                 this.v8_1 = 1,
-                                (t = fi(s_(this.i92_1, this.g92_1, this.h92_1, null), this)) === xn())
-                                    return t;
+                                (t = fi(s_(this.i92_1, this.g92_1, this.h92_1, null), this)) === xn()) {
+                                    return t;									
+								}
                                 continue t;
                             case 1:
                                 var n = t;
+								
                                 this.j92_1 = Sn(zn(n, 10)),
                                 this.k92_1 = n.m(),
                                 this.v8_1 = 2;
@@ -200379,7 +200493,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                                 continue t;
                             case 2:
                                 var i = Ve(t);
-								 if (this?.b9s_1?.includes('atlas')) {
+								 if (this?.b9s_1?.includes('atlas') || this?.b9s_1?.includes('Atlas')) {
 									 i.name = this.b9s_1.split('/')[this.b9s_1.split('/').length - 1].split('.')[0]
 									 if (i.name === 'atlas') {
 										 i.atlasId = 1
@@ -200389,6 +200503,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									 }
 									 if (i.name === 'atlas3') {
 										 i.atlasId = 3
+									 }
+									 if (i.name === 'towerAtlas') {
+										 i.atlasId = 101
 									 }
 								 }
                                 return We.e77(i);
@@ -200602,15 +200719,39 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								// atlas webp
 								
 								if (JSON.parse(localStorage.getItem('oldGraphics'))) {
+									if (n.includes('towerAtlas')) {
+										i = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer/new`;
+									}
 									if (
 										i.includes('63/30023334330564') // ping-pong summer
+										|| i.includes('306/30023334503250') // ping-pong winter
+										
 										|| i.includes('365/31552421666543') // silence summer
+										|| i.includes('4/30023355061311') // silence winter
+										|| i.includes('102/30125767471417') // silence space
 									) {
 										window.__CHANGE_TO_OLD__ = true
-										if (i.includes('365/31552421666543')) {
-											window.__CURRENT_MAP__ = 'silence'
-										}
 										i = i.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
+										
+										if (i.includes('365/31552421666543')) {
+											window.__CURRENT_MAP__ = 'silence_summer'
+											if (n.includes('towerAtlas')) {
+												i = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+											}
+										}
+										if (i.includes('4/30023355061311')) {
+											window.__CURRENT_MAP__ = 'silence_winter'
+											if (n.includes('towerAtlas')) {
+												i = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsWinter`;
+											}
+										}
+										if (i.includes('102/30125767471417')) {
+											window.__CURRENT_MAP__ = 'silence_space'
+											if (n.includes('towerAtlas')) {
+												i = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+											}
+										}
+										
 									} else {
 										window.__CHANGE_TO_OLD__ = false
 									}
@@ -200693,6 +200834,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								
 								if (window.__CHANGE_TO_OLD__) {
 									if (
+										// summer
 										n.includes('30023173712307/watch_to')
 										|| n.includes('30023173712307/tower')
 										|| n.includes('30023201751631/nubu_6')
@@ -200713,6 +200855,28 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 										|| n.includes('30023203466004/tube_2')
 										|| n.includes('30023203466004/tube_3')
 										|| n.includes('30023203466004/tube_4')
+										
+										// winter
+										|| n.includes('30023173724731/watch_to')
+										|| n.includes('30023173724731/tower')
+										|| n.includes('30023201770274/nubu_6')
+										|| n.includes('30023202034222/nubu_9')
+										|| n.includes('30023171316730/smhouse5')
+										|| n.includes('30023173674746/brid_2')
+										|| n.includes('30023173674746/brid_7')
+										|| n.includes('30023173674746/brid_6')
+										|| n.includes('30023173674746/brid_5')
+										|| n.includes('30023173674746/brid_3')
+										|| n.includes('30023173674746/brid_4')
+										|| n.includes('30023173674746/brid_1')
+										|| n.includes('30023173674746/brid_1_3')
+										|| n.includes('30023202117502/tunnel_1')
+										|| n.includes('30023202117502/tunnel_2')
+										|| n.includes('30023202117502/ow_t')
+										|| n.includes('30023203505745/tube_1')
+										|| n.includes('30023203505745/tube_2')
+										|| n.includes('30023203505745/tube_3')
+										|| n.includes('30023203505745/tube_4')
 									) {
 										n = n.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
 									}
@@ -395152,6 +395316,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							}
 						}
 						if (parseInt(lastTick) < parseInt(currentTick)) {
+							if (nickName === 'towerAtlas') {
+								t.a3p_1.isTowerAtlas = true;
+							}
 							n.e3x(t.a3p_1);
 							n.c3x(t.p3o_1);
 							t.g3o_1.r1t(n);
@@ -413756,8 +413923,27 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     
 						if (window.__CHANGE_TO_OLD__) {
 							let discardBlack = ''
-							if (window.__CURRENT_MAP__ === 'silence') {
-								discardBlack = 'vec2 dx = dFdx(vUV);\n\t\t\tvec2 dy = dFdy(vUV);\n\t\t\tfloat delta_max = max(dot(dx, dx), dot(dy, dy));\n\t\t\tfloat mipLevel = max(0.0, 0.5 * log2(delta_max));\n\t\t\tfloat threshold = 0.03 + clamp(mipLevel * 0.035, 0.0, 0.18);\n\t\t\tfloat brightness = (color.r + color.g + color.b) / 3.0;\n\t\t\tbool isTarget = (vUV.x >= 0.5546875 && vUV.x <= 0.6796875 && vUV.y >= 0.6015625 && vUV.y <= 0.7265625) || (vUV.x >= 0.1484375 && vUV.x <= 0.2734375 && vUV.y >= 0.0703125 && vUV.y <= 0.1953125);\n\t\t\tbool isTerrain = (uAtlasId == 1);\n\t\t\tif (isTerrain && isTarget && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t';
+							if (
+								window.__CURRENT_MAP__ === 'silence_summer'
+								|| window.__CURRENT_MAP__ === 'silence_winter'
+								|| window.__CURRENT_MAP__ === 'silence_space'
+							) {
+								let uvCords = {
+									fromX: '0.9999999',
+									toX: '0.9999999',
+									fromY: '0.9999999',
+									toY: '0.9999999'
+								};
+								if (window.__CURRENT_MAP__ === 'silence_summer' || window.__CURRENT_MAP__ === 'silence_winter' || window.__CURRENT_MAP__ === 'silence_space') {
+									// brid_1
+									uvCords = {
+										fromX: '0.1484375',
+										toX: '0.2734375',
+										fromY: '0.0703125',
+										toY: '0.1953125'
+									};
+								}
+								discardBlack = 'vec2 dx = dFdx(vUV);\n\t\t\tvec2 dy = dFdy(vUV);\n\t\t\tfloat delta_max = max(dot(dx, dx), dot(dy, dy));\n\t\t\tfloat mipLevel = max(0.0, 0.5 * log2(delta_max));\n\t\t\tfloat threshold = 0.03 + clamp(mipLevel * 0.035, 0.0, 0.18);\n\t\t\tfloat brightness = (color.r + color.g + color.b) / 3.0;\n\t\t\tbool isTarget = (vUV.x >= ' + uvCords.fromX + ' && vUV.x <= ' + uvCords.toX + ' && vUV.y >= ' + uvCords.fromY + ' && vUV.y <= ' + uvCords.toY + ');\n\t\t\tbool isTerrain = (uAtlasId == 1);\n\t\t\tbool isTower = (uAtlasId == 101);\n\t\t\tif (isTower && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t\n\t\t\tif ((isTerrain && isTarget) && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t';
 							}
 							shader = "\n\t\tuniform int uAtlasId;\n\t\t" + Yy("USE_COLOR_TRANSFORM", _) + "\n\t\t" + Yy("USE_SOFT_ATTENUATION", a) + "\n\n\t\tuniform sampler2D mainTexture;\n\t\tuniform float alpha;\n\t\tvarying vec2 vUV;\n\t\t\n\t\t" + o.c4n() + "\n\t\t\n\t\t#if USE_COLOR_TRANSFORM\n\t\tuniform vec4 colorOffset;\n\t\tuniform vec4 colorMultiplier;\n\t\t#endif\n\t\t\n\t\t" + Ne.x75(h) + "\n\t\t" + ze.x75(c) + "\n\t\t" + Ce.x75(f) + "\n\t\t" + Ie.x75(l) + "\n\t\t\t\t\n\t\t#if USE_SOFT_ATTENUATION\n\t\tuniform sampler2D depthTexture;\t\n\t\tuniform vec2 screenSize;\n\t\tuniform float softAttenuationInvDistance;\n\t\t\n\t\t\n\t\t\t#ifndef Z_BUFFER_LINEARIZATION_INCLUDE\n\t\t\t#define Z_BUFFER_LINEARIZATION_INCLUDE\n\t\t\t\n\t\t\tuniform vec4 zBufferParams;\n\t\t\t\n\t\t\tfloat LinearDepth(float z) {\t\t\n\t\t\t\treturn 1.0 / (zBufferParams.z * z + zBufferParams.w);\n\t\t\t}\n\t\t\t#endif //Z_BUFFER_LINEARIZATION_INCLUDE\n\t\t\n\t\t#endif\t\n\t\n\t\tvoid main() {\n\t\t\tvec4 color = texture2D(mainTexture, vUV);\n\t\t\t" + discardBlack + "\n\n\n\t\t\t\n\t\t\t" + ze.b76("color.a") + "\n\t\t\t\n\t\t\t" + Ie.f4n() + "\n\t\t\t\n\t\t\t#if USE_COLOR_TRANSFORM\n\t\t\t\tcolor = color * colorMultiplier + colorOffset;\n\t\t\t#endif\n\t\t\t\n\t\t\t" + Ne.b76("color") + "\n\t\t\t" + o.f4n() + "\n\t\t\tcolor.rgb *= light;\n\t\t\t\n\t\t\t#if USE_SOFT_ATTENUATION\n\t\t\t\tfloat fragDepth = LinearDepth(gl_FragCoord.z);\n\t\t\t\tfloat nonLinearSceneDepth = texture2D(depthTexture, gl_FragCoord.xy / screenSize).x;\n\t\t\t\tfloat sceneDepth = LinearDepth(nonLinearSceneDepth);\n\t\t\t\tfloat softAttenuation = clamp((sceneDepth - fragDepth) * softAttenuationInvDistance, 0.0, 1.0);\n\t\t\t\tcolor.a *= softAttenuation;\n\t\t\t#endif\n\t\t\t\n\t\t\t" + Ce.b76("color.rgb") + "\n\t\t\t\n\t\t\tcolor.a *= alpha;\n\t\t\tgl_FragColor = color;\n\t\t}\n\t\t"
 						}
@@ -414164,7 +414350,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         var r = t.m4a_1.t76_1 ? 9729 : 9728;
                         n.h3s(i, 10240, r);
                         var e = t.m4a_1.w76_1 ? t.m4a_1.t76_1 ? 9987 : 9986 : r;
-                        if (n.h3s(i, 10241, e),
+                        if (n.h3s(i, 10241, e, n?.isTowerAtlas),
                         t.m4a_1.w76_1 && t.m4a_1.x76_1 >= 0 && n.u3r() > 2 && n.h3s(i, 33085, t.m4a_1.x76_1),
                         n.x3r()) {
                             var s = t.m4a_1.y76_1 ? n.z3r() : 1;
@@ -415652,6 +415838,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					
 					if (this?.n7k_1?.l4a_1?.atlasId) {
 						e.j3u(r.atlasId, this.n7k_1.l4a_1.atlasId);
+					} else {
+						e.j3u(r.atlasId, 9999);
 					}
 
                     var DARK_MULT = [0.00353, 0.01922, 0.03490, 1.0];
@@ -416863,7 +417051,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                     return this.b80_1.activeTexture(t)
                 }
                 ,
-                Hs(QS).h3s = function(t, n, i) {
+                Hs(QS).h3s = function(t, n, i, isTowerAtlas) {
+					if (isTowerAtlas) {
+						i = 9729;
+					}
                     return this.b80_1.texParameteri(t, n, i),
                     Bs
                 }
