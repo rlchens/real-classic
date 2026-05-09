@@ -200719,9 +200719,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								// atlas webp
 								
 								if (JSON.parse(localStorage.getItem('oldGraphics'))) {
-									if (n.includes('towerAtlas')) {
-										i = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer/new`;
-									}
+									
 									if (
 										i.includes('63/30023334330564') // ping-pong summer
 										|| i.includes('306/30023334503250') // ping-pong winter
@@ -200754,6 +200752,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 										
 									} else {
 										window.__CHANGE_TO_OLD__ = false
+										if (n.includes('towerAtlas')) {
+											i = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer/new`;
+										}
 									}
 									
 									if (i.includes('165/30023360127765')) {
