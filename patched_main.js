@@ -1676,11 +1676,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redArea.svg) !important;
 				  }
 				  
-				  .css-1c1wcrm, .css-1vl3ale, .css-gcy3m0, .css-dteaal {
+				  .css-1c1wcrm, .css-1vl3ale, .css-gcy3m0, .css-dteaal, .css-1cfxxtr {
 					  font-size: 0.9rem !important;
 				  }
 				  
-				  .css-1c1wcrm, .css-gcy3m0 {
+				  .css-1c1wcrm, .css-gcy3m0, .css-1cfxxtr {
 					  padding-left: 0.3rem !important;
 				  }
 				  
@@ -2188,6 +2188,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				
 				.css-195jawz {
 					bottom: 0.325rem !important;
+					gap: 0.125rem !important;
 				}
 				
 				.css-195jawz > div {
@@ -2721,7 +2722,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						<div class="css-ynddud">
 							<img class="css-yj108x" src="${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/accept.8be2e839.svg" style="display: ${savedGraphics ? 'block' : 'none'};">
 						</div>
-						<div class="css-vo4gqt">Старая графика (Тишина, Пинг-Понг) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
+						<div class="css-vo4gqt">Старая графика (Тишина, Пинг-Понг, Будущее) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
 					</div>
 					
 					<!-- ЧЕКБОКС СТАРЫХ ЛАЙТМАПОВ -->
@@ -191584,21 +191585,59 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                             r.o8u_1 = t.l1t(),
                             r.p8u_1 = new wr(e,s,u,_)
                             if (!window.__ATLAS_RECTS__) window.__ATLAS_RECTS__ = []
-                            window.__ATLAS_RECTS__.push({ 
+							let rect = { 
 								atlasName,
 								atlasWidth: n,
 								atlasHeight: i,
-                                groupPropsName: r.n8u_1,
-                                name: r.o8u_1,
-                                posX: t.c83_1,
-                                posY: t.d83_1,
-                                width: t.b83_1,
-                                height: t.y82_1,
-                                uvPosX: e,
-                                uvPosY: s,
-                                uvWidth: u,
-                                uvHeight: _
-                            })
+								groupPropsName: r.n8u_1,
+								name: r.o8u_1,
+								posX: t.c83_1,
+								posY: t.d83_1,
+								width: t.b83_1,
+								height: t.y82_1,
+								uvPosX: e,
+								uvPosY: s,
+								uvWidth: u,
+								uvHeight: _
+							};
+							if (r.n8u_1 === 'Passage' && r.o8u_1 === 'brid_1') {
+								rect.name = 'brid_11';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Passage' && r.o8u_1 === 'brid_2') {
+								rect.name = 'brid_222';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Passage' && r.o8u_1 === 'brid_6') {
+								rect.name = 'brid_66';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Passage' && r.o8u_1 === 'brid_7') {
+								rect.name = 'brid_77';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Com Build' && r.o8u_1 === 'wtile_b') {
+								rect.name = 'wtile_bb';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'sm_rck1') {
+								rect.name = 'sm_rck11';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'bg_rock') {
+								rect.name = 'bg_rockk';
+								window.__ATLAS_RECTS__.push(rect);
+							} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'concrete_1') {
+								rect.name = 'concrete_11';
+								window.__ATLAS_RECTS__.push(rect)
+							} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'concrete_2') {
+								rect.name = 'concrete_22';
+								window.__ATLAS_RECTS__.push(rect)
+							} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'concrete_3') {
+								rect.name = 'concrete_33';
+								window.__ATLAS_RECTS__.push(rect)
+							} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'concrete_4') {
+								rect.name = 'concrete_44';
+								window.__ATLAS_RECTS__.push(rect)
+							} else {
+								window.__ATLAS_RECTS__.push(rect);
+							}
+							
+                            
                         }(t, n.u82_1, n.q82_1, i, n.r82_1),
                         i
                     }(t, n, cn(Zt(ta)))
@@ -200727,6 +200766,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 										|| i.includes('365/31552421666543') // silence summer
 										|| i.includes('4/30023355061311') // silence winter
 										|| i.includes('102/30125767471417') // silence space
+										
+										|| i.includes('157/31552415643116') // future
+										|| i.includes('137/30040002170721') // future space
+										
 									) {
 										window.__CHANGE_TO_OLD__ = true
 										i = i.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
@@ -342101,6 +342144,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 }
                 ,
                 _y(NKt).hao = function(t, n, i, weaponName) {
+					console.log('4', weaponName);
+					
                     if (Rj(this.s12i_1, Oj(0)) <= 0 && !this.t12i_1)
                         return !1;
                     if (this.x12i_1) {
@@ -369912,6 +369957,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 _y(IEn).qas = function(t) {}
                 ,
                 _y(IEn).hao = function(t, n, i, weaponName) {
+					console.log('1', weaponName);
                     if (Rj(this.j12o_1, Oj(0)) <= 0 && !this.k12o_1)
                         return !1;
                     if (this.l12o_1) {
@@ -370603,6 +370649,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 _y(NEn).qas = function(t) {}
                 ,
                 _y(NEn).hao = function(t, n, i, weaponName) {
+					console.log('2', weaponName);
+					
                     if (Rj(this.zx1_1, Oj(0)) <= 0 && !this.ax2_1)
                         return !1;
                     if (this.bx2_1) {
@@ -371440,6 +371488,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 _y(UEn).qas = function(t) {}
                 ,
                 _y(UEn).hao = function(t, n, i, weaponName) {
+					console.log('3', weaponName);
+					
                     if (Rj(this.i13b_1, Oj(0)) <= 0 && !this.j13b_1)
                         return !1;
                     if (this.k13b_1) {
@@ -409453,9 +409503,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                         }
                     }
                     r.k3u(i.a55_1, this.m5i_1.h3z()),
-                    isSuicide ? r.n3r(i.y54_1, (window.outerWidth / 2) - (suicideWidth / 2), (window.outerHeight / 2) - suicideHeight, this.m5i_1.r3m_1.p1j_1)
+                    isSuicide ? r.n3r(i.y54_1, (window.outerWidth / 2) - (suicideWidth / 3), (window.outerHeight / 2) - (suicideHeight / 1.5), this.m5i_1.r3m_1.p1j_1)
                     : r.n3r(i.y54_1, Zp().n5i_1.o5c_1, Zp().n5i_1.p5c_1, this.m5i_1.r3m_1.p1j_1),
-                    isSuicide ? r.o3r(i.x54_1, n.a3m_1.j1s(), n.a3m_1.i1s(), suicideWidth, suicideHeight)
+                    isSuicide ? r.o3r(i.x54_1, n.a3m_1.j1s(), n.a3m_1.i1s(), suicideWidth / 1.5, suicideHeight / 1.5)
                     : r.o3r(i.x54_1, n.a3m_1.j1s(), n.a3m_1.i1s(), Zp().n5i_1.q5c_1, Zp().n5i_1.r5c_1),
                     r.o3r(i.w54_1, this.m5i_1.g5i_1 - this.m5i_1.e5i_1, this.m5i_1.e5i_1, this.m5i_1.h5i_1 - this.m5i_1.f5i_1, this.m5i_1.f5i_1),
                     t.q4b(i.z54_1, this.m5i_1.b5i_1),
