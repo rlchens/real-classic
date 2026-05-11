@@ -135,13 +135,331 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
     'use strict';
 
     const realWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+
+	// 🔥 ПРОКСИ-КЛИЕНТ для patched_main.js (контекст страницы)
+	;(function installPageProxy() {
+		'use strict';
+		
+		const EXTERNAL = ['cdn.jsdelivr.net', 'raw.githubusercontent.com'];
+		let _requestId = 0;
+		
+		// 🔹 Функция отправки запроса через мост
+		function proxyViaBridge(url, init) {
+			return new Promise((resolve, reject) => {
+				const requestId = 'req_' + (++_requestId) + '_' + Date.now();
+				
+				// Слушаем ответ
+				const onMessage = (event) => {
+					if (event.source !== realWindow) return;
+					if (event.data?.type !== 'REAL_CLASSIC_PROXY_RESPONSE') return;
+					if (event.data?.requestId !== requestId) return;
+					
+					// Убираем слушатель
+					realWindow.removeEventListener('message', onMessage);
+					
+					const response = event.data.payload;
+					if (response?.success) {
+						const uint8 = new Uint8Array(response.buffer);
+						const blob = new Blob([uint8], { type: response.contentType });
+						resolve(new Response(blob, {
+							status: response.status,
+							headers: { 'Content-Type': response.contentType }
+						}));
+					} else {
+						reject(new Error(response?.error || 'Proxy failed'));
+					}
+				};
+				
+				realWindow.addEventListener('message', onMessage);
+				
+				// Отправляем запрос
+				realWindow.postMessage({
+					type: 'REAL_CLASSIC_PROXY_REQUEST',
+					requestId,
+					payload: { url, method: init?.method, headers: init?.headers }
+				}, '*');
+			});
+		}
+		
+		// 🔹 Перехват fetch
+		const origFetch = realWindow.fetch;
+		realWindow.fetch = function(input, init) {
+			let url = typeof input === 'string' ? input : input?.url;
+			
+			if (url && EXTERNAL.some(d => url.includes(d))) {
+				console.log('[PAGE-PROXY] Intercepted:', url);
+				return proxyViaBridge(url, init);
+			}
+			return origFetch.call(this, input, init);
+		};
+		
+		// 🔹 Перехват XMLHttpRequest (опционально)
+		const origOpen = XMLHttpRequest.prototype.open;
+		XMLHttpRequest.prototype.open = function(method, url, ...args) {
+			if (typeof url === 'string' && EXTERNAL.some(d => url.includes(d))) {
+				console.log('[PAGE-PROXY] Intercepted XHR:', url);
+				this._proxyViaBridge = true;
+				this._proxyUrl = url;
+				this._proxyMethod = method;
+				return origOpen.call(this, method, 'blob:null/', ...args);
+			}
+			return origOpen.call(this, method, url, ...args);
+		};
+		
+		const origSend = XMLHttpRequest.prototype.send;
+		XMLHttpRequest.prototype.send = function(body) {
+			if (this._proxyViaBridge && this._proxyUrl) {
+				proxyViaBridge(this._proxyUrl, { method: this._proxyMethod })
+					.then(resp => resp.blob())
+					.then(blob => {
+						Object.defineProperties(this, {
+							response: { value: blob, configurable: true },
+							responseText: { value: '', configurable: true },
+							status: { value: 200, configurable: true }
+						});
+						this.onload?.({ target: this });
+					})
+					.catch(err => { console.error('[PAGE-PROXY] XHR error:', err); this.onerror?.(); });
+				return;
+			}
+			return origSend.call(this, body);
+		};
+
+		// 🔥 Перехват Image.src (для <img> тегов)
+		;(function interceptImageSrc() {
+			const EXTERNAL = ['cdn.jsdelivr.net', 'raw.githubusercontent.com'];
+			const imgDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+			
+			Object.defineProperty(HTMLImageElement.prototype, 'src', {
+				get: function() {
+					return this._realSrc || imgDesc.get.call(this);
+				},
+				set: function(value) {
+					// Если это внешний URL — проксируем
+					if (typeof value === 'string' && EXTERNAL.some(d => value.includes(d))) {
+						console.log('[PAGE-PROXY] Intercepted Image.src:', value);
+						
+						// Создаём невидимое изображение для загрузки через proxy
+						const proxyImg = new Image();
+						
+						// Загружаем через proxy (используем тот же механизм, что и для fetch)
+						proxyViaBridge(value)
+							.then(response => response.blob())
+							.then(async (blob) => {
+								const arrayBuffer = await blob.arrayBuffer();
+								const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+								const contentType = blob.type || 'image/webp';
+								const dataUrl = `data:${contentType};base64,${base64}`;
+								this._realSrc = dataUrl;
+								imgDesc.set.call(this, dataUrl);
+								
+								// Эмулируем события загрузки
+								setTimeout(() => {
+									this.dispatchEvent(new Event('load', { bubbles: false }));
+								}, 0);
+							})
+							.catch(err => {
+								console.error('[PAGE-PROXY] Image failed:', value, err);
+								this.dispatchEvent(new Event('error', { bubbles: false }));
+							});
+						return;
+					}
+					
+					// Обычный случай — как есть
+					imgDesc.set.call(this, value);
+				},
+				configurable: true
+			});
+
+			// 🔥 РАННИЙ ПЕРЕХВАТ: перехватываем создание <img> до установки src
+			;(function interceptImageCreation() {
+				const EXTERNAL = ['cdn.jsdelivr.net', 'raw.githubusercontent.com'];
+				
+				// 1. Перехват document.createElement('img')
+				const origCreateElement = document.createElement;
+				document.createElement = function(tagName, options) {
+					const el = origCreateElement.call(this, tagName, options);
+					
+					if (tagName.toLowerCase() === 'img') {
+						// Сразу вешаем наш прокси-хук на этот экземпляр
+						const imgDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+						const originalSet = imgDesc?.set;
+						
+						if (originalSet) {
+							Object.defineProperty(el, 'src', {
+								get: function() { return this._realSrc || imgDesc.get.call(this); },
+								set: function(value) {
+									if (typeof value === 'string' && EXTERNAL.some(d => value.includes(d))) {
+										console.log('[EARLY-PROXY] Intercepted new Image():', value);
+										proxyViaBridge(value)
+											.then(r => r.blob())
+											.then(async blob => {
+												const buf = await blob.arrayBuffer();
+												const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+												const ct = blob.type || 'image/webp';
+												const dataUrl = `data:${ct};base64,${b64}`;
+												this._realSrc = dataUrl;
+												originalSet.call(this, dataUrl);
+												setTimeout(() => this.dispatchEvent(new Event('load')), 0);
+											})
+											.catch(err => {
+												console.error('[EARLY-PROXY] Failed:', value, err);
+												originalSet.call(this, value); // фоллбэк
+												this.dispatchEvent(new Event('error'));
+											});
+										return;
+									}
+									originalSet.call(this, value);
+								},
+								configurable: true
+							});
+						}
+					}
+					return el;
+				};
+				
+				// 2. MutationObserver для уже существующих <img> в DOM
+				new MutationObserver(mutations => {
+					mutations.forEach(m => {
+						m.addedNodes.forEach(node => {
+							if (node.tagName === 'IMG' && node.src && EXTERNAL.some(d => node.src.includes(d))) {
+								console.log('[EARLY-PROXY] Intercepted existing <img>:', node.src);
+								const originalSrc = node.src;
+								proxyViaBridge(originalSrc)
+									.then(r => r.blob())
+									.then(async blob => {
+										const buf = await blob.arrayBuffer();
+										const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+										const ct = blob.type || 'image/webp';
+										node.src = `data:${ct};base64,${b64}`;
+									})
+									.catch(err => console.error('[EARLY-PROXY] Existing img failed:', err));
+							}
+						});
+					});
+				}).observe(document.documentElement, { childList: true, subtree: true });
+
+				// 🔥 Перехват CSS-инъекций для замены URL в background-image
+				;(function interceptCSSUrls() {
+					const EXTERNAL = ['cdn.jsdelivr.net', 'raw.githubusercontent.com'];
+					const CDN_BASE = 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/';
+					
+					// 1. Перехват CSSStyleSheet.insertRule
+					const origInsertRule = CSSStyleSheet.prototype.insertRule;
+					CSSStyleSheet.prototype.insertRule = function(rule, index) {
+						let modifiedRule = rule;
+						
+						// Ищем url(...) в правиле и заменяем внешние ссылки
+						modifiedRule = modifiedRule.replace(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g, (match, url) => {
+							if (EXTERNAL.some(d => url.includes(d))) {
+								console.log('[CSS-PROXY] Rewriting:', url);
+								// Возвращаем заглушку — реальная замена будет через proxyViaBridge
+								return `url("${CDN_BASE}__PROXY__/${encodeURIComponent(url)}")`;
+							}
+							return match;
+						});
+						
+						return origInsertRule.call(this, modifiedRule, index);
+					};
+					
+					// 2. Перехват установки innerHTML/style.textContent для <style> тегов
+					const styleDesc = Object.getOwnPropertyDescriptor(HTMLStyleElement.prototype, 'textContent');
+					const origStyleSet = styleDesc?.set;
+					
+					if (origStyleSet) {
+						Object.defineProperty(HTMLStyleElement.prototype, 'textContent', {
+							set: function(value) {
+								if (typeof value === 'string' && EXTERNAL.some(d => value.includes(d))) {
+									console.log('[CSS-PROXY] Intercepted style.textContent');
+									const modified = value.replace(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g, (match, url) => {
+										if (EXTERNAL.some(d => url.includes(d))) {
+											return `url("${CDN_BASE}__PROXY__/${encodeURIComponent(url)}")`;
+										}
+										return match;
+									});
+									return origStyleSet.call(this, modified);
+								}
+								return origStyleSet.call(this, value);
+							},
+							configurable: true
+						});
+					}
+					
+					// 3. Глобальный перехват через MutationObserver для динамических <style>
+					new MutationObserver(mutations => {
+						mutations.forEach(m => {
+							m.addedNodes.forEach(node => {
+								if (node.tagName === 'STYLE' && node.textContent) {
+									const css = node.textContent;
+									if (EXTERNAL.some(d => css.includes(d))) {
+										console.log('[CSS-PROXY] Intercepted dynamic <style>');
+										const modified = css.replace(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g, (match, url) => {
+											if (EXTERNAL.some(d => url.includes(d))) {
+												// Запускаем асинхронную замену (упрощённо)
+												fetch(url) // это всё ещё заблокируется CSP, но хотя бы лог
+													.catch(() => {
+														// Фоллбэк: заменяем на пустой data: URL
+														node.textContent = css.replace(match, 'url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")');
+													});
+												return match; // пока оставляем как есть
+											}
+											return match;
+										});
+										// node.textContent = modified; // осторожно: может вызвать рекурсию
+									}
+								}
+							});
+						});
+					}).observe(document.head || document.documentElement, { childList: true, subtree: true });
+					
+					console.log('[CSS-PROXY] CSS URL intercept installed');
+				})();
+				
+				console.log('[EARLY-PROXY] Image creation intercept installed');
+			})();
+			
+			console.log('[PAGE-PROXY] Image.src hook installed');
+		})();
+
+		// 🔥 Универсальный перехват для медиа-элементов
+		['HTMLVideoElement', 'HTMLAudioElement', 'HTMLSourceElement', 'HTMLTrackElement'].forEach(tag => {
+			if (realWindow[tag]) {
+				const desc = Object.getOwnPropertyDescriptor(realWindow[tag].prototype, 'src');
+				if (desc) {
+					Object.defineProperty(realWindow[tag].prototype, 'src', {
+						get: function() { return this._realSrc || desc.get.call(this); },
+						set: function(value) {
+							if (typeof value === 'string' && EXTERNAL.some(d => value.includes(d))) {
+								console.log(`[PAGE-PROXY] Intercepted ${tag}.src:`, value);
+								proxyViaBridge(value)
+									.then(r => r.blob())
+									.then(async (blob) => {
+										const arrayBuffer = await blob.arrayBuffer();
+										const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+										const contentType = blob.type || 'image/webp';
+										const dataUrl = `data:${contentType};base64,${base64}`;
+										this._realSrc = dataUrl;
+										desc.set.call(this, this._realSrc);
+									});
+								return;
+							}
+							desc.set.call(this, value);
+						},
+						configurable: true
+					});
+				}
+			}
+		});
+		
+		console.log('[PAGE-PROXY] Installed in page context');
+	})();
     
     const bitmapConfig = {
         resizeQuality: "high",
         premultiplyAlpha: "none"
     };
 	
-	const assets = {
+	const battleAssets = {
 		// === Флаги
 		__BLUE_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/562/45113/354/117/30545000605610/image.webp",
 		__RED_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/562/45113/354/120/30545000607013/image.webp",
@@ -224,7 +542,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		__NEUTRAL_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralHmini.svg",
 		__RED_H__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redH.svg",
 		__RED_H_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redHlight.svg",
-		__RED_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redHmini.svg",
+		__RED_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redHmini.svg"
+	};
+	
+	const assets = {
 		// === Эффекты пушек
 		// Огнемет
 		__FIRE_EFFECT_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/173/213/30545000703101/image.webp",
@@ -554,7 +875,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 	  await Promise.all(executing);
 	  return results;
 	}
+	loadBitmapsConcurrently(battleAssets, bitmapConfig, 4).then(bitmaps => {
+		console.log(bitmaps, realWindow);
+	  Object.assign(realWindow, bitmaps);
+	});	
 	loadBitmapsConcurrently(assets, bitmapConfig, 4).then(bitmaps => {
+		console.log(bitmaps, realWindow);
 	  Object.assign(realWindow, bitmaps);
 	});	
 })();
@@ -742,7 +1068,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 
 				.flag-delivered::before {
 					content: ' ';
-					background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/flagDelivered.png);
+					background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/flagDelivered.png);
 					animation: flag-pulse 1.5s ease-out forwards !important;
 					will-change: opacity;
 					position: absolute;
@@ -757,7 +1083,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				
 				.flag-dropped::before {
 					content: ' ';
-					background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redFlagTaken.png);
+					background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/redFlagTaken.png);
 					animation: flag-dropped-pulse 2s ease-out forwards infinite !important;
 					will-change: opacity;
 					position: absolute;
@@ -767,7 +1093,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				}
 				
 				.css-7623cl.flag-dropped::before {
-					background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueFlagTaken.png);
+					background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blueFlagTaken.png);
 					transform: translate(-0.2rem, -0.15rem) !important;
 				}
 				
@@ -925,17 +1251,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				background-size: calc(var(--browser-zoom-factor) * 10vw), calc(var(--browser-zoom-factor) * 10vw) !important;
 				border-image-width: 1.3rem !important;
 				  border-image-slice: 20 !important;
-				  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/outerBorder.svg) !important;
+				  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/outerBorder.svg) !important;
 				  border-radius: 0.4rem !important;
 			  }
 			  
 			  .css-1xb94xv, .css-1epuzai, .css-12gl1uk, .css-af3n89, .css-9bxe37 {
-				  background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenBackground.jpg) no-repeat 0% 0% border-box padding-box, rgb(11 34 11) !important;
+				  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenBackground.jpg) no-repeat 0% 0% border-box padding-box, rgb(11 34 11) !important;
 				  background-size: contain !important;
 				  border: 0.2rem solid transparent !important;
 				  border-image-width: 0.3rem !important;
 				  border-image-slice: 3 !important;
-				  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/innerBorder.svg) !important;
+				  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/innerBorder.svg) !important;
 				  border-radius: 0.4rem !important;
 				  box-shadow: none !important;
 				  padding: 0.25rem !important;
@@ -949,19 +1275,19 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  border: 0.2rem solid transparent !important;
 				  border-image-width: 0.3rem !important;
 				  border-image-slice: 3 !important;
-				  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/innerBorder.svg) !important;
+				  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/innerBorder.svg) !important;
 				  border-radius: 0.4rem !important;
 				  box-shadow: none !important;
 				  height: 70% !important;
 			  }
 			  
 			  .css-af3n89 {
-				  background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redBackground.jpg) no-repeat 0% 0% border-box padding-box, rgb(98 23 0) !important;
+				  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/redBackground.jpg) no-repeat 0% 0% border-box padding-box, rgb(98 23 0) !important;
 				  background-size: contain !important;
 			  }
 			  
 			  .css-9bxe37 {
-				  background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueBackground.jpg) no-repeat 0% 0% border-box padding-box, rgb(0 44 89) !important;
+				  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blueBackground.jpg) no-repeat 0% 0% border-box padding-box, rgb(0 44 89) !important;
 				  background-size: contain !important;
 			  }
 			  
@@ -1200,7 +1526,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-vs2a1i, .css-omkxpr {
 					  border-image-width: 2rem !important;
 					  border-image-slice: 23 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/headerTitle.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/headerTitle.svg) !important;
 					  background: transparent !important;
 				  }
 
@@ -1254,7 +1580,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1yuo37v, .css-1il55k3 {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/progress.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/progress.svg) !important;
 					  background: transparent !important;
 					  height: 2rem !important;
 					  cursor: auto !important;
@@ -1304,7 +1630,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-7zn1qp {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/goldButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/goldButton.svg) !important;
 					  background: transparent !important;
 					  height: 2rem !important;
 					  min-width: 5.5rem !important;
@@ -1313,7 +1639,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-lpv5t2 {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenButton.svg) !important;
 					  background: transparent !important;
 					  height: 2rem !important;
 					  min-width: 6.5rem !important;
@@ -1322,7 +1648,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-u9j3as {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayButton.svg) !important;
 					  background: transparent !important;
 					  height: 2rem !important;
 					  min-width: 6.5rem !important;
@@ -1331,7 +1657,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-478rqm {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayButtonSmall.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayButtonSmall.svg) !important;
 					  background: transparent !important;
 					  height: 2.1rem !important;
 					  min-width: 2rem !important;
@@ -1343,7 +1669,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					  border-image-width: unset !important;
 						border-image-slice: unset !important;
 						border-image-source: unset !important;
-						background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/closeButton.svg) !important;
+						background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/closeButton.svg) !important;
 						background-size: cover !important;
 						height: 1.5rem !important;
 						min-width: 1.5rem !important;
@@ -1354,7 +1680,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1yj9w4g, .css-43pyvi {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redInnerButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/redInnerButton.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 				  }
@@ -1362,7 +1688,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-zwi1aq {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redInnerButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/redInnerButtonActive.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 				  }
@@ -1370,31 +1696,31 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1f6hgrq {
 					  border-image-width: 2rem !important;
 					  border-image-slice: 28 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenBigButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenBigButton.svg) !important;
 					  background: transparent !important;
 				  }
 				  
 				  .css-1f6hgrq:hover {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenBigButtonHover.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenBigButtonHover.svg) !important;
 				  }
 				  
 				  .css-1f6hgrq:active {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenBigButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenBigButtonActive.svg) !important;
 				  }
 				  
 				  .css-73xaro, .css-ynddud, .custom-checkbox-replacement {
 					  border-image-width: 1.0rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayModeButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayModeButton.svg) !important;
 					  background: transparent !important;
 				  }
 				  
 				  .css-73xaro:hover, .css-1hyfx7x:hover + .css-ynddud, .custom-checkbox-replacement:hover {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayModeButtonHover.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayModeButtonHover.svg) !important;
 				  }
 				  
 				  .css-73xaro:active, .css-1hyfx7x:active + .css-ynddud, .custom-checkbox-replacement:active {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayModeButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayModeButtonActive.svg) !important;
 				  }
 				  
 				  .css-73xaro {
@@ -1444,13 +1770,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-iwcpp3:has(.css-466b8a) {
 					  padding-top: 0.425rem !important;
 					  padding-bottom: 0.425rem !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleSmallArea.svg) !important;
 				  }
 				  
 				  .css-12exf76 {
 					  border-image-width: 2rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenModeButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenModeButton.svg) !important;
 					  background: transparent !important;
 					  position: relative !important;
 					  width: 2rem !important;
@@ -1460,7 +1786,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1xji6ji, .css-olyig7 .css-69i1ev .css-1xji6ji {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButton.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 					  padding: 0.3rem !important;
@@ -1469,7 +1795,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1xji6ji:hover, .css-olyig7 .css-69i1ev .css-1xji6ji:hover {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonHover.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButtonHover.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 					  padding: 0.3rem !important;
@@ -1478,7 +1804,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1xji6ji:active, .css-olyig7 .css-69i1ev .css-1xji6ji:active {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButtonActive.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 					  padding: 0.3rem !important;
@@ -1487,7 +1813,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-e6qkxc {
 					  border-image-width: 1.6rem !important;
 					  border-image-slice: 24 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayBigButtonActive.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 					  padding: 0.3rem !important;
@@ -1504,16 +1830,16 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-69i1ev .css-1xji6ji, .css-5harb3 .css-1xji6ji, .css-bs5yg2 .css-1xji6ji, .css-20a40q, .css-9s12yc, .css-1gx1ox7 .css-1xji6ji {
 					  border-image-width: 1.7rem !important;
 					  border-image-slice: 24 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayBigButton.svg) !important;
 					  background: transparent !important;
 				  }
 				  
 				  .css-69i1ev .css-1xji6ji:hover, .css-5harb3 .css-1xji6ji:hover, .css-bs5yg2 .css-1xji6ji:hover, .css-20a40q:hover, .css-9s12yc:hover, .css-1gx1ox7 .css-1xji6ji:hover {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButtonHover.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayBigButtonHover.svg) !important;
 				  }
 				  
 				  .css-69i1ev .css-1xji6ji:active, .css-5harb3 .css-1xji6ji:active, .css-bs5yg2 .css-1xji6ji:active, .css-20a40q:active, .css-9s12yc:active, .css-1gx1ox7 .css-1xji6ji:active {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayBigButtonActive.svg) !important;
 				  }
 				  
 				  .css-cgrxzx .css-bs5yg2 .css-1xji6ji, .css-cgrxzx .css-69i1ev .css-1xji6ji {
@@ -1527,7 +1853,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-7cbgtg {
 					  border-image-width: 1.8rem !important;
 					  border-image-slice: 24 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButtonDisabled.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayBigButtonDisabled.svg) !important;
 					  background: transparent !important;
 					  min-width: 9rem !important;
 						height: 3.4rem !important;
@@ -1551,7 +1877,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  
 				  .css-bs5yg2 > div:first-child .css-1fkspv9::before {
 					  content: " ";
-					  background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/playTank.png) !important;
+					  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/playTank.png) !important;
 						width: 3rem;
 						height: 2rem;
 						background-size: cover !important;
@@ -1560,7 +1886,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		  
 				  .css-69i1ev:has(> .css-17gh0kn) > div:first-child .css-1fkspv9::before {
 					  content: " ";
-					  background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/playTankRed.png) !important;
+					  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/playTankRed.png) !important;
 					  width: 3rem;
 						height: 2rem;
 						background-size: cover !important;
@@ -1569,7 +1895,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  
 				  .css-69i1ev:has(> .css-17gh0kn) > div:last-child .css-1fkspv9::before {
 					  content: " ";
-					  background: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/playTankBlue.png) !important;
+					  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/playTankBlue.png) !important;
 					  width: 3rem;
 						height: 2rem;
 						background-size: cover !important;
@@ -1583,7 +1909,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-h521rs, .css-1n70775 {
 					  border-image-width: 1.6rem !important;
 					  border-image-slice: 24 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayBigButtonDisabled.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayBigButtonDisabled.svg) !important;
 					  background: transparent !important;
 				  }
 				  
@@ -1596,7 +1922,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1gx1ox7 > div:last-child .css-1xji6ji {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButton.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 				  }
@@ -1604,7 +1930,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1gx1ox7 > div:last-child .css-1xji6ji:hover {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonHover.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButtonHover.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 				  }
@@ -1612,7 +1938,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1gx1ox7 > div:last-child .css-1xji6ji:active {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 15 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButtonActive.svg) !important;
 					  background: transparent !important;
 					  box-shadow: none !important;
 				  }
@@ -1628,40 +1954,40 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-17bedp5, .css-ow6ga9, .css-13vxpdt {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 16 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/greenInnerButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenInnerButtonActive.svg) !important;
 					  background: transparent !important;
 				  }
 				  
 				  .css-bxvpwh .css-13vxpdt {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/grayInnerButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/grayInnerButtonActive.svg) !important;
 				  }
 				  
 				  .css-1ylu24w {
 					  border-image-width: 1.1rem !important;
 					  border-image-slice: 16 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/goldInnerButton.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/goldInnerButton.svg) !important;
 					  background: transparent !important;
 				  }
 				  
 				  .css-1ylu24w:hover {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/goldInnerButtonHover.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/goldInnerButtonHover.svg) !important;
 				  }
 				  
 				  .css-1ylu24w:active {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/goldInnerButtonActive.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/goldInnerButtonActive.svg) !important;
 				  }
 				  
 				  .css-12d913b, .css-qouasq, .css-19k7i50, .css-11t9z04 {
 					  border-image-width: 1.2rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blackArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blackArea.svg) !important;
 					  background: transparent !important;
 				  }
 				  
 				  .css-l9qovh, .css-19qw7vn {
 					  border-image-width: 1.2rem !important;
 					  border-image-slice: 14 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blackArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blackArea.svg) !important;
 					  background: transparent !important;
 					  height: 2rem !important;
 					  bottom: 12rem !important;
@@ -1669,11 +1995,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  }
 				  
 				  .css-l9qovh {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blueArea.svg) !important;
 				  }
 				  
 				  .css-l9qovh.TEAM_A {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/redArea.svg) !important;
 				  }
 				  
 				  .css-1c1wcrm, .css-1vl3ale, .css-gcy3m0, .css-dteaal, .css-1cfxxtr {
@@ -1697,13 +2023,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  }
 				  
 				  .css-vqpzl5 .css-qouasq, .css-11t9z04 {
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blackSmallArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blackSmallArea.svg) !important;
 				  }
 				  
 				  .css-iwcpp3, .css-11q19bv {
 					  border-image-width: 1.6rem !important;
 					  border-image-slice: 21 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleArea.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleArea.svg) !important;
 					  background: transparent !important;
 				  }
 				  
@@ -1722,7 +2048,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					position: relative;
 					border-image-width: 1.7rem;
 					border-image-slice: 19;
-					border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleMiniArea.svg);
+					border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleMiniArea.svg);
 					padding-left: 0.1rem;
 					margin-right: -0.05rem;
 					border-radius: 0.4rem;
@@ -1778,14 +2104,14 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  .css-1xbh12v {
 					  border-image-width: 1.6rem !important;
 					  border-image-slice: 19 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaLeft.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleSmallAreaLeft.svg) !important;
 					  background: linear-gradient(to left, rgb(0, 67, 137) -10%, rgb(145, 33, 0) 15%) !important;
 				  }
 				  
 				  .css-7623cl {
 					  border-image-width: 1.6rem !important;
 					  border-image-slice: 19 !important;
-					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaRight.svg) !important;
+					  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleSmallAreaRight.svg) !important;
 					  background: linear-gradient(to right, rgb(145, 33, 0) -10%, rgb(0, 67, 137) 15%) !important;
 				  }
 				  
@@ -2067,69 +2393,69 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				}
 
 				/* Ранги */
-				.rank-31, .css-5a240w { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/31.8a5d8a3d.webp") !important }
-				.rank-30, .css-16djier { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/30.acaaced1.webp") !important }
-				.rank-29, .css-1cc5ksc { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/29.cc76cbcc.webp") !important }
-				.rank-28, .css-lksibs { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/28.7b7572ab.webp") !important }
-				.rank-27, .css-v5p14d { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/27.59ac81ba.webp") !important }
-				.rank-26, .css-131u5bn { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/26.f9d5fb8c.webp") !important }
-				.rank-25, .css-bytu4m { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/25.8f5d3b42.webp") !important }
-				.rank-24, .css-1ta2duj { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/24.ee0567d5.webp") !important }
-				.rank-23, .css-1xpozwh { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/23.f7e3e8a9.webp") !important }
-				.rank-22, .css-32dcgx { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/22.0bc84156.webp") !important }
-				.rank-21, .css-fks4xx { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/21.67355bb5.webp") !important }
-				.rank-20, .css-lb9e25 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/20.ce6a783d.webp") !important }
-				.rank-19, .css-zy0u2k { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/19.91c30239.webp") !important }
-				.rank-18, .css-5v5wl { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/18.1c71a8e0.webp") !important }
-				.rank-17, .css-180mkbj { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/17.7c89e529.webp") !important }
-				.rank-16, .css-1gr6eno { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/16.cd247b29.webp") !important }
-				.rank-15, .css-1axpmhs { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/15.70cf8f5b.webp") !important }
-				.rank-14, .css-mz8lk1 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/14.038e31ee.webp") !important }
-				.rank-13, .css-1qhoe21 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/13.1663ebd1.webp") !important }
-				.rank-12, .css-1stylis { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/12.c8158aa7.webp") !important }
-				.rank-11, .css-v5ratt { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/11.f4ddcab2.webp") !important }
-				.rank-10, .css-qlthsa { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/10.4aa99791.webp") !important }
-				.rank-9, .css-17izbp6 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/09.85247b14.webp") !important }
-				.rank-8, .css-3ojqt0 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/08.8a130fc7.webp") !important }
-				.rank-7, .css-tzp8vd { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/07.dfb6ccf6.webp") !important }
-				.rank-6, .css-knf7nz { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/06.55dc2a63.webp") !important }
-				.rank-5, .css-rxkzww { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/05.40580bd1.webp") !important }
-				.rank-4, .css-18n97qm { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/04.b28333e4.webp") !important }
-				.rank-3, .css-1mo8a66 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/03.9c02a44e.webp") !important }
-				.rank-2, .css-o6xknv { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/02.faa1f4fb.webp") !important }
-				.rank-1, .css-1xktgyf { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/01.47622e1a.webp") !important }
+				.rank-31, .css-5a240w { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/31.8a5d8a3d.webp") !important }
+				.rank-30, .css-16djier { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/30.acaaced1.webp") !important }
+				.rank-29, .css-1cc5ksc { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/29.cc76cbcc.webp") !important }
+				.rank-28, .css-lksibs { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/28.7b7572ab.webp") !important }
+				.rank-27, .css-v5p14d { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/27.59ac81ba.webp") !important }
+				.rank-26, .css-131u5bn { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/26.f9d5fb8c.webp") !important }
+				.rank-25, .css-bytu4m { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/25.8f5d3b42.webp") !important }
+				.rank-24, .css-1ta2duj { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/24.ee0567d5.webp") !important }
+				.rank-23, .css-1xpozwh { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/23.f7e3e8a9.webp") !important }
+				.rank-22, .css-32dcgx { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/22.0bc84156.webp") !important }
+				.rank-21, .css-fks4xx { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/21.67355bb5.webp") !important }
+				.rank-20, .css-lb9e25 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/20.ce6a783d.webp") !important }
+				.rank-19, .css-zy0u2k { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/19.91c30239.webp") !important }
+				.rank-18, .css-5v5wl { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/18.1c71a8e0.webp") !important }
+				.rank-17, .css-180mkbj { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/17.7c89e529.webp") !important }
+				.rank-16, .css-1gr6eno { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/16.cd247b29.webp") !important }
+				.rank-15, .css-1axpmhs { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/15.70cf8f5b.webp") !important }
+				.rank-14, .css-mz8lk1 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/14.038e31ee.webp") !important }
+				.rank-13, .css-1qhoe21 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/13.1663ebd1.webp") !important }
+				.rank-12, .css-1stylis { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/12.c8158aa7.webp") !important }
+				.rank-11, .css-v5ratt { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/11.f4ddcab2.webp") !important }
+				.rank-10, .css-qlthsa { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/10.4aa99791.webp") !important }
+				.rank-9, .css-17izbp6 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/09.85247b14.webp") !important }
+				.rank-8, .css-3ojqt0 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/08.8a130fc7.webp") !important }
+				.rank-7, .css-tzp8vd { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/07.dfb6ccf6.webp") !important }
+				.rank-6, .css-knf7nz { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/06.55dc2a63.webp") !important }
+				.rank-5, .css-rxkzww { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/05.40580bd1.webp") !important }
+				.rank-4, .css-18n97qm { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/04.b28333e4.webp") !important }
+				.rank-3, .css-1mo8a66 { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/03.9c02a44e.webp") !important }
+				.rank-2, .css-o6xknv { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/02.faa1f4fb.webp") !important }
+				.rank-1, .css-1xktgyf { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/01.47622e1a.webp") !important }
 				
-				.rank-31.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/31.d51e86c9.webp") !important }
-				.rank-30.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/30.9d07ac6d.webp") !important }
-				.rank-29.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/29.ee5f90ba.webp") !important }
-				.rank-28.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/28.6ee30e89.webp") !important }
-				.rank-27.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/27.172fb842.webp") !important }
-				.rank-26.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/26.a1fc14f6.webp") !important }
-				.rank-25.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/25.ef416fe8.webp") !important }
-				.rank-24.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/24.a82e2381.webp") !important }
-				.rank-23.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/23.c13eb72c.webp") !important }
-				.rank-22.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/22.9aeab00f.webp") !important }
-				.rank-21.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/21.6e78d577.webp") !important }
-				.rank-20.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/20.4d07ac16.webp") !important }
-				.rank-19.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/19.dca802d5.webp") !important }
-				.rank-18.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/18.e86c45fa.webp") !important }
-				.rank-17.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/17.0699291d.webp") !important }
-				.rank-16.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/16.dfdc6796.webp") !important }
-				.rank-15.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/15.981b89e8.webp") !important }
-				.rank-14.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/14.499e0cc4.webp") !important }
-				.rank-13.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/13.a8370113.webp") !important }
-				.rank-12.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/12.12e6efa4.webp") !important }
-				.rank-11.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/11.c833f3f4.webp") !important }
-				.rank-10.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/10.1eca8fbb.webp") !important }
-				.rank-9.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/09.152e4563.webp") !important }
-				.rank-8.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/08.91fca264.webp") !important }
-				.rank-7.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/07.9a536624.webp") !important }
-				.rank-6.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/06.ea232c50.webp") !important }
-				.rank-5.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/05.9b5d475b.webp") !important }
-				.rank-4.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/04.cb72d624.webp") !important }
-				.rank-3.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/03.46e2680b.webp") !important }
-				.rank-2.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/02.e6d45e9d.webp") !important }
-				.rank-1.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com"}/play/static/images/01.01554134.webp") !important }
+				.rank-31.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/31.d51e86c9.webp") !important }
+				.rank-30.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/30.9d07ac6d.webp") !important }
+				.rank-29.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/29.ee5f90ba.webp") !important }
+				.rank-28.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/28.6ee30e89.webp") !important }
+				.rank-27.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/27.172fb842.webp") !important }
+				.rank-26.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/26.a1fc14f6.webp") !important }
+				.rank-25.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/25.ef416fe8.webp") !important }
+				.rank-24.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/24.a82e2381.webp") !important }
+				.rank-23.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/23.c13eb72c.webp") !important }
+				.rank-22.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/22.9aeab00f.webp") !important }
+				.rank-21.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/21.6e78d577.webp") !important }
+				.rank-20.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/20.4d07ac16.webp") !important }
+				.rank-19.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/19.dca802d5.webp") !important }
+				.rank-18.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/18.e86c45fa.webp") !important }
+				.rank-17.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/17.0699291d.webp") !important }
+				.rank-16.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/16.dfdc6796.webp") !important }
+				.rank-15.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/15.981b89e8.webp") !important }
+				.rank-14.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/14.499e0cc4.webp") !important }
+				.rank-13.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/13.a8370113.webp") !important }
+				.rank-12.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/12.12e6efa4.webp") !important }
+				.rank-11.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/11.c833f3f4.webp") !important }
+				.rank-10.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/10.1eca8fbb.webp") !important }
+				.rank-9.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/09.152e4563.webp") !important }
+				.rank-8.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/08.91fca264.webp") !important }
+				.rank-7.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/07.9a536624.webp") !important }
+				.rank-6.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/06.ea232c50.webp") !important }
+				.rank-5.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/05.9b5d475b.webp") !important }
+				.rank-4.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/04.cb72d624.webp") !important }
+				.rank-3.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/03.46e2680b.webp") !important }
+				.rank-2.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/02.e6d45e9d.webp") !important }
+				.rank-1.prem { background-image: url("${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/01.01554134.webp") !important }
 				
 				.rank-1, .rank-2, .rank-3, .rank-4, .rank-5, .rank-6, .rank-7, .rank-8, .rank-9, .rank-10, 
 				.rank-11, .rank-12, .rank-13, .rank-14, .rank-15, .rank-16, .rank-17, .rank-18, .rank-19, .rank-20, 
@@ -5757,7 +6083,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         550: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/16.dfdc6796.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/16.dfdc6796.webp"
         }
         ,
         806: (t, n, i) => {
@@ -5865,12 +6191,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         1153: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/overheat.89c0e772.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/overheat.89c0e772.svg"
         }
         ,
         1196: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_base_no_flag.94a2bf33.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_base_no_flag.94a2bf33.svg"
         }
         ,
         1257: (t, n, i) => {
@@ -5885,7 +6211,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         1463: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/iconConfig.d49d57b9.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/iconConfig.d49d57b9.png"
         }
         ,
         1498: (t, n, i) => {
@@ -6921,7 +7247,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         2387: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/31.d51e86c9.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/31.d51e86c9.webp"
         }
         ,
         2462: (t, n, i) => {
@@ -6931,7 +7257,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         2538: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/03.46e2680b.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/03.46e2680b.webp"
         }
         ,
         2826: (t, n, i) => {
@@ -8250,12 +8576,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         3682: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/jgr_red.8e25466e.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/jgr_red.8e25466e.svg"
         }
         ,
         3718: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/mainPanel_ICON_BATTLE.f3f17079.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/mainPanel_ICON_BATTLE.f3f17079.png"
         }
         ,
         3905: (t, n, i) => {
@@ -8265,7 +8591,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         4081: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/02.faa1f4fb.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/02.faa1f4fb.webp"
         }
         ,
         4228: (t, n, i) => {
@@ -8290,7 +8616,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         4958: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/14.038e31ee.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/14.038e31ee.webp"
         }
         ,
         4959: (t, n, i) => {
@@ -8325,7 +8651,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         5680: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/overheat.c5da6580.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/overheat.c5da6580.svg"
         }
         ,
         5741: (t, n, i) => {
@@ -8535,7 +8861,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         5789: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/20.ce6a783d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/20.ce6a783d.webp"
         }
         ,
         5912: (t, n, i) => {
@@ -8560,7 +8886,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         6501: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/15.981b89e8.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/15.981b89e8.webp"
         }
         ,
         6506: (t, n, i) => {
@@ -8575,7 +8901,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         6937: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/jgr_blue.c3fe3a20.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/jgr_blue.c3fe3a20.svg"
         }
         ,
         7070: (t, n, i) => {
@@ -8656,12 +8982,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         7724: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/jgr_red_ally.ad048a31.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/jgr_red_ally.ad048a31.svg"
         }
         ,
         7729: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/Valuable.b03ff5d2.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/Valuable.b03ff5d2.svg"
         }
         ,
         7737: (t, n, i) => {
@@ -8731,7 +9057,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         9167: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/mainPanel_ICON_GARAGE.bb2a28cc.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/mainPanel_ICON_GARAGE.bb2a28cc.png"
         }
         ,
         9214: (t, n, i) => {
@@ -10689,7 +11015,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         9471: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/26.a1fc14f6.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/26.a1fc14f6.webp"
         }
         ,
         9539: (t, n, i) => {
@@ -78386,7 +78712,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         10737: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/06.55dc2a63.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/06.55dc2a63.webp"
         }
         ,
         10813: (t, n, i) => {
@@ -78406,7 +78732,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         10998: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/fund.7496d0c5.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/fund.7496d0c5.svg"
         }
         ,
         11071: (t, n, i) => {
@@ -78431,7 +78757,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         11534: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ultimateWithoutBackground.18426912.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ultimateWithoutBackground.18426912.svg"
         }
         ,
         11556: (t, n, i) => {
@@ -78446,7 +78772,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         11829: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/19.91c30239.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/19.91c30239.webp"
         }
         ,
         11920: (t, n, i) => {
@@ -78456,7 +78782,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         12e3: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/suicide.aaf32a67.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/suicide.aaf32a67.svg"
         }
         ,
         12017: (t, n, i) => {
@@ -78506,7 +78832,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         12875: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/privateIcon.4427d3a1.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/privateIcon.4427d3a1.svg"
         }
         ,
         13175: (t, n, i) => {
@@ -78587,7 +78913,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         13570: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/21.6e78d577.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/21.6e78d577.webp"
         }
         ,
         13589: (t, n, i) => {
@@ -78597,7 +78923,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         13676: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/clock.1e1fe192.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/clock.1e1fe192.svg"
         }
         ,
         13754: (t, n, i) => {
@@ -78617,7 +78943,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         13891: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/22.9aeab00f.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/22.9aeab00f.webp"
         }
         ,
         13997: (t, n, i) => {
@@ -78667,7 +78993,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         14281: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/24.ee0567d5.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/24.ee0567d5.webp"
         }
         ,
         14353: (t, n, i) => {
@@ -78702,7 +79028,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         14838: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/05.9b5d475b.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/05.9b5d475b.webp"
         }
         ,
         14842: (t, n, i) => {
@@ -78712,7 +79038,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         14991: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/dot.69f2e150.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/dot.69f2e150.svg"
         }
         ,
         15188: (t, n, i) => {
@@ -78742,7 +79068,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         15401: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/20.ce6a783d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/20.ce6a783d.webp"
         }
         ,
         15476: (t, n, i) => {
@@ -78777,7 +79103,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         15744: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/09.152e4563.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/09.152e4563.webp"
         }
         ,
         15976: (t, n, i) => {
@@ -81072,12 +81398,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         16147: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/red_flag.902470b8.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/red_flag.902470b8.png"
         }
         ,
         16173: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/scull.c7d3d323.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/scull.c7d3d323.svg"
         }
         ,
         16219: (t, n, i) => {
@@ -81112,7 +81438,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         16626: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ultimateWithBackground.d18cf95d.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ultimateWithBackground.d18cf95d.svg"
         }
         ,
         16660: (t, n, i) => {
@@ -81809,7 +82135,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         16924: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/16.cd247b29.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/16.cd247b29.webp"
         }
         ,
         16930: (t, n, i) => {
@@ -81942,7 +82268,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         17335: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/04.b28333e4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/04.b28333e4.webp"
         }
         ,
         17440: (t, n, i) => {
@@ -81957,12 +82283,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         17549: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/22.9aeab00f.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/22.9aeab00f.webp"
         }
         ,
         17908: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/blue_flag.3abc6059.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/blue_flag.3abc6059.png"
         }
         ,
         17952: (t, n, i) => {
@@ -91318,7 +91644,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         18463: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/17.7c89e529.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/17.7c89e529.webp"
         }
         ,
         18503: (t, n, i) => {
@@ -91388,7 +91714,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         19374: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/21.67355bb5.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/21.67355bb5.webp"
         }
         ,
         19487: (t, n, i) => {
@@ -91438,7 +91764,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         21132: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/23.f7e3e8a9.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/23.f7e3e8a9.webp"
         }
         ,
         21194: (t, n, i) => {
@@ -91453,7 +91779,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         21498: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_red_base.725359a2.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_red_base.725359a2.svg"
         }
         ,
         21597: (t, n, i) => {
@@ -91473,7 +91799,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         21736: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/10.1eca8fbb.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/10.1eca8fbb.webp"
         }
         ,
         21817: (t, n, i) => {
@@ -91588,12 +91914,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         24024: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/03.46e2680b.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/03.46e2680b.webp"
         }
         ,
         24087: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/06.ea232c50.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/06.ea232c50.webp"
         }
         ,
         24094: (t, n, i) => {
@@ -92659,7 +92985,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         24929: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/fullscreen_icon.4609c208.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/fullscreen_icon.4609c208.png"
         }
         ,
         25111: (t, n, i) => {
@@ -94632,12 +94958,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         25788: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/30.acaaced1.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/30.acaaced1.webp"
         }
         ,
         25830: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/07.9a536624.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/07.9a536624.webp"
         }
         ,
         26078: (t, n, i) => {
@@ -94657,7 +94983,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         26366: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/27.172fb842.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/27.172fb842.webp"
         }
         ,
         26422: (t, n, i) => {
@@ -94686,17 +95012,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         26486: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/29.cc76cbcc.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/29.cc76cbcc.webp"
         }
         ,
         26504: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_delivering_down.f9808b5c.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_delivering_down.f9808b5c.svg"
         }
         ,
         26593: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/11.f4ddcab2.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/11.f4ddcab2.webp"
         }
         ,
         26860: (t, n, i) => {
@@ -94756,7 +95082,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         28194: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/Overdrives.ac06ab56.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/Overdrives.ac06ab56.svg"
         }
         ,
         28259: (t, n, i) => {
@@ -94766,7 +95092,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         28361: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/freezing.7f014edf.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/freezing.7f014edf.svg"
         }
         ,
         28380: (t, n, i) => {
@@ -94794,7 +95120,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         28708: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/14.499e0cc4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/14.499e0cc4.webp"
         }
         ,
         28720: (t, n, i) => {
@@ -94819,7 +95145,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         29232: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/armorWithoutBackground.7c123edf.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/armorWithoutBackground.7c123edf.svg"
         }
         ,
         29408: (t, n, i) => {
@@ -94834,7 +95160,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         29512: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/freezing.bff72869.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/freezing.bff72869.svg"
         }
         ,
         29518: (t, n, i) => {
@@ -97282,7 +97608,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         29675: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/11.c833f3f4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/11.c833f3f4.webp"
         }
         ,
         29744: (t, n, i) => {
@@ -97297,7 +97623,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         29940: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/12.12e6efa4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/12.12e6efa4.webp"
         }
         ,
         29956: (t, n, i) => {
@@ -97312,7 +97638,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         30167: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/health.c14ae374.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/health.c14ae374.png"
         }
         ,
         30240: (t, n, i) => {
@@ -101776,7 +102102,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         30344: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/jgr_red_hostile.8e25466e.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/jgr_red_hostile.8e25466e.svg"
         }
         ,
         30443: (t, n, i) => {
@@ -101821,7 +102147,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         30999: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/13.a8370113.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/13.a8370113.webp"
         }
         ,
         31031: (t, n, i) => {
@@ -107185,7 +107511,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         32383: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/31.8a5d8a3d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/31.8a5d8a3d.webp"
         }
         ,
         32516: (t, n, i) => {
@@ -107195,12 +107521,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         32523: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/28.6ee30e89.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/28.6ee30e89.webp"
         }
         ,
         32531: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/08.8a130fc7.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/08.8a130fc7.webp"
         }
         ,
         32532: (t, n, i) => {
@@ -107215,7 +107541,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         32628: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/05.40580bd1.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/05.40580bd1.webp"
         }
         ,
         32778: (t, n, i) => {
@@ -107250,7 +107576,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         33122: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/10.4aa99791.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/10.4aa99791.webp"
         }
         ,
         33300: (t, n, i) => {
@@ -107285,7 +107611,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         34261: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/nitroWithBackground.9d0ffef7.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/nitroWithBackground.9d0ffef7.svg"
         }
         ,
         34470: (t, n, i) => {
@@ -107295,7 +107621,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         34479: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/26.f9d5fb8c.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/26.f9d5fb8c.webp"
         }
         ,
         34632: (t, n, i) => {
@@ -107305,7 +107631,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         34918: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/10.4aa99791.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/10.4aa99791.webp"
         }
         ,
         34947: (t, n, i) => {
@@ -107355,7 +107681,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         35459: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/31.8a5d8a3d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/31.8a5d8a3d.webp"
         }
         ,
         35750: (t, n, i) => {
@@ -107395,7 +107721,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         36571: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/17.0699291d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/17.0699291d.webp"
         }
         ,
         36659: (t, n, i) => {
@@ -115942,7 +116268,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         36809: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/31.d51e86c9.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/31.d51e86c9.webp"
         }
         ,
         36997: (t, n, i) => {
@@ -129485,7 +129811,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         37560: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/01.47622e1a.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/01.47622e1a.webp"
         }
         ,
         37602: (t, n, i) => {
@@ -129515,7 +129841,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         38332: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/25.ef416fe8.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/25.ef416fe8.webp"
         }
         ,
         38390: (t, n, i) => {
@@ -129525,7 +129851,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         38448: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/09.85247b14.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/09.85247b14.webp"
         }
         ,
         38498: (t, n, i) => {
@@ -129535,7 +129861,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         38509: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/20.4d07ac16.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/20.4d07ac16.webp"
         }
         ,
         38525: (t, n, i) => {
@@ -129555,7 +129881,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         38896: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/27.59ac81ba.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/27.59ac81ba.webp"
         }
         ,
         39368: (t, n, i) => {
@@ -129565,7 +129891,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         39567: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/08.8a130fc7.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/08.8a130fc7.webp"
         }
         ,
         39702: (t, n, i) => {
@@ -129585,7 +129911,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         39871: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/24.a82e2381.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/24.a82e2381.webp"
         }
         ,
         39931: (t, n, i) => {
@@ -129610,7 +129936,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         40393: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ProtectionModules.41103d70.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ProtectionModules.41103d70.svg"
         }
         ,
         40464: (t, n, i) => {
@@ -129625,7 +129951,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         40547: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/13.1663ebd1.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/13.1663ebd1.webp"
         }
         ,
         40627: (t, n, i) => {
@@ -129635,7 +129961,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         40782: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/30.9d07ac6d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/30.9d07ac6d.webp"
         }
         ,
         40891: (t, n, i) => {
@@ -129886,7 +130212,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         41483: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_base.13dd239f.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_base.13dd239f.svg"
         }
         ,
         41695: (t, n, i) => {
@@ -129896,7 +130222,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         41703: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/13.1663ebd1.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/13.1663ebd1.webp"
         }
         ,
         41801: (t, n, i) => {
@@ -129951,12 +130277,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         42865: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/28.7b7572ab.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/28.7b7572ab.webp"
         }
         ,
         42887: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/15.981b89e8.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/15.981b89e8.webp"
         }
         ,
         43049: (t, n, i) => {
@@ -129986,7 +130312,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         43840: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/23.c13eb72c.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/23.c13eb72c.webp"
         }
         ,
         43919: (t, n, i) => {
@@ -130163,7 +130489,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         44298: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/iconSound0002.8680529b.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/iconSound0002.8680529b.png"
         }
         ,
         44325: (t, n, i) => {
@@ -130297,12 +130623,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         44789: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/13.a8370113.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/13.a8370113.webp"
         }
         ,
         44820: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/01.47622e1a.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/01.47622e1a.webp"
         }
         ,
         44829: (t, n, i) => {
@@ -130337,7 +130663,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         45522: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/09.152e4563.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/09.152e4563.webp"
         }
         ,
         45555: (t, n, i) => {
@@ -138691,17 +139017,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         46806: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/03.9c02a44e.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/03.9c02a44e.webp"
         }
         ,
         46878: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/overdrive_active.f6ac659d.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/overdrive_active.f6ac659d.svg"
         }
         ,
         47016: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/01.01554134.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/01.01554134.webp"
         }
         ,
         47156: (t, n, i) => {
@@ -155586,12 +155912,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         47881: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_delivering.51894cf2.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_blue_delivering.51894cf2.svg"
         }
         ,
         47968: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/30.acaaced1.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/30.acaaced1.webp"
         }
         ,
         48051: (t, n, i) => {
@@ -155601,7 +155927,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         48285: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/08.91fca264.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/08.91fca264.webp"
         }
         ,
         48505: (t, n, i) => {
@@ -155651,7 +155977,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         49908: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/BonusBoxes.59bbac9e.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/BonusBoxes.59bbac9e.svg"
         }
         ,
         50178: (t, n, i) => {
@@ -156152,7 +156478,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         51224: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/16.dfdc6796.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/16.dfdc6796.webp"
         }
         ,
         51232: (t, n, i) => {
@@ -156187,7 +156513,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         51525: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/28.7b7572ab.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/28.7b7572ab.webp"
         }
         ,
         51618: (t, n, i) => {
@@ -161260,7 +161586,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         53056: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/12.c8158aa7.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/12.c8158aa7.webp"
         }
         ,
         53058: (t, n, i) => {
@@ -161315,7 +161641,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         53988: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/05.9b5d475b.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/05.9b5d475b.webp"
         }
         ,
         54199: (t, n, i) => {
@@ -162745,12 +163071,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         54450: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/21.67355bb5.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/21.67355bb5.webp"
         }
         ,
         54530: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/23.c13eb72c.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/23.c13eb72c.webp"
         }
         ,
         54584: (t, n, i) => {
@@ -167631,7 +167957,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         56613: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/06.55dc2a63.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/06.55dc2a63.webp"
         }
         ,
         56819: (t, n, i) => {
@@ -167641,7 +167967,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         57010: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/25.8f5d3b42.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/25.8f5d3b42.webp"
         }
         ,
         57063: (t, n, i) => {
@@ -168578,7 +168904,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         58330: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/overdrive_ready.b56250e7.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/overdrive_ready.b56250e7.svg"
         }
         ,
         58344: (t, n, i) => {
@@ -168634,7 +168960,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         59403: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/aim_cross_green.eabb5664.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/aim_cross_green.eabb5664.webp"
         }
         ,
         59414: (t, n, i) => {
@@ -168664,7 +168990,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         60170: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/14.038e31ee.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/14.038e31ee.webp"
         }
         ,
         60242: (t, n, i) => {
@@ -168684,7 +169010,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         60352: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_mode.fba37902.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_mode.fba37902.svg"
         }
         ,
         60432: (t, n, i) => {
@@ -180257,12 +180583,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         61955: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/20.4d07ac16.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/20.4d07ac16.webp"
         }
         ,
         61974: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/translations/ru.bb0190de.json"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/translations/ru.bb0190de.json"
         }
         ,
         62029: (t, n, i) => {
@@ -180272,12 +180598,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         62059: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/17.7c89e529.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/17.7c89e529.webp"
         }
         ,
         62255: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/jgr_blue_ally.051eb141.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/jgr_blue_ally.051eb141.svg"
         }
         ,
         62375: (t, n, i) => {
@@ -180307,12 +180633,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         62960: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/23.f7e3e8a9.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/23.f7e3e8a9.webp"
         }
         ,
         63284: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/mine.5620ed14.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/mine.5620ed14.png"
         }
         ,
         63300: (t, n, i) => {
@@ -180377,7 +180703,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         64437: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/15.70cf8f5b.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/15.70cf8f5b.webp"
         }
         ,
         64438: (t, n, i) => {
@@ -180392,12 +180718,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         64659: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/26.f9d5fb8c.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/26.f9d5fb8c.webp"
         }
         ,
         64680: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/16.cd247b29.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/16.cd247b29.webp"
         }
         ,
         64725: (t, n, i) => {
@@ -180442,7 +180768,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         65849: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/15.70cf8f5b.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/15.70cf8f5b.webp"
         }
         ,
         65951: (t, n, i) => {
@@ -180452,12 +180778,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         66185: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/19.dca802d5.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/19.dca802d5.webp"
         }
         ,
         66187: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/translations/en-US.644bfe70.json"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/translations/en-US.644bfe70.json"
         }
         ,
         66353: (t, n, i) => {
@@ -180477,17 +180803,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         66591: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_red_delivering_down.ee038857.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_red_delivering_down.ee038857.svg"
         }
         ,
         66676: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/armorWithBackground.3a887dad.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/armorWithBackground.3a887dad.svg"
         }
         ,
         66843: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/02.e6d45e9d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/02.e6d45e9d.webp"
         }
         ,
         66863: (t, n, i) => {
@@ -180812,7 +181138,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         67702: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/en_ru_es_fr_de_pl_pt_sdf.d4d81ec5.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/en_ru_es_fr_de_pl_pt_sdf.d4d81ec5.png"
         }
         ,
         67783: (t, n, i) => {
@@ -180832,7 +181158,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         68167: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/04.cb72d624.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/04.cb72d624.webp"
         }
         ,
         68267: (t, n, i) => {
@@ -180852,12 +181178,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         68377: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/19.91c30239.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/19.91c30239.webp"
         }
         ,
         68513: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/nitro.bded466a.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/nitro.bded466a.png"
         }
         ,
         68529: (t, n, i) => {
@@ -180872,7 +181198,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         68569: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/dd.91e43f8e.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/dd.91e43f8e.png"
         }
         ,
         68714: (t, n, i) => {
@@ -180957,7 +181283,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         70069: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/02.e6d45e9d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/02.e6d45e9d.webp"
         }
         ,
         70130: (t, n, i) => {
@@ -190666,7 +190992,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         70305: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/17.0699291d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/17.0699291d.webp"
         }
         ,
         70335: (t, n, i) => {
@@ -203571,7 +203897,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         71963: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/04.b28333e4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/04.b28333e4.webp"
         }
         ,
         72080: (t, n, i) => {
@@ -203586,7 +203912,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         72154: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/mineWithBackground.eced36f5.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/mineWithBackground.eced36f5.svg"
         }
         ,
         72186: (t, n, i) => {
@@ -204310,12 +204636,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         73507: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/19.dca802d5.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/19.dca802d5.webp"
         }
         ,
         73509: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_red_base_no_flag.8053d3fa.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_red_base_no_flag.8053d3fa.svg"
         }
         ,
         73512: (t, n, i) => {
@@ -204340,7 +204666,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         73834: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/29.ee5f90ba.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/29.ee5f90ba.webp"
         }
         ,
         73853: (t, n, i) => {
@@ -204370,12 +204696,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         74210: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/Autobalance.e011e48f.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/Autobalance.e011e48f.svg"
         }
         ,
         74464: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/21.6e78d577.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/21.6e78d577.webp"
         }
         ,
         74613: (t, n, i) => {
@@ -204395,7 +204721,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         75182: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/25.8f5d3b42.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/25.8f5d3b42.webp"
         }
         ,
         75465: (t, n, i) => {
@@ -204405,7 +204731,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         75510: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/07.dfb6ccf6.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/07.dfb6ccf6.webp"
         }
         ,
         75649: (t, n, i) => {
@@ -204415,12 +204741,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         75668: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/tdm_mode.ef239dba.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/tdm_mode.ef239dba.svg"
         }
         ,
         75890: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/cp_mode.9d327fbc.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/cp_mode.9d327fbc.svg"
         }
         ,
         75974: (t, n, i) => {
@@ -204491,7 +204817,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         76122: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/14.499e0cc4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/14.499e0cc4.webp"
         }
         ,
         76206: (t, n, i) => {
@@ -204511,12 +204837,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         76623: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/FriendFire.cde8d0d5.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/FriendFire.cde8d0d5.svg"
         }
         ,
         76624: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/30.9d07ac6d.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/30.9d07ac6d.webp"
         }
         ,
         76688: (t, n, i) => {
@@ -204536,7 +204862,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         77258: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/12.12e6efa4.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/12.12e6efa4.webp"
         }
         ,
         77282: (t, n, i) => {
@@ -204546,7 +204872,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         77396: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/suicide.fa6ce4b0.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/suicide.fa6ce4b0.svg"
         }
         ,
         77603: (t, n, i) => {
@@ -204576,7 +204902,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         78101: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/28.6ee30e89.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/28.6ee30e89.webp"
         }
         ,
         78231: () => {
@@ -204704,7 +205030,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         78314: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/dm_mode.cedf5c30.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/dm_mode.cedf5c30.svg"
         }
         ,
         78339: (t, n, i) => {
@@ -204739,7 +205065,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         78810: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/03.9c02a44e.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/03.9c02a44e.webp"
         }
         ,
         78910: (t, n, i) => {
@@ -205150,7 +205476,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         78935: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/WeaponChange.89d8adcc.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/WeaponChange.89d8adcc.svg"
         }
         ,
         78970: (t, n, i) => {
@@ -205165,7 +205491,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         79108: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/12.c8158aa7.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/12.c8158aa7.webp"
         }
         ,
         79147: (t, n, i) => {
@@ -205205,12 +205531,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         79536: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/damageWithBackground.4a80d6f3.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/damageWithBackground.4a80d6f3.svg"
         }
         ,
         79569: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/04.cb72d624.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/04.cb72d624.webp"
         }
         ,
         79763: (t, n) => {
@@ -205520,7 +205846,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         79777: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/tank-found-ic.b8ba4b47.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/tank-found-ic.b8ba4b47.png"
         }
         ,
         79836: (t, n, i) => {
@@ -205545,7 +205871,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         80026: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/29.cc76cbcc.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/29.cc76cbcc.webp"
         }
         ,
         80074: (t, n, i) => {
@@ -205631,7 +205957,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         81136: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/repairWithoutBackground.b9e452b0.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/repairWithoutBackground.b9e452b0.svg"
         }
         ,
         81192: (t, n, i) => {
@@ -205646,7 +205972,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         81532: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/27.172fb842.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/27.172fb842.webp"
         }
         ,
         81635: (t, n, i) => {
@@ -205666,12 +205992,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         81725: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/24.ee0567d5.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/24.ee0567d5.webp"
         }
         ,
         81829: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/jgr_blue_hostile.c3fe3a20.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/jgr_blue_hostile.c3fe3a20.svg"
         }
         ,
         81886: (t, n, i) => {
@@ -205688,7 +206014,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         82041: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/24.a82e2381.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/24.a82e2381.webp"
         }
         ,
         82069: (t, n, i) => {
@@ -205703,7 +206029,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         82228: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/07.9a536624.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/07.9a536624.webp"
         }
         ,
         82277: (t, n, i) => {
@@ -205728,7 +206054,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         82828: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/GoldBoxes.eea52483.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/GoldBoxes.eea52483.svg"
         }
         ,
         82921: (t, n, i) => {
@@ -206017,7 +206343,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         82927: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/action_log_icons.b4df02c6.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/action_log_icons.b4df02c6.webp"
         }
         ,
         82940: (t, n, i) => {
@@ -206032,7 +206358,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         83140: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/accept.8be2e839.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/accept.8be2e839.svg"
         }
         ,
         83201: (t, n, i) => {
@@ -206052,7 +206378,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         83417: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/open_sans_cyrillic.bb8c7bce.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/open_sans_cyrillic.bb8c7bce.png"
         }
         ,
         83440: (t, n, i) => {
@@ -206082,12 +206408,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         83699: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/SmartSupplies.d7f811ef.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/SmartSupplies.d7f811ef.svg"
         }
         ,
         83870: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/18.1c71a8e0.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/18.1c71a8e0.webp"
         }
         ,
         83883: (t, n, i) => {
@@ -206147,7 +206473,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         85114: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/07.dfb6ccf6.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/07.dfb6ccf6.webp"
         }
         ,
         85183: (t, n, i) => {
@@ -254307,7 +254633,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         86856: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/ctf_red_delivering.05f7555f.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/ctf_red_delivering.05f7555f.svg"
         }
         ,
         86928: (t, n, i) => {
@@ -342144,8 +342470,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 }
                 ,
                 _y(NKt).hao = function(t, n, i, weaponName) {
-					console.log('4', weaponName);
-					
                     if (Rj(this.s12i_1, Oj(0)) <= 0 && !this.t12i_1)
                         return !1;
                     if (this.x12i_1) {
@@ -369957,7 +370281,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 _y(IEn).qas = function(t) {}
                 ,
                 _y(IEn).hao = function(t, n, i, weaponName) {
-					console.log('1', weaponName);
                     if (Rj(this.j12o_1, Oj(0)) <= 0 && !this.k12o_1)
                         return !1;
                     if (this.l12o_1) {
@@ -370649,8 +370972,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 _y(NEn).qas = function(t) {}
                 ,
                 _y(NEn).hao = function(t, n, i, weaponName) {
-					console.log('2', weaponName);
-					
                     if (Rj(this.zx1_1, Oj(0)) <= 0 && !this.ax2_1)
                         return !1;
                     if (this.bx2_1) {
@@ -371488,8 +371809,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 _y(UEn).qas = function(t) {}
                 ,
                 _y(UEn).hao = function(t, n, i, weaponName) {
-					console.log('3', weaponName);
-					
                     if (Rj(this.i13b_1, Oj(0)) <= 0 && !this.j13b_1)
                         return !1;
                     if (this.k13b_1) {
@@ -386515,12 +386834,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         87257: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/26.a1fc14f6.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/26.a1fc14f6.webp"
         }
         ,
         87322: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/01.01554134.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/01.01554134.webp"
         }
         ,
         87565: (t, n, i) => {
@@ -386580,7 +386899,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         88687: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/nitroWithoutBackground.bf86a6bd.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/nitroWithoutBackground.bf86a6bd.svg"
         }
         ,
         88693: (t, n, i) => {
@@ -387715,12 +388034,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         88722: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/icon_shop.f1970398.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/icon_shop.f1970398.png"
         }
         ,
         88723: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/22.0bc84156.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/22.0bc84156.webp"
         }
         ,
         88970: (t, n, i) => {
@@ -387745,7 +388064,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         89174: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/10.1eca8fbb.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/10.1eca8fbb.webp"
         }
         ,
         89395: (t, n, i) => {
@@ -394373,7 +394692,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         89900: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/damageWithoutBackground.4fb8a2b2.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/damageWithoutBackground.4fb8a2b2.svg"
         }
         ,
         90003: (t, n, i) => {
@@ -394393,7 +394712,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         90356: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/repairWithBackground.58991a46.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/repairWithBackground.58991a46.svg"
         }
         ,
         90359: (t, n, i) => {
@@ -394413,7 +394732,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         90464: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/18.e86c45fa.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/18.e86c45fa.webp"
         }
         ,
         90574: (t, n, i) => {
@@ -394468,7 +394787,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         91844: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/crystalSmall.242e6c15.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/crystalSmall.242e6c15.svg"
         }
         ,
         92005: (t, n, i) => {
@@ -394544,7 +394863,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         92837: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/02.faa1f4fb.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/02.faa1f4fb.webp"
         }
         ,
         92899: (t, n, i) => {
@@ -417481,14 +417800,16 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
                 }
                 ,
                 Hs(sC).j1s = function() {
-                    var t = this.w80_1.width;
-                    if (null == t)
-                        throw yu(_u("Required value was null."));
+                    var t = this.w80_1?.width;
+                    if (null == t) {
+						throw yu(_u("Required value was null."));
+					}
+                        
                     return t
                 }
                 ,
                 Hs(sC).i1s = function() {
-                    var t = this.w80_1.height;
+                    var t = this.w80_1?.height;
                     if (null == t)
                         throw yu(_u("Required value was null."));
                     return t
@@ -418763,7 +419084,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         93281: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/iconSound0001.7a14f0f9.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/iconSound0001.7a14f0f9.png"
         }
         ,
         93356: (t, n, i) => {
@@ -418803,7 +419124,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         93612: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/27.59ac81ba.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/27.59ac81ba.webp"
         }
         ,
         93891: (t, n, i) => {
@@ -418887,7 +419208,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         94826: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/18.1c71a8e0.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/18.1c71a8e0.webp"
         }
         ,
         94865: (t, n, i) => {
@@ -418917,17 +419238,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         95512: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/05.40580bd1.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/05.40580bd1.webp"
         }
         ,
         95585: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/06.ea232c50.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/06.ea232c50.webp"
         }
         ,
         95604: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/da.505f127a.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/da.505f127a.png"
         }
         ,
         95690: (t, n, i) => {
@@ -418942,7 +419263,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         96015: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/22.0bc84156.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/22.0bc84156.webp"
         }
         ,
         96141: (t, n, i) => {
@@ -418952,7 +419273,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         96462: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/18.e86c45fa.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/18.e86c45fa.webp"
         }
         ,
         96476: (t, n, i) => {
@@ -418962,7 +419283,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         96631: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/open_sans_georgian.8ab2c6cf.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/open_sans_georgian.8ab2c6cf.png"
         }
         ,
         96650: (t, n, i) => {
@@ -418972,7 +419293,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         96863: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/open_sans_latin.1f261a52.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/open_sans_latin.1f261a52.png"
         }
         ,
         97129: (t, n, i) => {
@@ -418997,7 +419318,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         97534: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/25.ef416fe8.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/25.ef416fe8.webp"
         }
         ,
         97556: (t, n, i) => {
@@ -419439,12 +419760,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         97801: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/starIcon.ab1eba08.png"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/starIcon.ab1eba08.png"
         }
         ,
         98280: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/29.ee5f90ba.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/29.ee5f90ba.webp"
         }
         ,
         98326: (t, n, i) => {
@@ -419464,17 +419785,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
         ,
         98700: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/09.85247b14.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/09.85247b14.webp"
         }
         ,
         98782: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/Supplies.57cf4b22.svg"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/Supplies.57cf4b22.svg"
         }
         ,
         98787: (t, n, i) => {
             "use strict";
-            t.exports = localStorage.getItem('__PATCH_ASSET_BASE__') + "tankiclassic.com" + i.p + "static/images/08.91fca264.webp"
+            t.exports = localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com" + i.p + "static/images/08.91fca264.webp"
         }
         ,
         98928: (t, n, i) => {

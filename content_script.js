@@ -3,7 +3,42 @@
 
     console.log('[PATCH] Content script loaded at document_start');
 
-    localStorage.setItem('__PATCH_ASSET_BASE__', chrome.runtime.getURL('/'));
+    const realWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+
+    localStorage.setItem('__PATCH_ASSET_BASE__', 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/');
+    localStorage.setItem('__PATCH_ASSET_BASE_2__', chrome.runtime.getURL('/'));
+
+    // 🔥 МОСТ: page context ↔ extension context
+    (function setupBridge() {
+        const BRIDGE_ID = 'real-classic-proxy-bridge';
+        
+        // 🔹 Слушаем сообщения ОТ страницы (patched_main.js)
+        realWindow.addEventListener('message', (event) => {
+            if (event.source !== window) return;
+            if (!event.data?.type?.startsWith('REAL_CLASSIC_')) return;
+            
+            const { type, payload, requestId } = event.data;
+            
+            if (type === 'REAL_CLASSIC_PROXY_REQUEST' && payload?.url) {
+                // Пересылаем в background.js
+                chrome.runtime.sendMessage(
+                    { type: 'PROXY_FETCH', url: payload.url, method: payload.method, headers: payload.headers },
+                    response => {
+                        // Отправляем ответ обратно в страницу
+                        window.postMessage({
+                            type: 'REAL_CLASSIC_PROXY_RESPONSE',
+                            requestId,
+                            payload: response
+                        }, '*');
+                    }
+                );
+            }
+        });
+        
+        console.log('[BRIDGE] Content script bridge ready');
+    })();
+
+    
 
     const TARGET_REGEX = /\/play\/static\/js\/main\.[a-f0-9]{8}\.js$/i;
     let patchedMain = false;
@@ -83,7 +118,7 @@
                         patchedMain = true;
                         console.log('[INTERCEPT] Blocking original, loading patch...');
                         
-                        const extensionUrl = chrome.runtime.getURL('patched_main.min.js');
+                        const extensionUrl = 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/patched_main.min.js';
                         descriptor.set.call(this, extensionUrl);
                         return;
                     }
@@ -105,7 +140,7 @@
                     if (TARGET_REGEX.test(src) && !patchedMain) {
                         patchedMain = true;
                         console.log('[OBSERVER] Intercepting:', src);
-                        node.src = chrome.runtime.getURL('patched_main.min.js');
+                        node.src = 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/patched_main.min.js';
                     }
                 }
             });
