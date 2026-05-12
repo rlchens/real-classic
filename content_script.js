@@ -1,18 +1,33 @@
 (function() {
     'use strict';
 
-    console.log('[PATCH] Content script loaded at document_start');
-
     const realWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
 
     localStorage.setItem('__PATCH_ASSET_BASE__', 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/');
     localStorage.setItem('__PATCH_ASSET_BASE_2__', chrome.runtime.getURL('/'));
 
-    // 🔥 МОСТ: page context ↔ extension context
+    (function removeCSPMeta() {
+        'use strict';
+        
+        document.querySelectorAll('meta[http-equiv="Content-Security-Policy"]').forEach(meta => {
+            meta.remove();
+        });
+        
+        const origSetAttribute = HTMLMetaElement.prototype.setAttribute;
+        HTMLMetaElement.prototype.setAttribute = function(name, value) {
+            if (name.toLowerCase() === 'http-equiv' && value.toLowerCase() === 'content-security-policy') {
+                console.log('[CSP] Blocked meta injection');
+                return;
+            }
+            return origSetAttribute.call(this, name, value);
+        };
+        
+        console.log('[CSP] Meta remover installed');
+    })();
+
     (function setupBridge() {
         const BRIDGE_ID = 'real-classic-proxy-bridge';
         
-        // 🔹 Слушаем сообщения ОТ страницы (patched_main.js)
         realWindow.addEventListener('message', (event) => {
             if (event.source !== window) return;
             if (!event.data?.type?.startsWith('REAL_CLASSIC_')) return;
@@ -24,7 +39,6 @@
                 chrome.runtime.sendMessage(
                     { type: 'PROXY_FETCH', url: payload.url, method: payload.method, headers: payload.headers },
                     response => {
-                        // Отправляем ответ обратно в страницу
                         window.postMessage({
                             type: 'REAL_CLASSIC_PROXY_RESPONSE',
                             requestId,
@@ -34,8 +48,6 @@
                 );
             }
         });
-        
-        console.log('[BRIDGE] Content script bridge ready');
     })();
 
     
@@ -75,7 +87,6 @@
         `;
         
         (document.head || document.documentElement).appendChild(fontStyle);
-        console.log('[FONTS] Shtrift vneadeny:', extId);
     }
 
     injectFonts();
@@ -116,9 +127,8 @@
                 set: function(value) {
                     if (value && TARGET_REGEX.test(value) && !patchedMain) {
                         patchedMain = true;
-                        console.log('[INTERCEPT] Blocking original, loading patch...');
                         
-                        const extensionUrl = 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/patched_main.min.js';
+                        const extensionUrl = chrome.runtime.getURL('patched_main.min.js');
                         descriptor.set.call(this, extensionUrl);
                         return;
                     }
@@ -139,8 +149,7 @@
                     const src = node.getAttribute('src');
                     if (TARGET_REGEX.test(src) && !patchedMain) {
                         patchedMain = true;
-                        console.log('[OBSERVER] Intercepting:', src);
-                        node.src = 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/patched_main.min.js';
+                        node.src = chrome.runtime.getURL('patched_main.min.js');
                     }
                 }
             });

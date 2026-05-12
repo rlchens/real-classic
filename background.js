@@ -1,14 +1,11 @@
 // 🔥 background.js — прокси + кеш через Cache API
-console.log('[BG] Service Worker started');
 
 const CACHE_NAME = 'real-classic-assets-v1'; // ← Меняй версию для сброса кеша
 const MAX_CACHE_SIZE = 1500 * 1024 * 1024; // 500 МБ лимит (опционально)
 
 // 🔹 Инициализация кеша при старте
 self.addEventListener('install', () => {
-    console.log('[BG] Installing, preparing cache...');
     caches.open(CACHE_NAME).then(cache => {
-        console.log('[BG] Cache ready:', CACHE_NAME);
     });
 });
 
@@ -21,14 +18,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
     // 🔹 ПРОКСИ-ЗАПРОС С КЕШИРОВАНИЕМ
     if (request.type === 'PROXY_FETCH' && request.url) {
-        console.log(`[BG] 📦 Request: ${request.url}`);
         
         // 1. Сначала пробуем взять из кеша
         caches.open(CACHE_NAME).then(async cache => {
             const cached = await cache.match(request.url);
             
             if (cached) {
-                console.log(`[BG] ✅ Cache HIT: ${request.url}`);
                 // Возвращаем из кеша
                 const arrayBuffer = await cached.arrayBuffer();
                 sendResponse({
@@ -40,8 +35,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 });
                 return;
             }
-            
-            console.log(`[BG] ⏳ Cache MISS, fetching: ${request.url}`);
             
             // 2. Если нет в кеше — грузим из сети
             try {
@@ -60,7 +53,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 
                 // 4. Сохраняем в Cache API
                 await cache.put(request.url, responseClone);
-                console.log(`[BG] 💾 Cached: ${request.url}`);
                 
                 // 5. Отправляем данные
                 sendResponse({
@@ -125,7 +117,6 @@ async function enforceCacheLimit(maxBytes) {
                 if (totalSize <= maxBytes) break;
                 await cache.delete(item.url);
                 totalSize -= item.size;
-                console.log(`[BG] 🗑️ Evicted: ${item.url} (${item.size} bytes)`);
             }
         }
     } catch (e) {

@@ -3,6 +3,9 @@
     "name": "Real Classic",
     "version": "0.8.4",
     "description": "Mod for Tanki Classic",
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' real-classic: https://cdn.jsdelivr.net https://raw.githubusercontent.com;"
+    },
     "host_permissions": [
         "https://s.eu.tankionline.com/*",
         "https://tankiclassic.com/*",
@@ -16,6 +19,7 @@
         "resources": [
             "patched_main.js",
             "patched_main.min.js",
+            "proxy.js",
             "fonts/*.woff2",
             "assets/*.3ds",
             "assets/*.a3d",
