@@ -190,8 +190,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		function proxyViaBridge(url, init) {
 			return new Promise((resolve, reject) => {
 				const requestId = 'req_' + (++_requestId) + '_' + Date.now();
-				
 				// Слушаем ответ
+					console.log(requestId);
+				
 				const onMessage = (event) => {
 					if (event.source !== realWindow) return;
 					if (event.data?.type !== 'REAL_CLASSIC_PROXY_RESPONSE') return;
@@ -491,326 +492,326 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 	
 	const assets = {
 		// === Флаги
-		__BLUE_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/562/45113/354/117/30545000605610/image.webp",
-		__RED_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/562/45113/354/120/30545000607013/image.webp",
-		__OLD_BLUE_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/562/45113/354/117/30545000605610/old_image.webp",
-		__OLD_RED_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/562/45113/354/120/30545000607013/old_image.webp",
+		__BLUE_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueFlag.webp",
+		__RED_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redFlag.webp",
+		__OLD_BLUE_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/oldBlueFlag.webp",
+		__OLD_RED_FLAG__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/oldRedFlag.webp",
 		// === Контроль точек
 		// Пьедесталы
-		__BLUE_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/560/31315/304/41/30545000606020/image.webp",
-		__RED_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/560/31315/304/44/30545000606021/image.webp",
-		__OLD_BLUE_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/560/31315/304/41/30545000606020/old_image.webp",
-		__OLD_RED_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/560/31315/304/44/30545000606021/old_image.webp",
+		__BLUE_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/bluePoint.webp",
+		__RED_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redPoint.webp",
+		__OLD_BLUE_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/oldBluePoint.webp",
+		__OLD_RED_CP_PEDESTAL__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/oldRedPoint.webp",
 		// A
-		__BLUE_A__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueA.svg",
-		__BLUE_A_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueAlight.svg",
-		__BLUE_A_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueAmini.svg",
-		__NEUTRAL_A__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralA.svg",
-		__NEUTRAL_A_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralAmini.svg",
-		__RED_A__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redA.svg",
-		__RED_A_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redAlight.svg",
-		__RED_A_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redAmini.svg",
+		__BLUE_A__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueA.svg",
+		__BLUE_A_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueAlight.svg",
+		__BLUE_A_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueAmini.svg",
+		__NEUTRAL_A__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralA.svg",
+		__NEUTRAL_A_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralAmini.svg",
+		__RED_A__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redA.svg",
+		__RED_A_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redAlight.svg",
+		__RED_A_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redAmini.svg",
 		// B
-		__BLUE_B__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueB.svg",
-		__BLUE_B_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueBlight.svg",
-		__BLUE_B_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueBmini.svg",
-		__NEUTRAL_B__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralB.svg",
-		__NEUTRAL_B_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralBmini.svg",
-		__RED_B__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redB.svg",
-		__RED_B_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redBlight.svg",
-		__RED_B_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redBmini.svg",
+		__BLUE_B__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueB.svg",
+		__BLUE_B_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueBlight.svg",
+		__BLUE_B_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueBmini.svg",
+		__NEUTRAL_B__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralB.svg",
+		__NEUTRAL_B_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralBmini.svg",
+		__RED_B__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redB.svg",
+		__RED_B_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redBlight.svg",
+		__RED_B_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redBmini.svg",
 		// C
-		__BLUE_C__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueC.svg",
-		__BLUE_C_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueClight.svg",
-		__BLUE_C_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueCmini.svg",
-		__NEUTRAL_C__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralC.svg",
-		__NEUTRAL_C_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralCmini.svg",
-		__RED_C__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redC.svg",
-		__RED_C_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redClight.svg",
-		__RED_C_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redCmini.svg",
+		__BLUE_C__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueC.svg",
+		__BLUE_C_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueClight.svg",
+		__BLUE_C_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueCmini.svg",
+		__NEUTRAL_C__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralC.svg",
+		__NEUTRAL_C_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralCmini.svg",
+		__RED_C__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redC.svg",
+		__RED_C_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redClight.svg",
+		__RED_C_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redCmini.svg",
 		// D
-		__BLUE_D__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueD.svg",
-		__BLUE_D_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueDlight.svg",
-		__BLUE_D_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueDmini.svg",
-		__NEUTRAL_D__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralD.svg",
-		__NEUTRAL_D_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralDmini.svg",
-		__RED_D__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redD.svg",
-		__RED_D_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redDlight.svg",
-		__RED_D_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redDmini.svg",
+		__BLUE_D__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueD.svg",
+		__BLUE_D_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueDlight.svg",
+		__BLUE_D_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueDmini.svg",
+		__NEUTRAL_D__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralD.svg",
+		__NEUTRAL_D_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralDmini.svg",
+		__RED_D__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redD.svg",
+		__RED_D_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redDlight.svg",
+		__RED_D_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redDmini.svg",
 		// E
-		__BLUE_E__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueE.svg",
-		__BLUE_E_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueElight.svg",
-		__BLUE_E_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueEmini.svg",
-		__NEUTRAL_E__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralE.svg",
-		__NEUTRAL_E_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralEmini.svg",
-		__RED_E__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redE.svg",
-		__RED_E_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redElight.svg",
-		__RED_E_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redEmini.svg",
+		__BLUE_E__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueE.svg",
+		__BLUE_E_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueElight.svg",
+		__BLUE_E_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueEmini.svg",
+		__NEUTRAL_E__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralE.svg",
+		__NEUTRAL_E_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralEmini.svg",
+		__RED_E__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redE.svg",
+		__RED_E_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redElight.svg",
+		__RED_E_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redEmini.svg",
 		// F
-		__BLUE_F__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueF.svg",
-		__BLUE_F_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueFlight.svg",
-		__BLUE_F_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueFmini.svg",
-		__NEUTRAL_F__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralF.svg",
-		__NEUTRAL_F_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralFmini.svg",
-		__RED_F__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redF.svg",
-		__RED_F_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redFlight.svg",
-		__RED_F_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redFmini.svg",
+		__BLUE_F__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueF.svg",
+		__BLUE_F_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueFlight.svg",
+		__BLUE_F_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueFmini.svg",
+		__NEUTRAL_F__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralF.svg",
+		__NEUTRAL_F_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralFmini.svg",
+		__RED_F__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redF.svg",
+		__RED_F_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redFlight.svg",
+		__RED_F_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redFmini.svg",
 		// G
-		__BLUE_G__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueG.svg",
-		__BLUE_G_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueGlight.svg",
-		__BLUE_G_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueGmini.svg",
-		__NEUTRAL_G__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralG.svg",
-		__NEUTRAL_G_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralGmini.svg",
-		__RED_G__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redG.svg",
-		__RED_G_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redGlight.svg",
-		__RED_G_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redGmini.svg",
+		__BLUE_G__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueG.svg",
+		__BLUE_G_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueGlight.svg",
+		__BLUE_G_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueGmini.svg",
+		__NEUTRAL_G__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralG.svg",
+		__NEUTRAL_G_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralGmini.svg",
+		__RED_G__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redG.svg",
+		__RED_G_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redGlight.svg",
+		__RED_G_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redGmini.svg",
 		// H
-		__BLUE_H__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueH.svg",
-		__BLUE_H_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueHlight.svg",
-		__BLUE_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/blueHmini.svg",
-		__NEUTRAL_H__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralH.svg",
-		__NEUTRAL_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/neutralHmini.svg",
-		__RED_H__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redH.svg",
-		__RED_H_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redHlight.svg",
-		__RED_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/redHmini.svg",
+		__BLUE_H__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueH.svg",
+		__BLUE_H_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueHlight.svg",
+		__BLUE_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/blueHmini.svg",
+		__NEUTRAL_H__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralH.svg",
+		__NEUTRAL_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/neutralHmini.svg",
+		__RED_H__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redH.svg",
+		__RED_H_LIGHT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redHlight.svg",
+		__RED_H_MINI__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/redHmini.svg",
 		// === Эффекты пушек
 		// Огнемет
-		__FIRE_EFFECT_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/173/213/30545000703101/image.webp",
-		__FIRE_EFFECT_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectM1.webp",
-		__FIRE_EFFECT_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectM2.webp",
-		__FIRE_EFFECT_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectM3.webp",
-		__FIRE_EFFECT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectXT.webp",
-		__FIRE_EFFECT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectLCM0.webp",
-		__FIRE_EFFECT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectLCM1.webp",
-		__FIRE_EFFECT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectLCM2.webp",
-		__FIRE_EFFECT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectLCM3.webp",
-		__FIRE_EFFECT_DC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/fireEffectDC.webp",
+		__FIRE_EFFECT_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectM0.webp",
+		__FIRE_EFFECT_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectM1.webp",
+		__FIRE_EFFECT_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectM2.webp",
+		__FIRE_EFFECT_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectM3.webp",
+		__FIRE_EFFECT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectXT.webp",
+		__FIRE_EFFECT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectLCM0.webp",
+		__FIRE_EFFECT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectLCM1.webp",
+		__FIRE_EFFECT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectLCM2.webp",
+		__FIRE_EFFECT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectLCM3.webp",
+		__FIRE_EFFECT_DC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/fireEffectDC.webp",
 		// Фриз
-		__FREEZE_BREEZE_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/142/206/30545000703057/image.webp",
-		__FREEZE_BREEZE_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeBreezeM1.webp",
-		__FREEZE_BREEZE_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeBreezeM2.webp",
-		__FREEZE_BREEZE_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeBreezeM3.webp",
-		__FREEZE_BREEZE_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeBreezeXT.webp",
-		__FREEZE_BREEZE_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeBreezeLC.webp",
-		__FREEZE_FLAKE_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/144/251/30545000702776/image.webp",
-		__FREEZE_FLAKE_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeM1.webp",
-		__FREEZE_FLAKE_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeM2.webp",
-		__FREEZE_FLAKE_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeM2.webp",
-		__FREEZE_FLAKE_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeM3.webp",
-		__FREEZE_FLAKE_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeXT.webp",
-		__FREEZE_FLAKE_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeLCM0.webp",
-		__FREEZE_FLAKE_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeLCM1.webp",
-		__FREEZE_FLAKE_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeLCM2.webp",
-		__FREEZE_FLAKE_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/freezeFlakeLCM3.webp",
+		__FREEZE_BREEZE_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeBreezeM0.webp",
+		__FREEZE_BREEZE_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeBreezeM1.webp",
+		__FREEZE_BREEZE_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeBreezeM2.webp",
+		__FREEZE_BREEZE_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeBreezeM3.webp",
+		__FREEZE_BREEZE_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeBreezeXT.webp",
+		__FREEZE_BREEZE_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeBreezeLC.webp",
+		__FREEZE_FLAKE_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeM0.webp",
+		__FREEZE_FLAKE_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeM1.webp",
+		__FREEZE_FLAKE_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeM2.webp",
+		__FREEZE_FLAKE_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeM2.webp",
+		__FREEZE_FLAKE_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeM3.webp",
+		__FREEZE_FLAKE_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeXT.webp",
+		__FREEZE_FLAKE_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeLCM0.webp",
+		__FREEZE_FLAKE_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeLCM1.webp",
+		__FREEZE_FLAKE_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeLCM2.webp",
+		__FREEZE_FLAKE_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/freezeFlakeLCM3.webp",
 		// Изида
-		__ISIDA_DAMAGE_BALL_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/157/16/30545000703112/image.webp",
-		__ISIDA_DAMAGE_BALL_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallM1.webp",
-		__ISIDA_DAMAGE_BALL_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallM2.webp",
-		__ISIDA_DAMAGE_BALL_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallM3.webp",
-		__ISIDA_DAMAGE_BALL_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallXT.webp",
-		__ISIDA_DAMAGE_BALL_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallLCM0.webp",
-		__ISIDA_DAMAGE_BALL_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallLCM1.webp",
-		__ISIDA_DAMAGE_BALL_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallLCM2.webp",
-		__ISIDA_DAMAGE_BALL_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageBallLCM3.webp",
-		__ISIDA_DAMAGE_RAY_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/147613/376/315/30545000606067/image.webp",
-		__ISIDA_DAMAGE_RAY_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayM1.webp",
-		__ISIDA_DAMAGE_RAY_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayM2.webp",
-		__ISIDA_DAMAGE_RAY_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayM3.webp",
-		__ISIDA_DAMAGE_RAY_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayXT.webp",
-		__ISIDA_DAMAGE_RAY_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayLCM0.webp",
-		__ISIDA_DAMAGE_RAY_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayLCM1.webp",
-		__ISIDA_DAMAGE_RAY_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayLCM2.webp",
-		__ISIDA_DAMAGE_RAY_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaDamageRayLCM3.webp",
-		__ISIDA_HEAL_BALL_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallM0.webp",
-		__ISIDA_HEAL_BALL_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallM1.webp",
-		__ISIDA_HEAL_BALL_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallM2.webp",
-		__ISIDA_HEAL_BALL_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallM3.webp",
-		__ISIDA_HEAL_BALL_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallXT.webp",
-		__ISIDA_HEAL_BALL_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallLCM0.webp",
-		__ISIDA_HEAL_BALL_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallLCM1.webp",
-		__ISIDA_HEAL_BALL_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallLCM2.webp",
-		__ISIDA_HEAL_BALL_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealBallLCM3.webp",
-		__ISIDA_HEAL_RAY_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/147603/120/334/30545000606002/image.webp",
-		__ISIDA_HEAL_RAY_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayM1.webp",
-		__ISIDA_HEAL_RAY_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayM2.webp",
-		__ISIDA_HEAL_RAY_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayM3.webp",
-		__ISIDA_HEAL_RAY_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayXT.webp",
-		__ISIDA_HEAL_RAY_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayLCM0.webp",
-		__ISIDA_HEAL_RAY_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayLCM1.webp",
-		__ISIDA_HEAL_RAY_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayLCM2.webp",
-		__ISIDA_HEAL_RAY_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaHealRayLCM3.webp",
-		__ISIDA_BALL__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/160/162/30545000702667/image.webp",
-		__ISIDA_BALL_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/isidaBallLC.webp",
+		__ISIDA_DAMAGE_BALL_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallM0.webp",
+		__ISIDA_DAMAGE_BALL_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallM1.webp",
+		__ISIDA_DAMAGE_BALL_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallM2.webp",
+		__ISIDA_DAMAGE_BALL_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallM3.webp",
+		__ISIDA_DAMAGE_BALL_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallXT.webp",
+		__ISIDA_DAMAGE_BALL_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallLCM0.webp",
+		__ISIDA_DAMAGE_BALL_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallLCM1.webp",
+		__ISIDA_DAMAGE_BALL_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallLCM2.webp",
+		__ISIDA_DAMAGE_BALL_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageBallLCM3.webp",
+		__ISIDA_DAMAGE_RAY_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayM0.webp",
+		__ISIDA_DAMAGE_RAY_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayM1.webp",
+		__ISIDA_DAMAGE_RAY_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayM2.webp",
+		__ISIDA_DAMAGE_RAY_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayM3.webp",
+		__ISIDA_DAMAGE_RAY_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayXT.webp",
+		__ISIDA_DAMAGE_RAY_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayLCM0.webp",
+		__ISIDA_DAMAGE_RAY_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayLCM1.webp",
+		__ISIDA_DAMAGE_RAY_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayLCM2.webp",
+		__ISIDA_DAMAGE_RAY_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaDamageRayLCM3.webp",
+		__ISIDA_HEAL_BALL_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallM0.webp",
+		__ISIDA_HEAL_BALL_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallM1.webp",
+		__ISIDA_HEAL_BALL_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallM2.webp",
+		__ISIDA_HEAL_BALL_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallM3.webp",
+		__ISIDA_HEAL_BALL_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallXT.webp",
+		__ISIDA_HEAL_BALL_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallLCM0.webp",
+		__ISIDA_HEAL_BALL_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallLCM1.webp",
+		__ISIDA_HEAL_BALL_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallLCM2.webp",
+		__ISIDA_HEAL_BALL_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealBallLCM3.webp",
+		__ISIDA_HEAL_RAY_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayM0.webp",
+		__ISIDA_HEAL_RAY_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayM1.webp",
+		__ISIDA_HEAL_RAY_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayM2.webp",
+		__ISIDA_HEAL_RAY_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayM3.webp",
+		__ISIDA_HEAL_RAY_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayXT.webp",
+		__ISIDA_HEAL_RAY_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayLCM0.webp",
+		__ISIDA_HEAL_RAY_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayLCM1.webp",
+		__ISIDA_HEAL_RAY_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayLCM2.webp",
+		__ISIDA_HEAL_RAY_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaHealRayLCM3.webp",
+		__ISIDA_BALL__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaBall.webp",
+		__ISIDA_BALL_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/isidaBallLC.webp",
 		// Молот
-		__HUMMER_BULLET_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/hummerBulletXT.webp",
-		__HUMMER_BULLET_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/hummerBulletLC.webp",
-		__HUMMER_LONG_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/hummerLongXT.webp",
-		__HUMMER_LONG_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/hummerLongLC.webp",
-		__HUMMER_CROSS_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/hummerCrossXT.webp",
-		__HUMMER_CROSS_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/hummerCrossLC.webp",
+		__HUMMER_BULLET_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/hummerBulletXT.webp",
+		__HUMMER_BULLET_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/hummerBulletLC.webp",
+		__HUMMER_LONG_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/hummerLongXT.webp",
+		__HUMMER_LONG_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/hummerLongLC.webp",
+		__HUMMER_CROSS_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/hummerCrossXT.webp",
+		__HUMMER_CROSS_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/hummerCrossLC.webp",
 		// Твинс
-		__TWINS_SHOT_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/166/330/30545000702745/image.webp",
-		__TWINS_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotM1.webp",
-		__TWINS_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotM2.webp",
-		__TWINS_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotM3.webp",
-		__TWINS_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotXT.webp",
-		__TWINS_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotLCM0.webp",
-		__TWINS_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotLCM1.webp",
-		__TWINS_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotLCM2.webp",
-		__TWINS_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotLCM3.webp",
-		__TWINS_SHOT_START_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/147411/176/204/30545000607302/image.webp",
-		__TWINS_SHOT_START_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotStartLCM0.webp",
-		__TWINS_SHOT_START_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotStartLCM1.webp",
-		__TWINS_SHOT_START_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotStartLCM2.webp",
-		__TWINS_SHOT_START_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotStartLCM3.webp",
-		__TWINS_SHOT_END_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/165/145/30545000702663/image.webp",
-		__TWINS_SHOT_END_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndM1.webp",
-		__TWINS_SHOT_END_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndM2.webp",
-		__TWINS_SHOT_END_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndM3.webp",
-		__TWINS_SHOT_END_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndXT.webp",
-		__TWINS_SHOT_END_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndLCM0.webp",
-		__TWINS_SHOT_END_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndLCM1.webp",
-		__TWINS_SHOT_END_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndLCM2.webp",
-		__TWINS_SHOT_END_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/twinsShotEndLCM3.webp",
+		__TWINS_SHOT_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotM0.webp",
+		__TWINS_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotM1.webp",
+		__TWINS_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotM2.webp",
+		__TWINS_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotM3.webp",
+		__TWINS_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotXT.webp",
+		__TWINS_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotLCM0.webp",
+		__TWINS_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotLCM1.webp",
+		__TWINS_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotLCM2.webp",
+		__TWINS_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotLCM3.webp",
+		__TWINS_SHOT_START_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotStartM0.webp",
+		__TWINS_SHOT_START_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotStartLCM0.webp",
+		__TWINS_SHOT_START_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotStartLCM1.webp",
+		__TWINS_SHOT_START_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotStartLCM2.webp",
+		__TWINS_SHOT_START_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotStartLCM3.webp",
+		__TWINS_SHOT_END_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndM0.webp",
+		__TWINS_SHOT_END_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndM1.webp",
+		__TWINS_SHOT_END_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndM2.webp",
+		__TWINS_SHOT_END_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndM3.webp",
+		__TWINS_SHOT_END_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndXT.webp",
+		__TWINS_SHOT_END_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndLCM0.webp",
+		__TWINS_SHOT_END_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndLCM1.webp",
+		__TWINS_SHOT_END_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndLCM2.webp",
+		__TWINS_SHOT_END_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/twinsShotEndLCM3.webp",
 		// Рикошет
-		__RICO_EXPLOSION_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/211/227/30545000703056/image.webp",
-		__RICO_EXPLOSION_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionM1.webp",
-		__RICO_EXPLOSION_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionM2.webp",
-		__RICO_EXPLOSION_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionM3.webp",
-		__RICO_EXPLOSION_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionXT.webp",
-		__RICO_EXPLOSION_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionLCM0.webp",
-		__RICO_EXPLOSION_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionLCM1.webp",
-		__RICO_EXPLOSION_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionLCM2.webp",
-		__RICO_EXPLOSION_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoExplosionLCM3.webp",
-		__RICO_SHOT_FLASH_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/147741/131/160/30545000606467/image.webp",
-		__RICO_SHOT_FLASH_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashM1.webp",
-		__RICO_SHOT_FLASH_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashM2.webp",
-		__RICO_SHOT_FLASH_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashM3.webp",
-		__RICO_SHOT_FLASH_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashXT.webp",
-		__RICO_SHOT_FLASH_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashLCM0.webp",
-		__RICO_SHOT_FLASH_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashLCM1.webp",
-		__RICO_SHOT_FLASH_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashLCM2.webp",
-		__RICO_SHOT_FLASH_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotFlashLCM3.webp",
-		__RICO_SHOT_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/145213/207/24/30545000703106/image.webp",
-		__RICO_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotM1.webp",
-		__RICO_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotM2.webp",
-		__RICO_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotM3.webp",
-		__RICO_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotXT.webp",
-		__RICO_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotLCM0.webp",
-		__RICO_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotLCM1.webp",
-		__RICO_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotLCM2.webp",
-		__RICO_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotLCM3.webp",
-		__RICO_SHOT_TRAIL_M0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "s.eu.tankionline.com/546/147746/300/166/30545000605533/image.webp",
-		__RICO_SHOT_TRAIL_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailM1.webp",
-		__RICO_SHOT_TRAIL_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailM2.webp",
-		__RICO_SHOT_TRAIL_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailM3.webp",
-		__RICO_SHOT_TRAIL_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailXT.webp",
-		__RICO_SHOT_TRAIL_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailLCM0.webp",
-		__RICO_SHOT_TRAIL_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailLCM1.webp",
-		__RICO_SHOT_TRAIL_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailLCM2.webp",
-		__RICO_SHOT_TRAIL_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/ricoShotTrailLCM3.webp",
+		__RICO_EXPLOSION_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionM0.webp",
+		__RICO_EXPLOSION_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionM1.webp",
+		__RICO_EXPLOSION_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionM2.webp",
+		__RICO_EXPLOSION_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionM3.webp",
+		__RICO_EXPLOSION_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionXT.webp",
+		__RICO_EXPLOSION_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionLCM0.webp",
+		__RICO_EXPLOSION_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionLCM1.webp",
+		__RICO_EXPLOSION_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionLCM2.webp",
+		__RICO_EXPLOSION_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoExplosionLCM3.webp",
+		__RICO_SHOT_FLASH_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashM0.webp",
+		__RICO_SHOT_FLASH_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashM1.webp",
+		__RICO_SHOT_FLASH_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashM2.webp",
+		__RICO_SHOT_FLASH_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashM3.webp",
+		__RICO_SHOT_FLASH_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashXT.webp",
+		__RICO_SHOT_FLASH_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashLCM0.webp",
+		__RICO_SHOT_FLASH_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashLCM1.webp",
+		__RICO_SHOT_FLASH_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashLCM2.webp",
+		__RICO_SHOT_FLASH_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotFlashLCM3.webp",
+		__RICO_SHOT_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotM0.webp",
+		__RICO_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotM1.webp",
+		__RICO_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotM2.webp",
+		__RICO_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotM3.webp",
+		__RICO_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotXT.webp",
+		__RICO_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotLCM0.webp",
+		__RICO_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotLCM1.webp",
+		__RICO_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotLCM2.webp",
+		__RICO_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotLCM3.webp",
+		__RICO_SHOT_TRAIL_M0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailM0.webp",
+		__RICO_SHOT_TRAIL_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailM1.webp",
+		__RICO_SHOT_TRAIL_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailM2.webp",
+		__RICO_SHOT_TRAIL_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailM3.webp",
+		__RICO_SHOT_TRAIL_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailXT.webp",
+		__RICO_SHOT_TRAIL_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailLCM0.webp",
+		__RICO_SHOT_TRAIL_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailLCM1.webp",
+		__RICO_SHOT_TRAIL_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailLCM2.webp",
+		__RICO_SHOT_TRAIL_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/ricoShotTrailLCM3.webp",
 		// Вулкан 
-		__VULCAN_CROSS_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/vulcanCrossXT.webp",
-		__VULCAN_CROSS_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/vulcanCrossLC.webp",
-		__VULCAN_CROSS_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/vulcanCrossPR.webp",
-		__VULCAN_LONG_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/vulcanLongXT.webp",
-		__VULCAN_LONG_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/vulcanLongLC.webp",
-		__VULCAN_LONG_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/vulcanLongPR.webp",
+		__VULCAN_CROSS_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/vulcanCrossXT.webp",
+		__VULCAN_CROSS_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/vulcanCrossLC.webp",
+		__VULCAN_CROSS_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/vulcanCrossPR.webp",
+		__VULCAN_LONG_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/vulcanLongXT.webp",
+		__VULCAN_LONG_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/vulcanLongLC.webp",
+		__VULCAN_LONG_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/vulcanLongPR.webp",
 		// Смоки
-		__SMOKY_SHOT_START_LC__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotStartLC.webp",
-		__SMOKY_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotM2.webp",
-		__SMOKY_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotLCM0.webp",
-		__SMOKY_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotLCM1.webp",
-		__SMOKY_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotLCM2.webp",
-		__SMOKY_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotLCM3.webp",
-		__SMOKY_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/smokyShotXT.webp",
+		__SMOKY_SHOT_START_LC__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotStartLC.webp",
+		__SMOKY_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotM2.webp",
+		__SMOKY_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotLCM0.webp",
+		__SMOKY_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotLCM1.webp",
+		__SMOKY_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotLCM2.webp",
+		__SMOKY_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotLCM3.webp",
+		__SMOKY_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/smokyShotXT.webp",
 		// Страйкер
-		__STRIKER_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/strikerShotXT.webp",
+		__STRIKER_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/strikerShotXT.webp",
 		// Гром
-		__THUNDER_SHOT_START_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartM1.webp",
-		__THUNDER_SHOT_START_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartM2.webp",
-		__THUNDER_SHOT_START_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartM3.webp",
-		__THUNDER_SHOT_START_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartXT.webp",
-		__THUNDER_SHOT_START_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartLCM0.webp",
-		__THUNDER_SHOT_START_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartLCM1.webp",
-		__THUNDER_SHOT_START_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartLCM2.webp",
-		__THUNDER_SHOT_START_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartLCM3.webp",
-		__THUNDER_SHOT_START_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotStartPR.webp",
-		__THUNDER_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotXT.webp",
-		__THUNDER_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotLCM0.webp",
-		__THUNDER_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotLCM1.webp",
-		__THUNDER_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotLCM2.webp",
-		__THUNDER_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotLCM3.webp",
-		__THUNDER_SHOT_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/thunderShotPR.webp",
+		__THUNDER_SHOT_START_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartM1.webp",
+		__THUNDER_SHOT_START_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartM2.webp",
+		__THUNDER_SHOT_START_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartM3.webp",
+		__THUNDER_SHOT_START_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartXT.webp",
+		__THUNDER_SHOT_START_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartLCM0.webp",
+		__THUNDER_SHOT_START_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartLCM1.webp",
+		__THUNDER_SHOT_START_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartLCM2.webp",
+		__THUNDER_SHOT_START_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartLCM3.webp",
+		__THUNDER_SHOT_START_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotStartPR.webp",
+		__THUNDER_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotXT.webp",
+		__THUNDER_SHOT_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotLCM0.webp",
+		__THUNDER_SHOT_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotLCM1.webp",
+		__THUNDER_SHOT_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotLCM2.webp",
+		__THUNDER_SHOT_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotLCM3.webp",
+		__THUNDER_SHOT_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/thunderShotPR.webp",
 		// Рельса
-		__RAIL_CHARGE_PART1_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1M1.webp",
-		__RAIL_CHARGE_PART1_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1M2.webp",
-		__RAIL_CHARGE_PART1_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1M3.webp",
-		__RAIL_CHARGE_PART1_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1XT.webp",
-		__RAIL_CHARGE_PART1_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1LCM0.webp",
-		__RAIL_CHARGE_PART1_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1LCM1.webp",
-		__RAIL_CHARGE_PART1_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1LCM2.webp",
-		__RAIL_CHARGE_PART1_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1LCM3.webp",
-		__RAIL_CHARGE_PART1_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart1PR.webp",
-		__RAIL_CHARGE_PART2_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2M1.webp",
-		__RAIL_CHARGE_PART2_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2M2.webp",
-		__RAIL_CHARGE_PART2_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2M3.webp",
-		__RAIL_CHARGE_PART2_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2XT.webp",
-		__RAIL_CHARGE_PART2_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2LCM0.webp",
-		__RAIL_CHARGE_PART2_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2LCM1.webp",
-		__RAIL_CHARGE_PART2_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2LCM2.webp",
-		__RAIL_CHARGE_PART2_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2LCM3.webp",
-		__RAIL_CHARGE_PART2_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart2PR.webp",
-		__RAIL_CHARGE_PART3_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3M1.webp",
-		__RAIL_CHARGE_PART3_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3M2.webp",
-		__RAIL_CHARGE_PART3_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3M3.webp",
-		__RAIL_CHARGE_PART3_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3XT.webp",
-		__RAIL_CHARGE_PART3_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3LCM0.webp",
-		__RAIL_CHARGE_PART3_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3LCM1.webp",
-		__RAIL_CHARGE_PART3_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3LCM2.webp",
-		__RAIL_CHARGE_PART3_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3LCM3.webp",
-		__RAIL_CHARGE_PART3_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railChargePart3PR.webp",
-		__RAIL_RAY_ADDITIONS_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsM1.webp",
-		__RAIL_RAY_ADDITIONS_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsM2.webp",
-		__RAIL_RAY_ADDITIONS_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsM3.webp",
-		__RAIL_RAY_ADDITIONS_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsXT.png",
-		__RAIL_RAY_ADDITIONS_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsPR.webp",
-		__RAIL_RAY_ADDITIONS_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsLCM0.webp",
-		__RAIL_RAY_ADDITIONS_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsLCM1.webp",
-		__RAIL_RAY_ADDITIONS_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsLCM2.webp",
-		__RAIL_RAY_ADDITIONS_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayAdditionsLCM3.webp",
-		__RAIL_RAY_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayM1.webp",
-		__RAIL_RAY_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayM2.webp",
-		__RAIL_RAY_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayM3.webp",
-		__RAIL_RAY_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayXT.webp",
-		__RAIL_RAY_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayLCM0.webp",
-		__RAIL_RAY_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayLCM1.webp",
-		__RAIL_RAY_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayLCM2.webp",
-		__RAIL_RAY_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayLCM3.webp",
-		__RAIL_RAY_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/railRayPR.webp",
+		__RAIL_CHARGE_PART1_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1M1.webp",
+		__RAIL_CHARGE_PART1_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1M2.webp",
+		__RAIL_CHARGE_PART1_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1M3.webp",
+		__RAIL_CHARGE_PART1_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1XT.webp",
+		__RAIL_CHARGE_PART1_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1LCM0.webp",
+		__RAIL_CHARGE_PART1_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1LCM1.webp",
+		__RAIL_CHARGE_PART1_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1LCM2.webp",
+		__RAIL_CHARGE_PART1_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1LCM3.webp",
+		__RAIL_CHARGE_PART1_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart1PR.webp",
+		__RAIL_CHARGE_PART2_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2M1.webp",
+		__RAIL_CHARGE_PART2_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2M2.webp",
+		__RAIL_CHARGE_PART2_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2M3.webp",
+		__RAIL_CHARGE_PART2_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2XT.webp",
+		__RAIL_CHARGE_PART2_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2LCM0.webp",
+		__RAIL_CHARGE_PART2_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2LCM1.webp",
+		__RAIL_CHARGE_PART2_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2LCM2.webp",
+		__RAIL_CHARGE_PART2_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2LCM3.webp",
+		__RAIL_CHARGE_PART2_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart2PR.webp",
+		__RAIL_CHARGE_PART3_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3M1.webp",
+		__RAIL_CHARGE_PART3_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3M2.webp",
+		__RAIL_CHARGE_PART3_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3M3.webp",
+		__RAIL_CHARGE_PART3_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3XT.webp",
+		__RAIL_CHARGE_PART3_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3LCM0.webp",
+		__RAIL_CHARGE_PART3_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3LCM1.webp",
+		__RAIL_CHARGE_PART3_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3LCM2.webp",
+		__RAIL_CHARGE_PART3_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3LCM3.webp",
+		__RAIL_CHARGE_PART3_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railChargePart3PR.webp",
+		__RAIL_RAY_ADDITIONS_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsM1.webp",
+		__RAIL_RAY_ADDITIONS_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsM2.webp",
+		__RAIL_RAY_ADDITIONS_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsM3.webp",
+		__RAIL_RAY_ADDITIONS_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsXT.png",
+		__RAIL_RAY_ADDITIONS_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsPR.webp",
+		__RAIL_RAY_ADDITIONS_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsLCM0.webp",
+		__RAIL_RAY_ADDITIONS_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsLCM1.webp",
+		__RAIL_RAY_ADDITIONS_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsLCM2.webp",
+		__RAIL_RAY_ADDITIONS_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayAdditionsLCM3.webp",
+		__RAIL_RAY_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayM1.webp",
+		__RAIL_RAY_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayM2.webp",
+		__RAIL_RAY_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayM3.webp",
+		__RAIL_RAY_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayXT.webp",
+		__RAIL_RAY_LCM0__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayLCM0.webp",
+		__RAIL_RAY_LCM1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayLCM1.webp",
+		__RAIL_RAY_LCM2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayLCM2.webp",
+		__RAIL_RAY_LCM3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayLCM3.webp",
+		__RAIL_RAY_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/railRayPR.webp",
 		// Гаусс
-		__GAUSS_BIG_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/gaussBigShotXT.webp",
-		__GAUSS_BIG_SHOT_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/gaussBigShotPR.webp",
-		__GAUSS_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/gaussShotXT.webp",
-		__GAUSS_SHOT_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/gaussShotPR.webp",
-		__GAUSS_SHOT_START_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/gaussShotStartXT.webp",
-		__GAUSS_SHOT_START_PR__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/gaussShotStartPR.webp",
+		__GAUSS_BIG_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/gaussBigShotXT.webp",
+		__GAUSS_BIG_SHOT_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/gaussBigShotPR.webp",
+		__GAUSS_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/gaussShotXT.webp",
+		__GAUSS_SHOT_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/gaussShotPR.webp",
+		__GAUSS_SHOT_START_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/gaussShotStartXT.webp",
+		__GAUSS_SHOT_START_PR__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/gaussShotStartPR.webp",
 		// Шафт
-		__SHAFT_PRICEL_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftPricelM1.webp",
-		__SHAFT_PRICEL_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftPricelM2.webp",
-		__SHAFT_PRICEL_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftPricelM3.webp",
-		__SHAFT_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftShotM1.webp",
-		__SHAFT_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftShotM2.webp",
-		__SHAFT_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftShotM3.webp",
-		__SHAFT_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftShotXT.webp",
-		__SHAFT_START_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftStartShotM1.webp",
-		__SHAFT_START_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftStartShotM2.webp",
-		__SHAFT_START_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftStartShotM3.webp",
-		__SHAFT_START_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftStartShotXT.webp",
-		__SHAFT_TRAIL_M1__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftTrailM1.webp",
-		__SHAFT_TRAIL_M2__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftTrailM2.webp",
-		__SHAFT_TRAIL_M3__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftTrailM3.webp",
-		__SHAFT_TRAIL_XT__: localStorage.getItem('__PATCH_ASSET_BASE__') + "assets/shaftTrailXT.webp",
+		__SHAFT_PRICEL_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftPricelM1.webp",
+		__SHAFT_PRICEL_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftPricelM2.webp",
+		__SHAFT_PRICEL_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftPricelM3.webp",
+		__SHAFT_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftShotM1.webp",
+		__SHAFT_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftShotM2.webp",
+		__SHAFT_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftShotM3.webp",
+		__SHAFT_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftShotXT.webp",
+		__SHAFT_START_SHOT_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftStartShotM1.webp",
+		__SHAFT_START_SHOT_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftStartShotM2.webp",
+		__SHAFT_START_SHOT_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftStartShotM3.webp",
+		__SHAFT_START_SHOT_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftStartShotXT.webp",
+		__SHAFT_TRAIL_M1__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftTrailM1.webp",
+		__SHAFT_TRAIL_M2__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftTrailM2.webp",
+		__SHAFT_TRAIL_M3__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftTrailM3.webp",
+		__SHAFT_TRAIL_XT__: localStorage.getItem('__PATCH_ASSET_BASE_2__') + "assets/shaftTrailXT.webp",
 	}
 	
 	async function getSvgDimensionsFromText(blob) {
@@ -928,31 +929,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				  }
 				  
 				  /* === GLOW HIGHLIGHT НА ПРОГРЕСС-БАРЕ === */
-					.rank-progress {
-						position: relative !important; /* Для позиционирования ::after */
-						overflow: visible !important;  /* Чтобы свечение не обрезалось */
-					}
-
-					/* Подсветка добавленной части */
-					.rank-progress::after {
-						content: '';
-						position: absolute;
-						top: 0;
-						/* left и width задаются динамически через JS */
-						height: 100%;
-						background: linear-gradient(90deg, 
-							rgba(0, 255, 0, 0) 0%, 
-							rgba(0, 255, 0, 0.6) 50%, 
-							rgba(0, 255, 0, 0) 100%);
-						box-shadow: 0 0 0.5rem rgba(0, 255, 0, 0.8), 
-									0 0 1rem rgba(0, 255, 0, 0.4);
-						border-radius: inherit;
-						opacity: 1;
-						pointer-events: none;
-						animation: glow-fade-out 1s ease-out forwards;
-						z-index: 10; /* Поверх основной полоски */
-					}
-
 					@keyframes glow-fade-out {
 						0% {
 							opacity: 1;
@@ -1548,7 +1524,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						  border-image-width: 2rem !important;
 						  border-image-slice: 23 !important;
 						  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/headerTitle.svg) !important;
-						  background: transparent !important;
+						  background: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/headerTitle.svg) !important;
+						  background-size: contain !important;
+						  background-repeat: no-repeat !important;
 					  }
 
 					  .css-vs2a1i .css-1xoqgsn, .css-omkxpr .css-lceqwt {
@@ -1719,6 +1697,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						  border-image-slice: 28 !important;
 						  border-image-source: url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/greenBigButton.svg) !important;
 						  background: transparent !important;
+						  position: relative !important;
 					  }
 					  
 					  .css-1f6hgrq:hover {
@@ -3069,7 +3048,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							<div class="css-ynddud">
 								<img class="css-yj108x" src="${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/accept.8be2e839.svg" style="display: ${savedGraphics ? 'block' : 'none'};">
 							</div>
-							<div class="css-vo4gqt">Старая графика (Тишина, Пинг-Понг, Будущее) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
+							<div class="css-vo4gqt">Старая графика (Тишина, Пинг-Понг, Будущее, Александровск Лето, Кёльн) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
 						</div>
 						
 						<!-- ЧЕКБОКС СТАРЫХ ЛАЙТМАПОВ -->
@@ -191980,6 +191959,15 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								} else if (r.n8u_1 === 'Terrain' && r.o8u_1 === 'concrete_4') {
 									rect.name = 'concrete_44';
 									window.__ATLAS_RECTS__.push(rect)
+								} else if (r.n8u_1 === 'Fort' && r.o8u_1 === 'wall_1') {
+									rect.name = 'wall_11';
+									window.__ATLAS_RECTS__.push(rect)
+								} else if (r.n8u_1 === 'Fort' && r.o8u_1 === 'wall_2') {
+									rect.name = 'wall_22';
+									window.__ATLAS_RECTS__.push(rect)
+								} else if (r.n8u_1 === 'Fort' && r.o8u_1 === 'wall_3') {
+									rect.name = 'wall_33';
+									window.__ATLAS_RECTS__.push(rect)
 								} else {
 									window.__ATLAS_RECTS__.push(rect);
 								}
@@ -201107,7 +201095,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									if (JSON.parse(localStorage.getItem('oldGraphics'))) {
 										
 										if (
-											i.includes('63/30023334330564') // ping-pong summer
+											i.includes('302/31552412441027') // aleksandrovsk summer
+											|| i.includes('44/30023223215516') // cologne
+										
+											|| i.includes('63/30023334330564') // ping-pong summer
 											|| i.includes('306/30023334503250') // ping-pong winter
 											
 											|| i.includes('365/31552421666543') // silence summer
@@ -201226,48 +201217,99 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									if (window.__CHANGE_TO_OLD__) {
 										if (
 											// summer
-											n.includes('30023173712307/watch_to')
-											|| n.includes('30023173712307/tower')
-											|| n.includes('30023201751631/nubu_6')
-											|| n.includes('30023202025674/nubu_9')
-											|| n.includes('30023171266676/smhouse5')
-											|| n.includes('30023173646166/brid_2')
-											|| n.includes('30023173646166/brid_7')
-											|| n.includes('30023173646166/brid_6')
-											|| n.includes('30023173646166/brid_5')
-											|| n.includes('30023173646166/brid_3')
-											|| n.includes('30023173646166/brid_4')
-											|| n.includes('30023173646166/brid_1')
-											|| n.includes('30023173646166/brid_1_3')
-											|| n.includes('30023202076501/tunnel_1')
-											|| n.includes('30023202076501/tunnel_2')
-											|| n.includes('30023202076501/ow_t')
-											|| n.includes('30023203466004/tube_1')
-											|| n.includes('30023203466004/tube_2')
-											|| n.includes('30023203466004/tube_3')
-											|| n.includes('30023203466004/tube_4')
+											n.includes('30023173712307/watch_to.3ds')
+											|| n.includes('30023173712307/tower.3ds')
+											|| n.includes('30023201751631/nubu_6.3ds')
+											|| n.includes('30023202025674/nubu_9.3ds')
+											|| n.includes('30023171266676/smhouse5.3ds')
+											|| n.includes('30023173646166/brid_2.3ds')
+											|| n.includes('30023173646166/brid_7.3ds')
+											|| n.includes('30023173646166/brid_6.3ds')
+											|| n.includes('30023173646166/brid_5.3ds')
+											|| n.includes('30023173646166/brid_3.3ds')
+											|| n.includes('30023173646166/brid_4.3ds')
+											|| n.includes('30023173646166/brid_1.3ds')
+											|| n.includes('30023173646166/brid_1_3.3ds')
+											|| n.includes('30023202076501/tunnel_1.3ds')
+											|| n.includes('30023202076501/tunnel_2.3ds')
+											|| n.includes('30023202076501/ow_t.3ds')
+											|| n.includes('30023203466004/tube_1.3ds')
+											|| n.includes('30023203466004/tube_2.3ds')
+											|| n.includes('30023203466004/tube_3.3ds')
+											|| n.includes('30023203466004/tube_4.3ds')
+											
+											|| n.includes('30023173136173/wall_gate.3ds')
+											|| n.includes('30023173136173/tower_roof.3ds')
+											|| n.includes('30023173136173/wall.3ds')
+											|| n.includes('30023173136173/wall_short.3ds')
+											|| n.includes('30023173136173/wall_end_1.3ds')
+											|| n.includes('30023173136173/wall_end_2.3ds')
+											|| n.includes('30023173136173/wall_cor_in.3ds')
+											|| n.includes('30023173136173/wall_cor_out.3ds')
+											|| n.includes('30023173136173/wall_broken_1.3ds')
+											|| n.includes('30023173136173/wall_broken_2.3ds')
+											|| n.includes('30023173136173/wlb_rise.3ds')
+											|| n.includes('30023172700363/fahwerk1.3ds')
+											|| n.includes('30023172730746/fahwerk2.3ds')
+											|| n.includes('30023201410562/nubu_1.3ds')
+											|| n.includes('30023201610531/nubu_2.3ds')
+											|| n.includes('30023201640362/nubu_3.3ds')
+											|| n.includes('30023201711773/nubu_5.3ds')
+											|| n.includes('30060462630451/rise_2.3ds')
+											|| n.includes('30060462630451/slope_1.3ds')
+											|| n.includes('30060462630451/slope_2.3ds')
+											|| n.includes('30023172121605/wall_e1.3ds')
+											|| n.includes('30023172121605/wall_e2.3ds')
+											|| n.includes('30023172121605/wall_cr.3ds')
+											|| n.includes('30023172121605/wall_st.3ds')
+											|| n.includes('30023203257226/border.3ds')
+											|| n.includes('30023203257226/wallend.3ds')
+											|| n.includes('30023203257226/wallbs.3ds')
+											//|| n.includes('30023164056106/bridge_1.3ds')
+											
+											|| n.includes('30023204016674/tree01.3ds')
+											|| n.includes('30023204016674/tree02.3ds')
+											//|| n.includes('30023164056106/bridge_1_1.3ds')
+											//|| n.includes('30023164056106/bridge_2.3ds')
+											//|| n.includes('30023164056106/bridge_3.3ds')
+											//|| n.includes('30023164056106/bridge_5.3ds')
+											|| n.includes('30023204035440/vilhou_1.3ds')
+											|| n.includes('30023204035440/vilhou_2.3ds')
+											|| n.includes('30023204035440/vilhou_3.3ds')
+											|| n.includes('30023204035440/vilhou_4.3ds')
+											|| n.includes('30023171365472/cliff_0.3ds')
+											|| n.includes('30023171365472/cliff_2.3ds')
+											|| n.includes('30023171365472/cliff_c2.3ds')
+											|| n.includes('30023171365472/cliff_ri.3ds')
+											|| n.includes('30023171365472/cliff_r2.3ds')
+											|| n.includes('30023171365472/cliff_cor.3ds')
+											|| n.includes('30023171332713/fab_tow.3ds')
+											|| n.includes('30023171332713/fab_tow2.3ds')
+											|| n.includes('30023172121605/wall_3w.3ds')
+											|| n.includes('30023172121605/wall_e3.3ds')
+											|| n.includes('30023201511745/nubu_12.3ds')
 											
 											// winter
-											|| n.includes('30023173724731/watch_to')
-											|| n.includes('30023173724731/tower')
-											|| n.includes('30023201770274/nubu_6')
-											|| n.includes('30023202034222/nubu_9')
-											|| n.includes('30023171316730/smhouse5')
-											|| n.includes('30023173674746/brid_2')
-											|| n.includes('30023173674746/brid_7')
-											|| n.includes('30023173674746/brid_6')
-											|| n.includes('30023173674746/brid_5')
-											|| n.includes('30023173674746/brid_3')
-											|| n.includes('30023173674746/brid_4')
-											|| n.includes('30023173674746/brid_1')
-											|| n.includes('30023173674746/brid_1_3')
-											|| n.includes('30023202117502/tunnel_1')
-											|| n.includes('30023202117502/tunnel_2')
-											|| n.includes('30023202117502/ow_t')
-											|| n.includes('30023203505745/tube_1')
-											|| n.includes('30023203505745/tube_2')
-											|| n.includes('30023203505745/tube_3')
-											|| n.includes('30023203505745/tube_4')
+											|| n.includes('30023173724731/watch_to.3ds')
+											|| n.includes('30023173724731/tower.3ds')
+											|| n.includes('30023201770274/nubu_6.3ds')
+											|| n.includes('30023202034222/nubu_9.3ds')
+											|| n.includes('30023171316730/smhouse5.3ds')
+											|| n.includes('30023173674746/brid_2.3ds')
+											|| n.includes('30023173674746/brid_7.3ds')
+											|| n.includes('30023173674746/brid_6.3ds')
+											|| n.includes('30023173674746/brid_5.3ds')
+											|| n.includes('30023173674746/brid_3.3ds')
+											|| n.includes('30023173674746/brid_4.3ds')
+											|| n.includes('30023173674746/brid_1.3ds')
+											|| n.includes('30023173674746/brid_1_3.3ds')
+											|| n.includes('30023202117502/tunnel_1.3ds')
+											|| n.includes('30023202117502/tunnel_2.3ds')
+											|| n.includes('30023202117502/ow_t.3ds')
+											|| n.includes('30023203505745/tube_1.3ds')
+											|| n.includes('30023203505745/tube_2.3ds')
+											|| n.includes('30023203505745/tube_3.3ds')
+											|| n.includes('30023203505745/tube_4.3ds')
 										) {
 											n = n.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
 										}
