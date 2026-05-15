@@ -3,7 +3,8 @@
 
     const realWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
 
-    localStorage.setItem('__PATCH_ASSET_BASE__', 'https://cdn.jsdelivr.net/gh/rlchens/real-classic@main/');
+    //localStorage.setItem('__PATCH_ASSET_BASE__', 'https://raw.githubusercontent.com/rlchens/real-classic/refs/heads/main/');
+    localStorage.setItem('__PATCH_ASSET_BASE__', chrome.runtime.getURL('/'));
     localStorage.setItem('__PATCH_ASSET_BASE_2__', chrome.runtime.getURL('/'));
 
     (function removeCSPMeta() {
@@ -128,7 +129,7 @@
                     if (value && TARGET_REGEX.test(value) && !patchedMain) {
                         patchedMain = true;
                         
-                        const extensionUrl = chrome.runtime.getURL('patched_main.min.js');
+                        const extensionUrl = chrome.runtime.getURL('patched_main.js');
                         descriptor.set.call(this, extensionUrl);
                         return;
                     }
@@ -149,7 +150,7 @@
                     const src = node.getAttribute('src');
                     if (TARGET_REGEX.test(src) && !patchedMain) {
                         patchedMain = true;
-                        node.src = chrome.runtime.getURL('patched_main.min.js');
+                        node.src = chrome.runtime.getURL('patched_main.js');
                     }
                 }
             });

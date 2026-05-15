@@ -190,9 +190,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 		function proxyViaBridge(url, init) {
 			return new Promise((resolve, reject) => {
 				const requestId = 'req_' + (++_requestId) + '_' + Date.now();
-				// Слушаем ответ
-					console.log(requestId);
 				
+				// Слушаем ответ
 				const onMessage = (event) => {
 					if (event.source !== realWindow) return;
 					if (event.data?.type !== 'REAL_CLASSIC_PROXY_RESPONSE') return;
@@ -201096,6 +201095,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 										
 										if (
 											i.includes('302/31552412441027') // aleksandrovsk summer
+											|| i.includes('41/30023204653562') // aleksandrovsk space
+											
+											|| i.includes('146/30023206047514') // arena summer
+											
+											|| i.includes('45/30023206531045') // atra summer
+											
+											|| i.includes('1/31552413301757') // barda summer
+											|| i.includes('340/30023207230033') // barda space
+											
+											|| i.includes('41/31552413622250') // berlin summer
+											
 											|| i.includes('44/30023223215516') // cologne
 										
 											|| i.includes('63/30023334330564') // ping-pong summer
@@ -201256,6 +201266,8 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 											|| n.includes('30023201640362/nubu_3.3ds')
 											|| n.includes('30023201711773/nubu_5.3ds')
 											|| n.includes('30060462630451/rise_2.3ds')
+											|| n.includes('30060462630451/rise_3.3ds')
+											|| n.includes('30060462630451/rise_5.3ds')
 											|| n.includes('30060462630451/slope_1.3ds')
 											|| n.includes('30060462630451/slope_2.3ds')
 											|| n.includes('30023172121605/wall_e1.3ds')
@@ -201279,6 +201291,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 											|| n.includes('30023204035440/vilhou_4.3ds')
 											|| n.includes('30023171365472/cliff_0.3ds')
 											|| n.includes('30023171365472/cliff_2.3ds')
+											|| n.includes('30023171365472/cliff_4.3ds')
 											|| n.includes('30023171365472/cliff_c2.3ds')
 											|| n.includes('30023171365472/cliff_ri.3ds')
 											|| n.includes('30023171365472/cliff_r2.3ds')
@@ -201287,11 +201300,15 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 											|| n.includes('30023171332713/fab_tow2.3ds')
 											|| n.includes('30023172121605/wall_3w.3ds')
 											|| n.includes('30023172121605/wall_e3.3ds')
+											|| n.includes('30023202003042/nubu_8.3ds')
+											|| n.includes('30023201462745/nubu_10.3ds')
 											|| n.includes('30023201511745/nubu_12.3ds')
+											|| n.includes('30023201547441/nubu_14.3ds')
 											
 											// winter
 											|| n.includes('30023173724731/watch_to.3ds')
 											|| n.includes('30023173724731/tower.3ds')
+											|| n.includes('30023201662612/nubu_4.3ds')
 											|| n.includes('30023201770274/nubu_6.3ds')
 											|| n.includes('30023202034222/nubu_9.3ds')
 											|| n.includes('30023171316730/smhouse5.3ds')
