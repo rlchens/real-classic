@@ -5459,7 +5459,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				if (!battlesInfo?.battles?.m5_1) return;
 				if (!battlesInfo?.usersTeam?.m5_1) return;
 				if (!battlesInfo?.userScore?.m5_1) return;
-				console.log(battlesInfo?.battles?.m5_1);
 
 				const battleIndex = battlesInfo.battles.m5_1.o6_1.indexOf(window.__SELECTED_BATTLE__);
 				const usersbattleIndex = battlesInfo.users.m5_1.o6_1.indexOf(window.__SELECTED_BATTLE__);
@@ -5616,7 +5615,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					if (battleScoreCount) {
 						scoreContainer.style.display = '';
 						const modeIcons = { CTF: 'flag.svg', CP: 'dom.svg' };
-						iconEl.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/${modeIcons[battleMode] || 'kill.svg'}`;
+						iconEl.src = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/${modeIcons[battleMode] || 'kill.svg'}`;
 
 						let scoreDiv = scoreContainer.querySelector('.battle-score-count');
 						if (!scoreDiv) {
@@ -5744,14 +5743,14 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				}
 				
 				if (iconMode) {
-					if (iconMode.src !== `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.svg`) {
-						iconMode.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.svg`;
+					if (iconMode.src !== `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/dom.svg`) {
+						iconMode.src = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/dom.svg`;
 					}
 				}
 				
 				if (iconCount) {
-					if (iconCount.src !== `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.png`) {
-						iconCount.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/dom.png`;
+					if (iconCount.src !== `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/dom.png`) {
+						iconCount.src = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/dom.png`;
 					}
 				}
 				
@@ -5835,11 +5834,11 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 							if (container.children.length >= 2) {
 								Array.from(container.children).forEach((el, index) => {
 									if (index === 0) {
-										el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaLeft.svg)`;
+										el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleSmallAreaLeft.svg)`;
 									} else if (index === (container.children.length - 1)) {
-										el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaRight.svg)`;
+										el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleSmallAreaRight.svg)`;
 									} else {
-										el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/battleSmallAreaCenter.svg)`;
+										el.style.borderImageSource = `url(${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/battleSmallAreaCenter.svg)`;
 									}
 								})
 							}
@@ -5945,12 +5944,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			
 			const FLAG_SRC = {
 				red: {
-					normal: `${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/red_flag.902470b8.png`,
-					taken: `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/redFlagTaken.png`
+					normal: `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}tankiclassic.com/play/static/images/red_flag.902470b8.png`,
+					taken: `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/redFlagTaken.png`
 				},
 				blue: {
-					normal: `${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/blue_flag.3abc6059.png`,
-					taken: `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/blueFlagTaken.png`
+					normal: `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}tankiclassic.com/play/static/images/blue_flag.3abc6059.png`,
+					taken: `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/blueFlagTaken.png`
 				}
 			};
 			
@@ -58029,7 +58028,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 														var s = t.x2_1;
 														let src = 4 === s ? di : 2 === s ? wi : 3 === s ? vi : "";
 														if ((4 === s ? di : 2 === s ? wi : 3 === s ? vi : "").includes('ctf_mode.fba37902.svg')) {
-															src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/ctf_count.svg`
+															src = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/ctf_count.svg`
 														}
 														return n.src = src,
 														Ed
@@ -198003,7 +198002,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						function mf(t, n) {
 							// === ЗАМЕНА 3DS
 							if (t.includes('44/31167700274234') && JSON.parse(localStorage.getItem('oldGraphics'))) {
-								t = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/mine/object.3ds`;
+								t = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/mine/object.3ds`;
 							}
 							if (
 								t.includes('31167700275754') // флаги
@@ -202277,31 +202276,31 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												
 											) {
 												window.__CHANGE_TO_OLD__ = true
-												this.z95_1 = this.z95_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
+												this.z95_1 = this.z95_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE_2__'));
 												
 												if (this.z95_1.includes('365/31552421666543')) {
 													window.__CURRENT_MAP__ = 'silence_summer'
 													if (this.a96_1.includes('towerAtlas')) {
-														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/propsSummer`;
 													}
 												}
 												if (this.z95_1.includes('4/30023355061311')) {
 													window.__CURRENT_MAP__ = 'silence_winter'
 													if (this.a96_1.includes('towerAtlas')) {
-														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsWinter`;
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/propsWinter`;
 													}
 												}
 												if (this.z95_1.includes('102/30125767471417')) {
 													window.__CURRENT_MAP__ = 'silence_space'
 													if (this.a96_1.includes('towerAtlas')) {
-														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/propsSummer`;
 													}
 												}
 												
 											} else {
 												window.__CHANGE_TO_OLD__ = false
 												if (this.a96_1.includes('towerAtlas')) {
-													this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer/new`;
+													this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}assets/propsSummer/new`;
 												}
 											}
 											
@@ -203278,7 +203277,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 											|| this.l9e_1.includes('31345722130246') // staying
 											|| this.l9e_1.includes('31345722130277') // start moving
 										) {
-											this.l9e_1 = this.l9e_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'))
+											this.l9e_1 = this.l9e_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE_2__'))
 										}
 										
 										if (41 === o)
