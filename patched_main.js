@@ -3318,6 +3318,10 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				.injected-time-selector .css-cqg39y {
 					width: 16rem !important;
 				}
+				
+				.css-18aiw1d {
+					display: none !important;
+				}
 			`;
 
 			const cssStyles = document.createElement('style');
@@ -3424,7 +3428,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 								<div class="css-o5amnh">
 									<img class="css-yj108x" src="${localStorage.getItem('__PATCH_ASSET_BASE_2__') + "tankiclassic.com"}/play/static/images/accept.8be2e839.svg" style="display: ${savedGraphics ? 'block' : 'none'};">
 								</div>
-								<div class="css-5bjw8l">Старая графика (Тишина, Пинг-Понг, Будущее, Александровск Лето, Кёльн) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
+								<div class="css-5bjw8l">Старая графика (Александровск, Арена, Атра, Барда, Берлин, Будущее, Кёльн, Пинг-Понг, Тишина) <br><span style="color: #ff6969; text-shadow: 1px ">Требуется перезаход</span></div>
 							</div>
 							
 							<!-- ЧЕКБОКС СТАРЫХ ЛАЙТМАПОВ -->
@@ -5858,7 +5862,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 						secondCounter.className = 'css-iwcpp3'
 						secondCounter.innerHTML = `
 							<div class="css-581flt">
-								<img class="css-466b8a" src="${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/scull.c7d3d323.svg">
+								<img class="css-466b8a" src="${localStorage.getItem('__PATCH_ASSET_BASE_2__')}tankiclassic.com/play/static/images/scull.c7d3d323.svg">
 								<div>0</div>
 							</div>
 						`;
@@ -5874,7 +5878,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					
 					const img = document.createElement('img');
 					img.className = 'css-1xfzc85';
-					img.src = `${localStorage.getItem('__PATCH_ASSET_BASE__')}tankiclassic.com/play/static/images/scull.c7d3d323.svg`;
+					img.src = `${localStorage.getItem('__PATCH_ASSET_BASE_2__')}tankiclassic.com/play/static/images/scull.c7d3d323.svg`;
 					
 					const value = document.createElement('div');
 					value.textContent = score;
@@ -203260,14 +203264,19 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 											|| this.l9e_1.includes('31345722126571')
 											|| this.l9e_1.includes('31345722126256')
 											
-											|| this.l9e_1.includes('31345722130102')
-											|| this.l9e_1.includes('31345722130116')
-											|| this.l9e_1.includes('31345722130066')
+											|| this.l9e_1.includes('31345722130102') // moving
+											|| this.l9e_1.includes('31345722130116') // start moving
+											|| this.l9e_1.includes('31345722130066') // staying
 											
 											|| this.l9e_1.includes('31345722127361')
 											|| this.l9e_1.includes('31345722127375')
 											|| this.l9e_1.includes('31345722127346')
 											
+											|| this.l9e_1.includes('31345722125527') // crit
+											
+											|| this.l9e_1.includes('31345722130262') // moving
+											|| this.l9e_1.includes('31345722130246') // staying
+											|| this.l9e_1.includes('31345722130277') // start moving
 										) {
 											this.l9e_1 = this.l9e_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'))
 										}
