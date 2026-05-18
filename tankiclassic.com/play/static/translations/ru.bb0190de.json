@@ -49,6 +49,7 @@
   "BATTLESELECT_FREE_USER_PLACE_LABEL": "Пусто",
   "BATTLESELECT_COPY_BATTLE_LINK": "Скопировать ссылку",
   "BATTLESELECT_PLAY": "В бой!",
+  "BATTLESELECT_EQUIPMENT_NOT_MATCH_CONSTRAINTS_MESSAGE": "Эта битва требует наличия определённого вооружения для участия. Ваш танк не соответствует правилам формата. <a href = 'https://en.tankiwiki.com/Format_Battles' target =' _ blank '><u>Детали</u></a>.",
   "PLAY_BUTTON": "Играть",
   "NEWS_BUTTON": "Новости",
   "CLAN_CHAT_BUTTON": "Чат клана",
@@ -88,5 +89,42 @@
   "SETTINGS_CONTROLS_INPUTMODE_KEYBOARD": "Клавиатура",
   "SETTINGS_CONTROLS_INPUTMODE_GAMEPAD": "Геймпад",
   "SETTINGS_CONTROLS_INPUTMODE_TOUCHSCREEN": "Тачскрин",
-  "MODAL_ACTION_NEED_PREMIUM": "Необходим премиум"
+  "MODAL_ACTION_NEED_PREMIUM": "Необходим премиум",
+  "MISSIONS_CHALLENGE_PROGRESS_TITLE": "Звезды",
+  "MISSIONS_CHALLENGE_TIER_LEVEL": "%0 уровень",
+  "MISSIONS_CHALLENGE_TIER_LEVEL_TITLE": "Уровень",
+
+  "BATTLE_MESSAGE_BLUE_TEAM_NAME": "Мы",
+  "BATTLE_MESSAGE_RED_TEAM_NAME": "Враги",
+  "BATTLE_MESSAGE_UNKNOWN_TEAM_NAME": "",
+  "BATTLE_MESSAGE_CTF_DELIVERED_FLAG": "%0 доставил флаг",
+  "BATTLE_MESSAGE_CTF_TAKEN_FLAG": "%0 взял флаг",
+  "BATTLE_MESSAGE_RUGBY_FACE_OFF": "The ball is in the game",
+  "BATTLE_MESSAGE_RUGBY_TAKE_BALL": "%0 has taken the ball",
+  "BATTLE_MESSAGE_RUGBY_GOAL_BLUE": "%0 have scored a goal!",
+  "BATTLE_MESSAGE_RUGBY_GOAL_RED": "%0 have scored a goal!",
+  "BATTLE_MESSAGE_DOM_BLUE_CAPTURED_POINT": "Allies have captured point %0",
+  "BATTLE_MESSAGE_DOM_RED_CAPTURED_POINT": "Enemies have captured point %0",
+  "BATTLE_MESSAGE_SGE_BLUE_CAPTURED_POINT": "Allies have captured point %0",
+  "BATTLE_MESSAGE_SGE_RED_CAPTURED_POINT": "Enemies have captured point %0",
+  "BATTLE_MESSAGE_SGE_POINT_ACTIVATED": "Attack the new point %0",
+  "BATTLE_MESSAGE_JGR_NEW_BOSS": "%0 has become the Juggernaut",
+  "BATTLE_MESSAGE_JGR_BOSS_KILLED": "%0 destroyed",
+  "BATTLE_MESSAGE_JGR_YOU_ARE_THE_BOSS": "Get ready, you're the next Juggernaut!",
+  "BATTLE_MESSAGE_TJR_NEW_RED_BOSS": "Enemy Juggernaut has joined the battle",
+  "BATTLE_MESSAGE_TJR_NEW_BLUE_BOSS": "Ally Juggernaut has joined the battle",
+  "BATTLE_MESSAGE_TJR_RED_BOSS_KILLED": "Enemy Juggernaut has been destroyed",
+  "BATTLE_MESSAGE_TJR_BLUE_BOSS_KILLED": "Ally Juggernaut has been destroyed",
+  "BATTLE_MESSAGE_ASSAULT_DELIVER_FLAG": "%0 has delivered the flag",
+  "BATTLE_MESSAGE_ASSAULT_PICK_FLAG": "%0 has taken the flag",
+
+  "BATTLE_AUTO_PAUSE_TITLE": "Auto pause",
+  "BATTLE_AUTO_PAUSE_REMAINING_TIME_LABEL": "You will leave the battle in",
+
+  "dateTime": {
+    "DAY": "d",
+    "HOUR": "h",
+    "MINUTE": "m",
+    "SECOND": "s"
+  }
 }

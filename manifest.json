@@ -18,7 +18,6 @@
     "web_accessible_resources": [{
         "resources": [
             "patched_main.js",
-            "patched_main2.js",
             "patched_main.min.js",
             "proxy.js",
             "fonts/*.woff2",

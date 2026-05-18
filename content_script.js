@@ -129,7 +129,7 @@
                     if (value && TARGET_REGEX.test(value) && !patchedMain) {
                         patchedMain = true;
                         
-                        const extensionUrl = chrome.runtime.getURL('patched_main2.js');
+                        const extensionUrl = chrome.runtime.getURL('patched_main.js');
                         descriptor.set.call(this, extensionUrl);
                         return;
                     }
@@ -150,7 +150,7 @@
                     const src = node.getAttribute('src');
                     if (TARGET_REGEX.test(src) && !patchedMain) {
                         patchedMain = true;
-                        node.src = chrome.runtime.getURL('patched_main2.js');
+                        node.src = chrome.runtime.getURL('patched_main.js');
                     }
                 }
             });
