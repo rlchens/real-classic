@@ -137,7 +137,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 	const realWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
 	
 	const htmlBackground = `
+		:root {
+			--browser-zoom-factor: 1;
+		}
+
+		* {
+			font-family: 'Myriad', sans-serif !important;
+			letter-spacing: 0.0025rem !important;
+		}
+	
 		html {
+			background-size: calc(var(--browser-zoom-factor) * 10vw), calc(var(--browser-zoom-factor) * 10vw) !important;
 			width: 100%;
 			height: 100%;
 			padding: 0;
@@ -151,7 +161,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			transform: translateX(-50%);
 			top: 50%;
 			font-family: 'Military', sans-serif !important;
-			font-size: 2rem !important;
+			font-size: calc(var(--browser-zoom-factor) * 2vw) !important;
 			background: url(/play/static/images/grey_texture.bc428d8e.jpg) !important;
 			background-size: cover !important;
 			background-position: center !important;
@@ -163,7 +173,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 			-webkit-text-stroke: none !important;
 			text-shadow: none !important;
 			filter: drop-shadow(0px 0.09375em 0px black) brightness(1.9) !important;
-			margin: -0.3rem 0.8rem 0 0.8rem !important;
+			margin: calc(var(--browser-zoom-factor) * -0.3vw) calc(var(--browser-zoom-factor) * 0.8vw) 0 calc(var(--browser-zoom-factor) * 0.8vw) !important;
 		}
 	`;
 	const htmlStyleElement = document.createElement('style');
@@ -905,30 +915,6 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 	loadBitmapsConcurrently(assets, bitmapConfig, 4).then(bitmaps => {
 	  Object.assign(realWindow, bitmaps);
 	  document.querySelector('.loading-start').remove();
-	  /* CSS MAIN STYLES */
-	  (function() {
-			
-			'use strict';
-			
-			const css = `
-				:root {
-					--browser-zoom-factor: 1;
-				}
-
-				* {
-					font-family: 'Myriad', sans-serif !important;
-					letter-spacing: 0.0025rem !important;
-				}
-
-				html {
-					background-size: calc(var(--browser-zoom-factor) * 10vw), calc(var(--browser-zoom-factor) * 10vw) !important;
-				}
-			`;
-
-			const cssStyles = document.createElement('style');
-			cssStyles.textContent = css;
-			(document.head || document.documentElement).appendChild(cssStyles);
-	  })();
 	  /* CSS ANIMATIONS */
 	  (function() {
 			
@@ -2789,7 +2775,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 					font-size: 0.85rem !important;
 				}
 
-				.css-1k80lry, .css-9929eq {
+				.css-14zw4s9, .css-rz1wv0 {
 					text-shadow: rgb(170, 170, 170) calc(var(--browser-zoom-factor) * 0.05vw) calc(var(--browser-zoom-factor) * 0.05vw) 0px, 
 					rgb(170, 170, 170) calc(var(--browser-zoom-factor) * -0.05vw) calc(var(--browser-zoom-factor) * 0.05vw) 0px, 
 					rgb(170, 170, 170) calc(var(--browser-zoom-factor) * 0.05vw) calc(var(--browser-zoom-factor) * -0.05vw) 0px, 
@@ -3321,6 +3307,22 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 				
 				.css-18aiw1d {
 					display: none !important;
+				}
+				
+				.css-1dnq87q > div {
+					height: calc(var(--browser-zoom-factor) * 0.15vw) !important;
+				}
+				
+				.css-1lwa86e {
+					border-width: calc(var(--browser-zoom-factor) * 0.1vw) !important;
+				}
+				
+				.css-sl7uo0 {
+					max-height: 25rem !important;
+				}
+				
+				.css-1w0mhl5 > .css-0 {
+					color: #47ff69;
 				}
 			`;
 
@@ -196361,7 +196363,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									} else {
 										window.__ATLAS_RECTS__.push(rect);
 									}
-								}(t, n.p80_1, n.l80_1, i),
+								}(t, n.p80_1, n.l80_1, i, n.m80_1),
 								i
 							}(t, n, cn(Xt(Vu)))
 						}
@@ -202100,9 +202102,13 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												// summer
 												n.includes('30023173712307/watch_to.3ds')
 												|| n.includes('30023173712307/tower.3ds')
+												|| n.includes('30023201662612/nubu_4.3ds')
 												|| n.includes('30023201751631/nubu_6.3ds')
 												|| n.includes('30023202025674/nubu_9.3ds')
 												|| n.includes('30023171266676/smhouse5.3ds')
+												|| n.includes('30023171266676/gasoline.3ds')
+												|| n.includes('30023172315126/smhouse2.3ds')
+												|| n.includes('30023172315126/smhouse3.3ds')
 												|| n.includes('30023173646166/brid_2.3ds')
 												|| n.includes('30023173646166/brid_7.3ds')
 												|| n.includes('30023173646166/brid_6.3ds')
@@ -202110,7 +202116,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												|| n.includes('30023173646166/brid_3.3ds')
 												|| n.includes('30023173646166/brid_4.3ds')
 												|| n.includes('30023173646166/brid_1.3ds')
+												|| n.includes('30023173646166/brid_1_1.3ds')
+												|| n.includes('30023173646166/brid_1_2.3ds')
 												|| n.includes('30023173646166/brid_1_3.3ds')
+												|| n.includes('30023202170662/brid_5.3ds')
+												|| n.includes('30023202170662/brid_3.3ds')
+												|| n.includes('30023202170662/brid_4.3ds')
 												|| n.includes('30023202076501/tunnel_1.3ds')
 												|| n.includes('30023202076501/tunnel_2.3ds')
 												|| n.includes('30023202076501/ow_t.3ds')
@@ -202118,9 +202129,12 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												|| n.includes('30023203466004/tube_2.3ds')
 												|| n.includes('30023203466004/tube_3.3ds')
 												|| n.includes('30023203466004/tube_4.3ds')
+												|| n.includes('30023203466004/brok_tank.3ds')
+												|| n.includes('30023203466004/post.3ds')
 												
 												|| n.includes('30023173136173/wall_gate.3ds')
 												|| n.includes('30023173136173/tower_roof.3ds')
+												|| n.includes('30023173136173/tower_str.3ds')
 												|| n.includes('30023173136173/wall.3ds')
 												|| n.includes('30023173136173/wall_short.3ds')
 												|| n.includes('30023173136173/wall_end_1.3ds')
@@ -202130,6 +202144,7 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												|| n.includes('30023173136173/wall_broken_1.3ds')
 												|| n.includes('30023173136173/wall_broken_2.3ds')
 												|| n.includes('30023173136173/wlb_rise.3ds')
+												|| n.includes('30023173136173/tower_corner.3ds')
 												|| n.includes('30023172700363/fahwerk1.3ds')
 												|| n.includes('30023172730746/fahwerk2.3ds')
 												|| n.includes('30023201410562/nubu_1.3ds')
@@ -202148,14 +202163,9 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												|| n.includes('30023203257226/border.3ds')
 												|| n.includes('30023203257226/wallend.3ds')
 												|| n.includes('30023203257226/wallbs.3ds')
-												//|| n.includes('30023164056106/bridge_1.3ds')
 												
 												|| n.includes('30023204016674/tree01.3ds')
 												|| n.includes('30023204016674/tree02.3ds')
-												//|| n.includes('30023164056106/bridge_1_1.3ds')
-												//|| n.includes('30023164056106/bridge_2.3ds')
-												//|| n.includes('30023164056106/bridge_3.3ds')
-												//|| n.includes('30023164056106/bridge_5.3ds')
 												|| n.includes('30023204035440/vilhou_1.3ds')
 												|| n.includes('30023204035440/vilhou_2.3ds')
 												|| n.includes('30023204035440/vilhou_3.3ds')
@@ -202176,13 +202186,17 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												|| n.includes('30023201511745/nubu_12.3ds')
 												|| n.includes('30023201547441/nubu_14.3ds')
 												
+												|| n.includes('30023173604610/hang_1.3ds')
+												|| n.includes('30023173604610/hang_2.3ds')
+												|| n.includes('30023173604610/hang_3.3ds')
+												
+												|| n.includes('30023164141766/h_roofc.3ds')
+												
+												|| n.includes('30037773037170/up_rock1.3ds')
+												
 												// winter
 												|| n.includes('30023173724731/watch_to.3ds')
 												|| n.includes('30023173724731/tower.3ds')
-												|| n.includes('30023201662612/nubu_4.3ds')
-												|| n.includes('30023201770274/nubu_6.3ds')
-												|| n.includes('30023202034222/nubu_9.3ds')
-												|| n.includes('30023171316730/smhouse5.3ds')
 												|| n.includes('30023173674746/brid_2.3ds')
 												|| n.includes('30023173674746/brid_7.3ds')
 												|| n.includes('30023173674746/brid_6.3ds')
@@ -202198,6 +202212,91 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 												|| n.includes('30023203505745/tube_2.3ds')
 												|| n.includes('30023203505745/tube_3.3ds')
 												|| n.includes('30023203505745/tube_4.3ds')
+												
+												|| n.includes('30023201626144/nubu_2.3ds')
+												|| n.includes('30023201653225/nubu_3.3ds')
+												|| n.includes('30023201672476/nubu_4.3ds')
+												|| n.includes('30023201733633/nubu_5.3ds')
+												|| n.includes('30023201770274/nubu_6.3ds')
+												|| n.includes('30023202016425/nubu_8.3ds')
+												|| n.includes('30023202034222/nubu_9.3ds')
+												|| n.includes('30023201500722/nubu_10.3ds')
+												|| n.includes('30023201524607/nubu_12.3ds')
+												|| n.includes('30023201575270/nubu_14.3ds')
+												
+												|| n.includes('30023172141500/wall_e1.3ds')
+												|| n.includes('30023172141500/wall_e2.3ds')
+												|| n.includes('30023172141500/wall_cr.3ds')
+												|| n.includes('30023172141500/wall_st.3ds')
+												|| n.includes('30023172141500/wall_3w.3ds')
+												|| n.includes('30023172141500/wall_e3.3ds')
+												
+												|| n.includes('30023204057557/vilhou_1.3ds')
+												|| n.includes('30023204057557/vilhou_2.3ds')
+												|| n.includes('30023204057557/vilhou_3.3ds')
+												|| n.includes('30023204057557/vilhou_4.3ds')
+												
+												|| n.includes('30023171406133/cliff_0.3ds')
+												|| n.includes('30023171406133/cliff_2.3ds')
+												|| n.includes('30023171406133/cliff_4.3ds')
+												|| n.includes('30023171406133/cliff_c2.3ds')
+												|| n.includes('30023171406133/cliff_ri.3ds')
+												|| n.includes('30023171406133/cliff_r2.3ds')
+												|| n.includes('30023171406133/cliff_cor.3ds')
+												
+												|| n.includes('30023203266657/border.3ds')
+												|| n.includes('30023203266657/wallend.3ds')
+												|| n.includes('30023203266657/wallbs.3ds')
+												
+												|| n.includes('30023204022637/tree01.3ds')
+												|| n.includes('30023204022637/tree02.3ds')
+												
+												|| n.includes('30023171344033/fab_tow.3ds')
+												|| n.includes('30023171344033/fab_tow2.3ds')
+												
+												|| n.includes('30060462661450/rise_2.3ds')
+												|| n.includes('30060462661450/rise_3.3ds')
+												|| n.includes('30060462661450/rise_5.3ds')
+												|| n.includes('30060462661450/slope_1.3ds')
+												|| n.includes('30060462661450/slope_2.3ds')
+												
+												|| n.includes('30023172330531/smhouse2.3ds')
+												|| n.includes('30023172330531/smhouse3.3ds')
+												|| n.includes('30023171316730/smhouse5.3ds')
+												|| n.includes('30023171316730/gasoline.3ds')
+												
+												|| n.includes('30023173646166/brid_1_1.3ds')
+												|| n.includes('30023173646166/brid_1_2.3ds')
+												|| n.includes('30023202170662/brid_5.3ds')
+												|| n.includes('30023202170662/brid_3.3ds')
+												|| n.includes('30023202170662/brid_4.3ds')
+												|| n.includes('30023203466004/brok_tank.3ds')
+												|| n.includes('30023203466004/post.3ds')
+												
+												|| n.includes('30023173136173/wall_gate.3ds')
+												|| n.includes('30023173136173/tower_roof.3ds')
+												|| n.includes('30023173136173/tower_str.3ds')
+												|| n.includes('30023173136173/wall.3ds')
+												|| n.includes('30023173136173/wall_short.3ds')
+												|| n.includes('30023173136173/wall_end_1.3ds')
+												|| n.includes('30023173136173/wall_end_2.3ds')
+												|| n.includes('30023173136173/wall_cor_in.3ds')
+												|| n.includes('30023173136173/wall_cor_out.3ds')
+												|| n.includes('30023173136173/wall_broken_1.3ds')
+												|| n.includes('30023173136173/wall_broken_2.3ds')
+												|| n.includes('30023173136173/wlb_rise.3ds')
+												|| n.includes('30023173136173/tower_corner.3ds')
+												|| n.includes('30023172700363/fahwerk1.3ds')
+												|| n.includes('30023172730746/fahwerk2.3ds')
+												|| n.includes('30023201410562/nubu_1.3ds')
+																								
+												|| n.includes('30023173604610/hang_1.3ds')
+												|| n.includes('30023173604610/hang_2.3ds')
+												|| n.includes('30023173604610/hang_3.3ds')
+												
+												|| n.includes('30023164141766/h_roofc.3ds')
+												
+												|| n.includes('30037773037170/up_rock1.3ds')
 											) {
 												n = n.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
 											}
@@ -202250,30 +202349,213 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 										if (JSON.parse(localStorage.getItem('oldGraphics'))) {
 											
 											if (
-												this.z95_1.includes('302/31552412441027') // aleksandrovsk summer
-												|| this.z95_1.includes('41/30023204653562') // aleksandrovsk space
+												this.z95_1.includes('41/30023204653562') // aleksandrovsk space
+												|| this.z95_1.includes('302/31552412441027') // aleksandrovsk summer
+												|| this.z95_1.includes('43/30023205751206') // aleksandrovsk winter
 												
 												|| this.z95_1.includes('146/30023206047514') // arena summer
+												|| this.z95_1.includes('162/30023206154173') // arena winter
 												
 												|| this.z95_1.includes('45/30023206531045') // atra summer
+												|| this.z95_1.includes('0/30023207007011') // atra winter
 												
 												|| this.z95_1.includes('1/31552413301757') // barda summer
 												|| this.z95_1.includes('340/30023207230033') // barda space
+												|| this.z95_1.includes('262/30023210265572') // barda winter
 												
 												|| this.z95_1.includes('41/31552413622250') // berlin summer
+												|| this.z95_1.includes('364/30023212342673') // berlin space
+												|| this.z95_1.includes('312/30023213143660') // berlin winter
+												
+												|| this.z95_1.includes('236/31552414207465') // bobruisk summer
+												|| this.z95_1.includes('54/30023213461561') // bobruisk space
+												|| this.z95_1.includes('333/30023214157352') // bobruisk winter
+												
+												|| this.z95_1.includes('170/31552414322561') // boombox summer
+												|| this.z95_1.includes('120/30023214345055') // boombox space
+												|| this.z95_1.includes('347/30023214675422') // boombox winter
+												
+												|| this.z95_1.includes('217/31552414456351') // brest summer
+												|| this.z95_1.includes('205/30023215450736') // brest space
+												|| this.z95_1.includes('352/30023216606346') // brest winter
+												
+												|| this.z95_1.includes('52/31552414614171') // bridges summer
+												|| this.z95_1.includes('252/30023217040313') // bridges space
+												|| this.z95_1.includes('366/30023217547354') // bridges winter
+												
+												|| this.z95_1.includes('144/30023217712312') // camp
+												|| this.z95_1.includes('175/30023220166324') // camp winter
+												
+												|| this.z95_1.includes('51/30023220351647') // canyon
+												|| this.z95_1.includes('24/30023220762077') // canyon winter
+												
+												|| this.z95_1.includes('334/31552415015432') // chernobyl summer
+												|| this.z95_1.includes('50/30023221517011') // chernobyl space
+												|| this.z95_1.includes('5/30023222561404') // chernobyl winter
 												
 												|| this.z95_1.includes('44/30023223215516') // cologne
+												
+												|| this.z95_1.includes('150/30023224502555') // combe
+												|| this.z95_1.includes('304/30023224674614') // combe winter
+												
+												|| this.z95_1.includes('257/31552415133226') // courage summer
+												|| this.z95_1.includes('145/30023226510527') // courage space
 											
+												|| this.z95_1.includes('41/31552415250327') // cross summer
+												|| this.z95_1.includes('77/30023227172626') // cross space
+												
+												|| this.z95_1.includes('30/30023230043250') // deathtrack summer
+												|| this.z95_1.includes('373/30023230342255') // deathtrack space
+												
+												|| this.z95_1.includes('50/30023231042262') // deck 9
+												
+												|| this.z95_1.includes('261/31552415351132') // desert summer
+												|| this.z95_1.includes('366/30023231521655') // desert space
+												
+												|| this.z95_1.includes('63/30023232012547') // duality
+												
+												|| this.z95_1.includes('35/30023232341705') // duel
+												
+												|| this.z95_1.includes('131/31553131417340') // dusseldorf summer
+												|| this.z95_1.includes('365/30023233341104') // dusseldorf space
+												
+												|| this.z95_1.includes('146/30023234661616') // edinburg
+												
+												|| this.z95_1.includes('276/30023235732370') // esplanada
+												
+												|| this.z95_1.includes('4/30023236307337') // factory
+												
+												|| this.z95_1.includes('46/30023236630075') // farm
+												
+												|| this.z95_1.includes('135/31552415531042') // forest summer
+												|| this.z95_1.includes('37/30023237420526') // forest space
+												
+												|| this.z95_1.includes('17/30023240045200') // fort knox
+												
+												|| this.z95_1.includes('157/31552415643116') // future
+												|| this.z95_1.includes('137/30040002170721') // future space
+												
+												|| this.z95_1.includes('161/30023242320272') // garder
+												
+												|| this.z95_1.includes('214/30023242573447') // gravity
+												
+												|| this.z95_1.includes('204/30023243112204') // gubakha
+												
+												|| this.z95_1.includes('255/31552416026264') // highland summer
+												|| this.z95_1.includes('75/30023245012560') // highland space
+												
+												|| this.z95_1.includes('254/31552416137077') // highways summer
+												|| this.z95_1.includes('332/30023246506771') // highways space
+												
+												|| this.z95_1.includes('163/30023247143430') // hill
+												
+												|| this.z95_1.includes('153/31552416266652') // industrial zone summer
+												|| this.z95_1.includes('152/30023247560646') // industrial zone space
+												
+												|| this.z95_1.includes('74/30023252200472') // island
+												
+												|| this.z95_1.includes('344/30023253354466') // kolhoz summer
+												|| this.z95_1.includes('0/30023253570700') // kolhoz space
+												
+												|| this.z95_1.includes('256/31552417003650') // kungur summer
+												|| this.z95_1.includes('113/30023254354052') // kungur space
+												
+												|| this.z95_1.includes('240/31552417207115') // lost temple summer
+												|| this.z95_1.includes('366/30023257355235') // lost temple space
+												
+												|| this.z95_1.includes('17/30023260124011') // madness
+												
+												|| this.z95_1.includes('60/30023260267241') // magadan
+												
+												|| this.z95_1.includes('335/31552417362430') // magistral summer
+												|| this.z95_1.includes('177/30023261012457') // magistral space
+												
+												|| this.z95_1.includes('267/31552417540633') // massacre summer
+												|| this.z95_1.includes('47/30040001251557') // massacre space
+												
+												|| this.z95_1.includes('271/31552417655521') // molotov summer
+												|| this.z95_1.includes('363/30023322230137') // molotov space
+												
+												|| this.z95_1.includes('333/30023323154000') // monte-carlo
+												
+												|| this.z95_1.includes('50/30023325350211') // noise
+												
+												|| this.z95_1.includes('371/30023326157237') // novel
+												
+												|| this.z95_1.includes('20/30023327504132') // opposition
+												
+												|| this.z95_1.includes('7/31552420063313') // osa summer
+												|| this.z95_1.includes('142/30023330375137') // osa space
+												
+												|| this.z95_1.includes('102/31552420213653') // parma summer
+												|| this.z95_1.includes('20/30023331623773') // parma space
+												
+												|| this.z95_1.includes('151/30023332354634') // pass
+												
 												|| this.z95_1.includes('63/30023334330564') // ping-pong summer
 												|| this.z95_1.includes('306/30023334503250') // ping-pong winter
+												
+												|| this.z95_1.includes('133/31552420325057') // polygon summer
+												|| this.z95_1.includes('364/30023335232756') // polygon space
+												
+												|| this.z95_1.includes('116/31552420501604') // red alert summer
+												|| this.z95_1.includes('371/30023337513542') // red alert space
+												
+												|| this.z95_1.includes('370/30023340620056') // rift
+												
+												|| this.z95_1.includes('0/31552420652106') // rio summer
+												|| this.z95_1.includes('357/30023341612334') // rio space
+												
+												|| this.z95_1.includes('331/31552421005323') // sandal summer
+												|| this.z95_1.includes('327/30023342757254') // sandal space
+												
+												|| this.z95_1.includes('326/31552421161640') // sandbox summer
+												|| this.z95_1.includes('27/30026243132232') // sandbox space
+												
+												|| this.z95_1.includes('252/30370653120334') // sandbox mm summer
+												
+												|| this.z95_1.includes('164/30040002722334') // scope summer
+												|| this.z95_1.includes('7/30050167746761') // scope space
+												
+												|| this.z95_1.includes('263/31552421357667') // serpuhov summer
+												|| this.z95_1.includes('176/30023347020365') // serpuhov space
+												
+												|| this.z95_1.includes('253/30023351102570') // short bridge
+												
+												|| this.z95_1.includes('51/31552421515041') // siege summer
+												|| this.z95_1.includes('222/30023351502605') // siege space
 												
 												|| this.z95_1.includes('365/31552421666543') // silence summer
 												|| this.z95_1.includes('4/30023355061311') // silence winter
 												|| this.z95_1.includes('102/30125767471417') // silence space
 												
-												|| this.z95_1.includes('157/31552415643116') // future
-												|| this.z95_1.includes('137/30040002170721') // future space
+												|| this.z95_1.includes('167/31552422054330') // skylark summer
+												|| this.z95_1.includes('12/30023356310045') // skylark space
 												
+												|| this.z95_1.includes('143/30040002545636') // skyscrapers
+												
+												|| this.z95_1.includes('224/31552422231263') // solikamsk summer
+												|| this.z95_1.includes('342/30023357310125') // solikamsk space
+												
+												|| this.z95_1.includes('165/30023360127765') // stadium
+												
+												|| this.z95_1.includes('64/30023360502355') // station
+												
+												|| this.z95_1.includes('341/30023361221167') // subway
+												
+												|| this.z95_1.includes('64/31552422517253') // tribute summer
+												|| this.z95_1.includes('250/30023363667137') // tribute space
+												
+												|| this.z95_1.includes('200/30023365351314') // valley
+												
+												|| this.z95_1.includes('201/30023365756375') // wave
+												
+												|| this.z95_1.includes('110/31552422722425') // wolfenstein summer
+												|| this.z95_1.includes('21/30023366536465') // wolfenstein space
+												
+												|| this.z95_1.includes('135/30023370157620') // year 2042 summer
+												
+												|| this.z95_1.includes('216/30023371201433') // zone
 											) {
 												window.__CHANGE_TO_OLD__ = true
 												this.z95_1 = this.z95_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'));
@@ -202297,6 +202579,175 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 													}
 												}
 												
+												if (this.z95_1.includes('144/30023217712312')) {
+													window.__CURRENT_MAP__ = 'camp'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												if (this.z95_1.includes('175/30023220166324')) {
+													window.__CURRENT_MAP__ = 'camp_winter'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsWinter`;
+													}
+												}
+												
+												if (this.z95_1.includes('51/30023220351647')) {
+													window.__CURRENT_MAP__ = 'canyon'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												if (this.z95_1.includes('24/30023220762077')) {
+													window.__CURRENT_MAP__ = 'canyon_winter'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsWinter`;
+													}
+												}
+												
+												if (this.z95_1.includes('257/31552415133226')) {
+													window.__CURRENT_MAP__ = 'courage_summer'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('145/30023226510527')) {
+													window.__CURRENT_MAP__ = 'courage_space'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('50/30023231042262')) {
+													window.__CURRENT_MAP__ = 'deck9'
+												}
+												
+												if (this.z95_1.includes('63/30023232012547')) {
+													window.__CURRENT_MAP__ = 'duality'
+												}
+												
+												if (this.z95_1.includes('276/30023235732370')) {
+													window.__CURRENT_MAP__ = 'esplanade'
+												}
+												
+												if (this.z95_1.includes('255/31552416026264')) {
+													window.__CURRENT_MAP__ = 'highland_summer'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('75/30023245012560')) {
+													window.__CURRENT_MAP__ = 'highland_space'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('153/31552416266652')) {
+													window.__CURRENT_MAP__ = 'industrial_zone_summer'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												if (this.z95_1.includes('152/30023247560646')) {
+													window.__CURRENT_MAP__ = 'industrial_zone_space'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('50/30023325350211')) {
+													window.__CURRENT_MAP__ = 'noise'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('371/30023326157237')) {
+													window.__CURRENT_MAP__ = 'novel'
+												}
+												
+												if (this.z95_1.includes('20/30023327504132')) {
+													window.__CURRENT_MAP__ = 'opposition'
+												}
+												
+												if (this.z95_1.includes('151/30023332354634')) {
+													window.__CURRENT_MAP__ = 'pass'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('133/31552420325057')) {
+													window.__CURRENT_MAP__ = 'polygon_summer'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												if (this.z95_1.includes('364/30023335232756')) {
+													window.__CURRENT_MAP__ = 'polygon_space'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												if (this.z95_1.includes('0/31552420652106')) {
+													window.__CURRENT_MAP__ = 'rio_summer'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												if (this.z95_1.includes('357/30023341612334')) {
+													window.__CURRENT_MAP__ = 'rio_space'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('164/30040002722334')) {
+													window.__CURRENT_MAP__ = 'scope_summer'
+												}
+												if (this.z95_1.includes('7/30050167746761')) {
+													window.__CURRENT_MAP__ = 'scope_space'
+												}
+												
+												if (this.z95_1.includes('143/30040002545636')) {
+													window.__CURRENT_MAP__ = 'skyscrapers'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('165/30023360127765')) {
+													window.__CURRENT_MAP__ = 'stadium'
+												}
+												
+												if (this.z95_1.includes('64/30023360502355')) {
+													window.__CURRENT_MAP__ = 'station'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
+												
+												if (this.z95_1.includes('341/30023361221167')) {
+													window.__CURRENT_MAP__ = 'subway'
+												}
+												
+												if (this.z95_1.includes('200/30023365351314')) {
+													window.__CURRENT_MAP__ = 'valley'
+												}
+												
+												if (this.z95_1.includes('135/30023370157620')) {
+													window.__CURRENT_MAP__ = 'year_2042'
+												}
+												
+												if (this.z95_1.includes('216/30023371201433')) {
+													window.__CURRENT_MAP__ = 'zone'
+													if (this.a96_1.includes('towerAtlas')) {
+														this.z95_1 = `${localStorage.getItem('__PATCH_ASSET_BASE__')}assets/propsSummer`;
+													}
+												}
 											} else {
 												window.__CHANGE_TO_OLD__ = false
 												if (this.a96_1.includes('towerAtlas')) {
@@ -203224,60 +203675,61 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 										n.t9d_1 = null == _ ? 1 : _;
 										var o = this.k9e_1.m8g_1.q8g_1;
 										
-										if (this.l9e_1.includes('31345722125533') // звуки ненужные
-											|| this.l9e_1.includes('31345722125657')
-											|| this.l9e_1.includes('30653771423445')
-											|| this.l9e_1.includes('31345722125727')
-											|| this.l9e_1.includes('31345722122142')
-											|| this.l9e_1.includes('31345722116231')
-											|| this.l9e_1.includes('31345722114575')
-											|| this.l9e_1.includes('31345722114571')
-											|| this.l9e_1.includes('31345722114677')
-											|| this.l9e_1.includes('31345722114674')
-											|| this.l9e_1.includes('31345722120537')
-											|| this.l9e_1.includes('31345722120533')
+										if (this.l9e_1.includes('230/31345722125533') // звуки ненужные
+											|| this.l9e_1.includes('227/31345722125657')
+											|| this.l9e_1.includes('177/30653771423445')
+											|| this.l9e_1.includes('351/31345722125727')
+											|| this.l9e_1.includes('350/31345722122142')
+											|| this.l9e_1.includes('344/31345722116231')
+											|| this.l9e_1.includes('341/31345722114575')
+											|| this.l9e_1.includes('340/31345722114571')
+											|| this.l9e_1.includes('343/31345722114677')
+											|| this.l9e_1.includes('342/31345722114674')
+											|| this.l9e_1.includes('346/31345722120537')
+											|| this.l9e_1.includes('345/31345722120533')
 											
-											|| this.l9e_1.includes('31345722113067')
-											|| this.l9e_1.includes('31345722114412')
-											|| this.l9e_1.includes('31345722117051')
-											|| this.l9e_1.includes('31345722117012')
-											|| this.l9e_1.includes('31345722125730')
-											|| this.l9e_1.includes('31345722125726')
-											|| this.l9e_1.includes('31345722125631')
-											|| this.l9e_1.includes('31345722125632')
-											|| this.l9e_1.includes('30653770652065')
-											|| this.l9e_1.includes('30653770652314')
-											|| this.l9e_1.includes('30653770652475')
-											|| this.l9e_1.includes('30653770652660')
-											|| this.l9e_1.includes('30653770653041')
-											|| this.l9e_1.includes('30653770653231')
-											|| this.l9e_1.includes('30653770653416')
-											|| this.l9e_1.includes('30653770653601')
-											|| this.l9e_1.includes('30653770653764')
-											|| this.l9e_1.includes('31345722130227')
+											|| this.l9e_1.includes('22/31345722113067')
+											|| this.l9e_1.includes('370/31345722114412')
+											|| this.l9e_1.includes('562/141727/210/7/31345722117051')
+											|| this.l9e_1.includes('546/141727/210/7/31345722117051')
+											|| this.l9e_1.includes('312/31345722117012')
+											|| this.l9e_1.includes('6/31345722125730')
+											|| this.l9e_1.includes('0/31345722125726')
+											|| this.l9e_1.includes('121/31345722125631')
+											|| this.l9e_1.includes('143/31345722125632')
+											|| this.l9e_1.includes('143/30653770652065')
+											|| this.l9e_1.includes('147/30653770652314')
+											|| this.l9e_1.includes('105/30653770652475')
+											|| this.l9e_1.includes('252/30653770652660')
+											|| this.l9e_1.includes('66/30653770653041')
+											|| this.l9e_1.includes('255/30653770653231')
+											|| this.l9e_1.includes('342/30653770653416')
+											|| this.l9e_1.includes('356/30653770653601')
+											|| this.l9e_1.includes('260/30653770653764')
+											|| this.l9e_1.includes('370/31345722130227')
 											
 											
-											|| this.l9e_1.includes('31345722126165')
-											|| this.l9e_1.includes('31345722120547')
-											|| this.l9e_1.includes('31345722127145')
-											|| this.l9e_1.includes('31345722126571')
-											|| this.l9e_1.includes('31345722126256')
+											|| this.l9e_1.includes('202/31345722126165')
+											|| this.l9e_1.includes('347/31345722120547')
+											|| this.l9e_1.includes('40/31345722127145')
+											|| this.l9e_1.includes('314/31345722126571')
+											|| this.l9e_1.includes('232/31345722126256')
 											
-											|| this.l9e_1.includes('31345722130102') // moving
-											|| this.l9e_1.includes('31345722130116') // start moving
-											|| this.l9e_1.includes('31345722130066') // staying
+											|| this.l9e_1.includes('3/31345722130102') // moving
+											|| this.l9e_1.includes('367/31345722130116') // start moving
+											|| this.l9e_1.includes('355/31345722130066') // staying
 											
-											|| this.l9e_1.includes('31345722127361')
-											|| this.l9e_1.includes('31345722127375')
-											|| this.l9e_1.includes('31345722127346')
+											|| this.l9e_1.includes('234/31345722127361')
+											|| this.l9e_1.includes('231/31345722127375')
+											|| this.l9e_1.includes('317/31345722127346')
 											
-											|| this.l9e_1.includes('31345722125527') // crit
+											|| this.l9e_1.includes('144/31345722125527') // crit
 											
-											|| this.l9e_1.includes('31345722130262') // moving
-											|| this.l9e_1.includes('31345722130246') // staying
-											|| this.l9e_1.includes('31345722130277') // start moving
+											|| this.l9e_1.includes('110/31345722130262') // moving
+											|| this.l9e_1.includes('200/31345722130246') // staying
+											|| this.l9e_1.includes('150/31345722130277') // start moving
 										) {
-											this.l9e_1 = this.l9e_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE__'))
+											this.l9e_1 = this.l9e_1.replace('https://',localStorage.getItem('__PATCH_ASSET_BASE_2__'))
 										}
 										
 										if (41 === o)
@@ -421965,6 +422417,37 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 									window.__CURRENT_MAP__ === 'silence_summer'
 									|| window.__CURRENT_MAP__ === 'silence_winter'
 									|| window.__CURRENT_MAP__ === 'silence_space'
+									
+									|| window.__CURRENT_MAP__ === 'camp'
+									|| window.__CURRENT_MAP__ === 'camp_winter'
+									|| window.__CURRENT_MAP__ === 'canyon'
+									|| window.__CURRENT_MAP__ === 'canyon_winter'
+									|| window.__CURRENT_MAP__ === 'courage_summer'
+									|| window.__CURRENT_MAP__ === 'courage_space'
+									|| window.__CURRENT_MAP__ === 'deck9'
+									|| window.__CURRENT_MAP__ === 'duality'
+									|| window.__CURRENT_MAP__ === 'esplanade'
+									|| window.__CURRENT_MAP__ === 'highland_summer'
+									|| window.__CURRENT_MAP__ === 'highland_space'
+									|| window.__CURRENT_MAP__ === 'industrial_zone_summer'
+									|| window.__CURRENT_MAP__ === 'industrial_zone_space'
+									|| window.__CURRENT_MAP__ === 'noise'
+									|| window.__CURRENT_MAP__ === 'novel'
+									|| window.__CURRENT_MAP__ === 'opposition'
+									|| window.__CURRENT_MAP__ === 'pass'
+									|| window.__CURRENT_MAP__ === 'polygon_summer'
+									|| window.__CURRENT_MAP__ === 'polygon_space'
+									|| window.__CURRENT_MAP__ === 'rio_summer'
+									|| window.__CURRENT_MAP__ === 'rio_space'
+									|| window.__CURRENT_MAP__ === 'scope_summer'
+									|| window.__CURRENT_MAP__ === 'scope_space'
+									|| window.__CURRENT_MAP__ === 'skyscrapers'
+									|| window.__CURRENT_MAP__ === 'stadium'
+									|| window.__CURRENT_MAP__ === 'station'
+									|| window.__CURRENT_MAP__ === 'subway'
+									|| window.__CURRENT_MAP__ === 'valley'
+									|| window.__CURRENT_MAP__ === 'year_2042'
+									|| window.__CURRENT_MAP__ === 'zone'
 								) {
 									let uvCords = {
 										fromX: '0.9999999',
@@ -421981,7 +422464,187 @@ Z.prototype.chain=tf,Z.prototype.commit=rf,Z.prototype.next=ef,Z.prototype.plant
 											toY: '0.1953125'
 										};
 									}
-									discardBlack = 'vec2 dx = dFdx(vUV);\n\t\t\tvec2 dy = dFdy(vUV);\n\t\t\tfloat delta_max = max(dot(dx, dx), dot(dy, dy));\n\t\t\tfloat mipLevel = max(0.0, 0.5 * log2(delta_max));\n\t\t\tfloat threshold = 0.03 + clamp(mipLevel * 0.035, 0.0, 0.18);\n\t\t\tfloat brightness = (color.r + color.g + color.b) / 3.0;\n\t\t\tbool isTarget = (vUV.x >= ' + uvCords.fromX + ' && vUV.x <= ' + uvCords.toX + ' && vUV.y >= ' + uvCords.fromY + ' && vUV.y <= ' + uvCords.toY + ');\n\t\t\tbool isTerrain = (uAtlasId == 1);\n\t\t\tbool isTower = (uAtlasId == 101);\n\t\t\tif (isTower && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t\n\t\t\tif ((isTerrain && isTarget) && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t';
+									if (window.__CURRENT_MAP__ === 'canyon' || window.__CURRENT_MAP__ === 'canyon_winter') {
+										// brid_1
+										uvCords = {
+											fromX: '0.8203125',
+											toX: '0.9453125',
+											fromY: '0.8671875',
+											toY: '0.9921875'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'courage_summer') {
+										// brid_1
+										uvCords = {
+											fromX: '0.0078125',
+											toX: '0.1328125',
+											fromY: '0.023681640625',
+											toY: '0.148681640625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'courage_space') {
+										// brid_1
+										uvCords = {
+											fromX: '0.5546875',
+											toX: '0.6796875',
+											fromY: '0.8515625',
+											toY: '0.9765625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'deck9') {
+										// brid_1
+										uvCords = {
+											fromX: '0.5546875',
+											toX: '0.6796875',
+											fromY: '0.837890625',
+											toY: '0.962890625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'duality') {
+										// brid_1
+										uvCords = {
+											fromX: '0.1484375',
+											toX: '0.2734375',
+											fromY: '0.7265625',
+											toY: '0.8515625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'esplanade') {
+										// brid_1
+										uvCords = {
+											fromX: '0.0078125',
+											toX: '0.1328125',
+											fromY: '0.7265625',
+											toY: '0.8515625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'industrial_zone_summer') {
+										// brid_1
+										uvCords = {
+											fromX: '0.5390625',
+											toX: '0.6640625',
+											fromY: '0.8671875',
+											toY: '0.9921875'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'industrial_zone_space') {
+										// brid_1
+										uvCords = {
+											fromX: '0.1484375',
+											toX: '0.2734375',
+											fromY: '0.0703125',
+											toY: '0.1953125'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'noise') {
+										// brid_1
+										uvCords = {
+											fromX: '0.5390625',
+											toX: '0.6640625',
+											fromY: '0.8671875',
+											toY: '0.9921875'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'novel') {
+										// brid_1
+										uvCords = {
+											fromX: '0.1484375',
+											toX: '0.2734375',
+											fromY: '0.8671875',
+											toY: '0.9921875'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'opposition') {
+										// brid_1
+										uvCords = {
+											fromX: '0.2890625',
+											toX: '0.4140625',
+											fromY: '0.7265625',
+											toY: '0.8515625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'polygon_summer') {
+										// brid_1
+										uvCords = {
+											fromX: '0.4140625',
+											toX: '0.5390625',
+											fromY: '0.4609375',
+											toY: '0.5859375'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'polygon_space') {
+										// brid_1
+										uvCords = {
+											fromX: '0.5390625',
+											toX: '0.6640625',
+											fromY: '0.5859375',
+											toY: '0.7109375'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'scope_summer') {
+										// brid_1
+										uvCords = {
+											fromX: '0.4140625',
+											toX: '0.5390625',
+											fromY: '0.851806640625',
+											toY: '0.976806640625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'scope_space') {
+										// brid_1
+										uvCords = {
+											fromX: '0.0078125',
+											toX: '0.1328125',
+											fromY: '0.586181640625',
+											toY: '0.711181640625'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'stadium') {
+										// brid_1
+										uvCords = {
+											fromX: '0.0078125',
+											toX: '0.1328125',
+											fromY: '0.453125',
+											toY: '0.703125'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'station') {
+										// brid_1
+										uvCords = {
+											fromX: '0.6953125',
+											toX: '0.8203125',
+											fromY: '0.8671875',
+											toY: '0.9921875'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'subway') {
+										// brid_1
+										uvCords = {
+											fromX: '0.2734375',
+											toX: '0.3984375',
+											fromY: '0.8671875',
+											toY: '0.9921875'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'valley') {
+										// brid_1
+										uvCords = {
+											fromX: '0.0078125',
+											toX: '0.1328125',
+											fromY: '0.453125',
+											toY: '0.703125'
+										};
+									}
+									if (window.__CURRENT_MAP__ === 'year_2042') {
+										// brid_1
+										uvCords = {
+											fromX: '0.4296875',
+											toX: '0.5546875',
+											fromY: '0.3359375',
+											toY: '0.4609375'
+										};
+									}
+									discardBlack = 'vec2 dx = dFdx(vUV);\n\t\t\tvec2 dy = dFdy(vUV);\n\t\t\tfloat delta_max = max(dot(dx, dx), dot(dy, dy));\n\t\t\tfloat mipLevel = max(0.0, 0.5 * log2(delta_max));\n\t\t\tfloat threshold = 0.03 + clamp(mipLevel * 0.035, 0.0, 0.18);\n\t\t\tfloat brightness = (color.r + color.g + color.b) / 3.0;\n\t\t\tbool isTarget = (vUV.x >= ' + uvCords.fromX + ' && vUV.x <= ' + uvCords.toX + ' && vUV.y >= ' + uvCords.fromY + ' && vUV.y <= ' + uvCords.toY + ');\n\t\t\tbool isTerrain = (uAtlasId == 1);\n\t\t\tbool isTerrain2 = (uAtlasId == 2);\n\t\t\tbool isTower = (uAtlasId == 101);\n\t\t\tif (isTower && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t\n\t\t\tif (((isTerrain || isTerrain2) && isTarget) && ((color.r < threshold && color.g < threshold && color.b < threshold) || brightness < threshold)) {\n\t\tdiscard;\n\t}\n\n\t\t\t';
 								}
 								shader = "\n\t\tuniform int uAtlasId;\n\t\t" + eq("USE_COLOR_TRANSFORM", t) + "\n\t\t" + eq("USE_SOFT_ATTENUATION", i) + "\n\n\t\tuniform sampler2D mainTexture;\n\t\tuniform float alpha;\n\t\tvarying vec2 vUV;\n\t\t\n\t\t" + u.n4o() + "\n\t\t\n\t\t#if USE_COLOR_TRANSFORM\n\t\tuniform vec4 colorOffset;\n\t\tuniform vec4 colorMultiplier;\n\t\t#endif\n\t\t\n\t\t" + Ar.i6e(e) + "\n\t\t" + zr.i6e(n) + "\n\t\t" + Cr.i6e(s) + "\n\t\t" + Tr.i6e(r) + "\n\t\t\t\t\n\t\t#if USE_SOFT_ATTENUATION\n\t\tuniform sampler2D depthTexture;\t\n\t\tuniform vec2 screenSize;\n\t\tuniform float softAttenuationInvDistance;\n\t\t\n\t\t\n\t\t\t#ifndef Z_BUFFER_LINEARIZATION_INCLUDE\n\t\t\t#define Z_BUFFER_LINEARIZATION_INCLUDE\n\t\t\t\n\t\t\tuniform vec4 zBufferParams;\n\t\t\t\n\t\t\tfloat LinearDepth(float z) {\t\t\n\t\t\t\treturn 1.0 / (zBufferParams.z * z + zBufferParams.w);\n\t\t\t}\n\t\t\t#endif //Z_BUFFER_LINEARIZATION_INCLUDE\n\t\t\n\t\t#endif\t\n\t\n\t\tvoid main() {\n\t\t\tvec4 color = texture2D(mainTexture, vUV);\n\t\t\t" + discardBlack + "\n\n\n\t\t\t\n\t\t\t" + zr.j6e("color.a") + "\n\t\t\t\n\t\t\t" + Tr.q4o() + "\n\t\t\t\n\t\t\t#if USE_COLOR_TRANSFORM\n\t\t\t\tcolor = color * colorMultiplier + colorOffset;\n\t\t\t#endif\n\t\t\t\n\t\t\t" + Ar.j6e("color") + "\n\t\t\t" + u.q4o() + "\n\t\t\tcolor.rgb *= light;\n\t\t\t\n\t\t\t#if USE_SOFT_ATTENUATION\n\t\t\t\tfloat fragDepth = LinearDepth(gl_FragCoord.z);\n\t\t\t\tfloat nonLinearSceneDepth = texture2D(depthTexture, gl_FragCoord.xy / screenSize).x;\n\t\t\t\tfloat sceneDepth = LinearDepth(nonLinearSceneDepth);\n\t\t\t\tfloat softAttenuation = clamp((sceneDepth - fragDepth) * softAttenuationInvDistance, 0.0, 1.0);\n\t\t\t\tcolor.a *= softAttenuation;\n\t\t\t#endif\n\t\t\t\n\t\t\t" + Cr.j6e("color.rgb") + "\n\t\t\t\n\t\t\tcolor.a *= alpha;\n\t\t\tgl_FragColor = color;\n\t\t}\n\t\t";
 							}
